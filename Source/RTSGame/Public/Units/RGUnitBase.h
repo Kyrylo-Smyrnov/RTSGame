@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "RGUnitBase.generated.h"
 
+class ARGPlayerController;
 class UDecalComponent;
 
 UCLASS()
@@ -17,6 +18,9 @@ class RTSGAME_API ARGUnitBase : public ACharacter
 	ARGUnitBase();
 	virtual void Tick(float DeltaTime) override;
 
+	UFUNCTION()
+	void HandleOnClicked(AActor* TouchedActor, FKey ButtonPressed);
+
 	void SetSelected(bool bIsSelected);
 
   protected:
@@ -26,5 +30,8 @@ class RTSGAME_API ARGUnitBase : public ACharacter
 	UDecalComponent* SelectionCircleDecal;
 
   private:
+	UPROPERTY()
+	ARGPlayerController* PlayerController;
+
 	bool bIsSelected = false;
 };

@@ -2,7 +2,9 @@
 
 #include "Player/RGPlayerHUD.h"
 #include "Kismet/GameplayStatics.h"
+#include "Player/RGPlayerPawn.h"
 #include "RGPlayerController.h"
+#include "Units/RGUnitBase.h"
 
 ARGPlayerHUD::ARGPlayerHUD()
 {
@@ -10,10 +12,12 @@ ARGPlayerHUD::ARGPlayerHUD()
 
 void ARGPlayerHUD::DrawHUD()
 {
-	if(bIsSelectionBoxDrawn)
+	if (bIsSelectionBoxDrawn)
 	{
 		PlayerController->GetMousePosition(SelectionBoxEndPoint.X, SelectionBoxEndPoint.Y);
-		DrawSelectionBox();
+
+		if (FVector2D::Distance(SelectionBoxStartPoint, SelectionBoxEndPoint) > 10.0f)
+			DrawSelectionBox();
 	}
 }
 
@@ -35,6 +39,19 @@ void ARGPlayerHUD::HandleLeftMouseButtonInputPressed(FVector2D MousePosition)
 void ARGPlayerHUD::HandleLeftMouseButtonInputReleased()
 {
 	bIsSelectionBoxDrawn = false;
+	
+	if (bIsSelectionBox)
+	{
+		ARGPlayerPawn* PlayerPawn = Cast<ARGPlayerPawn>(PlayerController->GetPawn());
+		if (PlayerPawn)
+		{
+			PlayerPawn->ClearSelectedEntities();
+			for(AActor* Entity : SelectedEntities)
+				PlayerPawn->AddEntityToSelected(Entity);
+			
+			bIsSelectionBox = false;
+		}
+	}
 }
 
 void ARGPlayerHUD::DrawSelectionBox()
@@ -47,4 +64,9 @@ void ARGPlayerHUD::DrawSelectionBox()
 			 SELECTION_BOX_OUTLINE_COLOR, SELECTION_BOX_OUTLINE_THICKNESS);
 	DrawLine(SelectionBoxEndPoint.X, SelectionBoxEndPoint.Y, SelectionBoxEndPoint.X, SelectionBoxStartPoint.Y,
 			 SELECTION_BOX_OUTLINE_COLOR, SELECTION_BOX_OUTLINE_THICKNESS);
+
+	bIsSelectionBox = true;
+	
+	GetActorsInSelectionRectangle(ARGUnitBase::StaticClass(), SelectionBoxStartPoint, SelectionBoxEndPoint,
+										  SelectedEntities, false, true);
 }

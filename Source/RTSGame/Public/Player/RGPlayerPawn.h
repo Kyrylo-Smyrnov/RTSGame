@@ -6,8 +6,8 @@
 #include "GameFramework/Pawn.h"
 #include "RGPlayerPawn.generated.h"
 
+class ARGPlayerController;
 class URGPlayerCameraComponent;
-class ARGUnitBase;
 
 UCLASS()
 class RTSGAME_API ARGPlayerPawn : public APawn
@@ -20,6 +20,14 @@ class RTSGAME_API ARGPlayerPawn : public APawn
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	UFUNCTION()
+	void HandleLeftMouseButtonInputPressedUninteractable();
+	
+	void AddEntityToSelected(AActor* Entity);
+	void RemoveEntityFromSelected(AActor* Entity);
+	void ClearSelectedEntities();
+	bool IsEntitySelected(AActor* Entity) const;
+	
   protected:
 	virtual void BeginPlay() override;
 
@@ -27,9 +35,8 @@ class RTSGAME_API ARGPlayerPawn : public APawn
 	URGPlayerCameraComponent* PlayerCameraComponent;
 
   private:
-	UFUNCTION()
-	void HandleOnClicked(AActor* TouchedActor, FKey ButtonPressed);
-
+	UPROPERTY()
+	ARGPlayerController* PlayerController;
 	UPROPERTY()
 	TArray<AActor*> SelectedEntities;
 };

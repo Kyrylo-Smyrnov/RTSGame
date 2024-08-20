@@ -5,7 +5,7 @@
 ARGPlayerController::ARGPlayerController()
 {
 	bEnableClickEvents = true;
-	DefaultClickTraceChannel = ECC_Camera;
+	DefaultClickTraceChannel = ECC_GameTraceChannel1;
 }
 
 void ARGPlayerController::SetupInputComponent()
@@ -41,6 +41,10 @@ void ARGPlayerController::OnLeftMouseButtonInputPressed()
 	FVector2D MousePosition;
 	GetMousePosition(MousePosition.X, MousePosition.Y);
 	LeftMouseButtonInputPressed.Broadcast(MousePosition);
+
+	FHitResult HitResult;
+	if(!GetHitResultUnderCursor(ECC_GameTraceChannel1, true, HitResult))
+		LeftMouseButtonInputPressedUninteractable.Broadcast();
 }
 
 void ARGPlayerController::OnLeftMouseButtonInputReleased()

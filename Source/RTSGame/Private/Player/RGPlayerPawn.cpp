@@ -2,6 +2,7 @@
 
 #include "Player/RGPlayerPawn.h"
 #include "Player/RGPlayerCameraComponent.h"
+#include "RGPlayerController.h"
 #include "Units/RGUnitBase.h"
 
 ARGPlayerPawn::ARGPlayerPawn()
@@ -22,22 +23,46 @@ void ARGPlayerPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 }
 
+void ARGPlayerPawn::HandleLeftMouseButtonInputPressedUninteractable()
+{
+	ClearSelectedEntities();
+}
+
+void ARGPlayerPawn::AddEntityToSelected(AActor* Entity)
+{
+	SelectedEntities.AddUnique(Entity);
+	if (ARGUnitBase* CastedUnit = Cast<ARGUnitBase>(Entity))
+	{
+		CastedUnit->SetSelected(true);
+	}
+}
+
+void ARGPlayerPawn::RemoveEntityFromSelected(AActor* Entity)
+{
+	SelectedEntities.Remove(Entity);
+	if (ARGUnitBase* CastedUnit = Cast<ARGUnitBase>(Entity))
+	{
+		CastedUnit->SetSelected(false);
+	}
+}
+
+void ARGPlayerPawn::ClearSelectedEntities()
+{
+	for (int32 i = SelectedEntities.Num() - 1; i >= 0; --i)
+		RemoveEntityFromSelected(SelectedEntities[i]);
+}
+
+bool ARGPlayerPawn::IsEntitySelected(AActor* Entity) const
+{
+	return SelectedEntities.Contains(Entity);
+}
+
 void ARGPlayerPawn::BeginPlay()
 {
 	Super::BeginPlay();
+	PlayerController = Cast<ARGPlayerController>(GetController());
 
-	OnClicked.AddDynamic(this, &ARGPlayerPawn::HandleOnClicked);
-}
-
-void ARGPlayerPawn::HandleOnClicked(AActor* TouchedActor, FKey ButtonPressed)
-{
-	ARGUnitBase* CastedUnit = Cast<ARGUnitBase>(TouchedActor);
-
-	if(CastedUnit && ButtonPressed == EKeys::LeftMouseButton)
-	{
-		const bool bIsSelected = SelectedEntities.Contains(CastedUnit);
-		CastedUnit->SetSelected(!bIsSelected);
-		if(!bIsSelected)
-			SelectedEntities.AddUnique(CastedUnit);
-	}
+	if (PlayerController)
+		PlayerController->LeftMouseButtonInputPressedUninteractable.AddUObject(
+			this, &ARGPlayerPawn::HandleLeftMouseButtonInputPressedUninteractable);
 }

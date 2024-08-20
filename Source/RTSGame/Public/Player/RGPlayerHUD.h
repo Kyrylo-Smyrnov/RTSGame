@@ -7,6 +7,7 @@
 #include "RGPlayerHUD.generated.h"
 
 class ARGPlayerController;
+class ARGPlayerPawn;
 
 UCLASS()
 class RTSGAME_API ARGPlayerHUD : public AHUD
@@ -30,9 +31,13 @@ class RTSGAME_API ARGPlayerHUD : public AHUD
 	ARGPlayerController* PlayerController;
 
 	bool bIsSelectionBoxDrawn = false;
+	bool bIsSelectionBox = false;
 	FVector2D SelectionBoxStartPoint = FVector2D::ZeroVector;
 	FVector2D SelectionBoxEndPoint = FVector2D::ZeroVector;
 	
 	const FLinearColor SELECTION_BOX_OUTLINE_COLOR = FLinearColor(0.0f, 1.0f, 0.0f, 1.0f);
 	const float SELECTION_BOX_OUTLINE_THICKNESS = 1.0f;
+
+	UPROPERTY()
+	TArray<AActor*> SelectedEntities;
 };
