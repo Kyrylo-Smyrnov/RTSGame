@@ -1,0 +1,38 @@
+// https://github.com/Kyrylo-Smyrnov/RTSGame
+
+#pragma once
+
+#include "CoreMinimal.h"
+#include "GameFramework/HUD.h"
+#include "RGPlayerHUD.generated.h"
+
+class ARGPlayerController;
+
+UCLASS()
+class RTSGAME_API ARGPlayerHUD : public AHUD
+{
+	GENERATED_BODY()
+
+  public:
+	ARGPlayerHUD();
+	virtual void DrawHUD() override;
+
+  protected:
+	virtual void BeginPlay() override;
+
+  private:
+	void HandleLeftMouseButtonInputPressed(FVector2D MousePosition);
+	void HandleLeftMouseButtonInputReleased();
+
+	void DrawSelectionBox();
+	
+	UPROPERTY()
+	ARGPlayerController* PlayerController;
+
+	bool bIsSelectionBoxDrawn = false;
+	FVector2D SelectionBoxStartPoint = FVector2D::ZeroVector;
+	FVector2D SelectionBoxEndPoint = FVector2D::ZeroVector;
+	
+	const FLinearColor SELECTION_BOX_OUTLINE_COLOR = FLinearColor(0.0f, 1.0f, 0.0f, 1.0f);
+	const float SELECTION_BOX_OUTLINE_THICKNESS = 1.0f;
+};
