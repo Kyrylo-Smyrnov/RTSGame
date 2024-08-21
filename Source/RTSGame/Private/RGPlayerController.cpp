@@ -43,7 +43,7 @@ void ARGPlayerController::OnLeftMouseButtonInputPressed()
 	LeftMouseButtonInputPressed.Broadcast(MousePosition);
 
 	FHitResult HitResult;
-	if(!GetHitResultUnderCursor(ECC_GameTraceChannel1, true, HitResult))
+	if (!GetHitResultUnderCursor(ECC_GameTraceChannel1, true, HitResult))
 		LeftMouseButtonInputPressedUninteractable.Broadcast();
 }
 

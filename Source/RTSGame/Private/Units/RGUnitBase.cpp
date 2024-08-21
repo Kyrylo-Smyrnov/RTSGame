@@ -32,13 +32,34 @@ void ARGUnitBase::HandleOnClicked(AActor* TouchedActor, FKey ButtonPressed)
 		if (!PlayerPawn)
 			return;
 
+		bool bIsShiftDown = PlayerController->IsInputKeyDown(EKeys::LeftShift);
+		bool bIsCtrlDown = PlayerController->IsInputKeyDown(EKeys::LeftControl);
+
 		if (!PlayerPawn->IsEntitySelected(this))
 		{
-			PlayerPawn->AddEntityToSelected(this);
+			if (bIsShiftDown)
+			{
+				// Shift + Click: add a unit to selected
+				PlayerPawn->AddEntityToSelected(this);
+			}
+			else
+			{
+				// Click without Shift: deselect all other units and select clicked unit.
+				PlayerPawn->ClearSelectedEntities();
+				PlayerPawn->AddEntityToSelected(this);
+			}
+		}
+		else if (bIsCtrlDown)
+		{
+			// Ctrl + Click: Remove unit from selected
+			PlayerPawn->RemoveEntityFromSelected(this);
 		}
 		else
 		{
-			PlayerPawn->RemoveEntityFromSelected(this);
+			// Click on an already selected unit without Shift and Ctrl
+			// Deselect all other units and leave this one selected
+			PlayerPawn->ClearSelectedEntities();
+			PlayerPawn->AddEntityToSelected(this);
 		}
 	}
 }
@@ -47,6 +68,11 @@ void ARGUnitBase::SetSelected(bool bIsUnitSelected)
 {
 	bIsSelected = bIsUnitSelected;
 	SelectionCircleDecal->SetVisibility(bIsUnitSelected);
+}
+
+bool ARGUnitBase::IsSelected() const
+{
+	return bIsSelected;
 }
 
 void ARGUnitBase::BeginPlay()

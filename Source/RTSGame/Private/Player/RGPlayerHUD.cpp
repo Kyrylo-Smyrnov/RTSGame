@@ -68,5 +68,5 @@ void ARGPlayerHUD::DrawSelectionBox()
 	bIsSelectionBox = true;
 	
 	GetActorsInSelectionRectangle(ARGUnitBase::StaticClass(), SelectionBoxStartPoint, SelectionBoxEndPoint,
-										  SelectedEntities, false, true);
+										  SelectedEntities, false, false);
 }

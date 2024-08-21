@@ -22,6 +22,8 @@ class RTSGAME_API ARGUnitBase : public ACharacter
 	void HandleOnClicked(AActor* TouchedActor, FKey ButtonPressed);
 
 	void SetSelected(bool bIsSelected);
+	UFUNCTION(BlueprintCallable)
+	bool IsSelected() const;
 
   protected:
 	virtual void BeginPlay() override;
