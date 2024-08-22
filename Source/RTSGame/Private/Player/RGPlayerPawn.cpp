@@ -3,6 +3,7 @@
 #include "Player/RGPlayerPawn.h"
 #include "Player/RGPlayerCameraComponent.h"
 #include "RGPlayerController.h"
+#include "Units/RGBuildingBase.h"
 #include "Units/RGUnitBase.h"
 
 ARGPlayerPawn::ARGPlayerPawn()
@@ -32,18 +33,18 @@ void ARGPlayerPawn::AddEntityToSelected(AActor* Entity)
 {
 	SelectedEntities.AddUnique(Entity);
 	if (ARGUnitBase* CastedUnit = Cast<ARGUnitBase>(Entity))
-	{
 		CastedUnit->SetSelected(true);
-	}
+	if(ARGBuildingBase* CastedBuilding = Cast<ARGBuildingBase>(Entity))
+		CastedBuilding->SetSelected(true);
 }
 
 void ARGPlayerPawn::RemoveEntityFromSelected(AActor* Entity)
 {
 	SelectedEntities.Remove(Entity);
 	if (ARGUnitBase* CastedUnit = Cast<ARGUnitBase>(Entity))
-	{
 		CastedUnit->SetSelected(false);
-	}
+	if(ARGBuildingBase* CastedBuilding = Cast<ARGBuildingBase>(Entity))
+		CastedBuilding->SetSelected(false);
 }
 
 void ARGPlayerPawn::ClearSelectedEntities()

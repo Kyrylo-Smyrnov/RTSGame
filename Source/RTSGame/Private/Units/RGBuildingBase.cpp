@@ -1,30 +1,32 @@
 // https://github.com/Kyrylo-Smyrnov/RTSGame
 
-#include "Units/RGUnitBase.h"
-#include "Components/CapsuleComponent.h"
+#include "Units/RGBuildingBase.h"
 #include "Components/DecalComponent.h"
+#include "Components/StaticMeshComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Player/RGPlayerPawn.h"
 #include "RGPlayerController.h"
 
-ARGUnitBase::ARGUnitBase()
+ARGBuildingBase::ARGBuildingBase()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
-	GetMesh()->bReceivesDecals = false;
-	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_GameTraceChannel1, ECR_Block);
+	StaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>("StaticMeshComponent");
+	StaticMeshComponent->SetCollisionResponseToChannel(ECC_GameTraceChannel1, ECR_Block);
+	StaticMeshComponent->bReceivesDecals = false;
+	SetRootComponent(StaticMeshComponent);
 
 	SelectionCircleDecal = CreateDefaultSubobject<UDecalComponent>("SelectionCircleDecal");
 	SelectionCircleDecal->SetupAttachment(GetRootComponent());
 	SelectionCircleDecal->SetVisibility(false);
 }
 
-void ARGUnitBase::Tick(float DeltaTime)
+void ARGBuildingBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 }
 
-void ARGUnitBase::HandleOnClicked(AActor* TouchedActor, FKey ButtonPressed)
+void ARGBuildingBase::HandleOnClicked(AActor* TouchedActor, FKey ButtonPressed)
 {
 	if (PlayerController && ButtonPressed == EKeys::LeftMouseButton)
 	{
@@ -64,21 +66,21 @@ void ARGUnitBase::HandleOnClicked(AActor* TouchedActor, FKey ButtonPressed)
 	}
 }
 
-bool ARGUnitBase::IsSelected() const
+bool ARGBuildingBase::IsSeleted() const
 {
 	return bIsSelected;
 }
 
-void ARGUnitBase::SetSelected(bool bIsUnitSelected)
+void ARGBuildingBase::SetSelected(bool bIsBuildingSelected)
 {
-	bIsSelected = bIsUnitSelected;
-	SelectionCircleDecal->SetVisibility(bIsUnitSelected);
+	bIsSelected = bIsBuildingSelected;
+	SelectionCircleDecal->SetVisibility(bIsBuildingSelected);
 }
 
-void ARGUnitBase::BeginPlay()
+void ARGBuildingBase::BeginPlay()
 {
 	Super::BeginPlay();
-	OnClicked.AddDynamic(this, &ARGUnitBase::HandleOnClicked);
+	OnClicked.AddDynamic(this, &ARGBuildingBase::HandleOnClicked);
 
 	PlayerController = Cast<ARGPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 }
