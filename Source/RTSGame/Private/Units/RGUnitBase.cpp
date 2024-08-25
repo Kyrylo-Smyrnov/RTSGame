@@ -75,6 +75,11 @@ void ARGUnitBase::SetSelected(bool bIsUnitSelected)
 	SelectionCircleDecal->SetVisibility(bIsUnitSelected);
 }
 
+int32 ARGUnitBase::GetImportance() const
+{
+	return UnitImportance;
+}
+
 void ARGUnitBase::BeginPlay()
 {
 	Super::BeginPlay();

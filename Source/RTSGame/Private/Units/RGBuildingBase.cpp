@@ -77,6 +77,11 @@ void ARGBuildingBase::SetSelected(bool bIsBuildingSelected)
 	SelectionCircleDecal->SetVisibility(bIsBuildingSelected);
 }
 
+int32 ARGBuildingBase::GetImportance() const
+{
+	return BuildingImportance;
+}
+
 void ARGBuildingBase::BeginPlay()
 {
 	Super::BeginPlay();

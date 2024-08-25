@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "EntitiesImportance.h"
 #include "GameFramework/Character.h"
 #include "RGUnitBase.generated.h"
 
@@ -25,6 +26,8 @@ class RTSGAME_API ARGUnitBase : public ACharacter
 	bool IsSelected() const;
 	void SetSelected(bool bIsSelected);
 
+	int32 GetImportance() const;
+
   protected:
 	virtual void BeginPlay() override;
 
@@ -35,5 +38,6 @@ class RTSGAME_API ARGUnitBase : public ACharacter
 	UPROPERTY()
 	ARGPlayerController* PlayerController;
 
+	EFEntitiesImportance UnitImportance;
 	bool bIsSelected = false;
 };

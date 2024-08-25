@@ -34,8 +34,14 @@ void ARGPlayerPawn::AddEntityToSelected(AActor* Entity)
 	SelectedEntities.AddUnique(Entity);
 	if (ARGUnitBase* CastedUnit = Cast<ARGUnitBase>(Entity))
 		CastedUnit->SetSelected(true);
-	if(ARGBuildingBase* CastedBuilding = Cast<ARGBuildingBase>(Entity))
+	if (ARGBuildingBase* CastedBuilding = Cast<ARGBuildingBase>(Entity))
 		CastedBuilding->SetSelected(true);
+
+	if(SelectedEntities.Num() > 1)
+		SelectedEntities.Sort(CompareEntityImportance);
+
+	if(SelectedEntities.Num() > 0)
+		OnSelectedEntitiesChanged.Broadcast(SelectedEntities[0]);
 }
 
 void ARGPlayerPawn::RemoveEntityFromSelected(AActor* Entity)
@@ -43,14 +49,20 @@ void ARGPlayerPawn::RemoveEntityFromSelected(AActor* Entity)
 	SelectedEntities.Remove(Entity);
 	if (ARGUnitBase* CastedUnit = Cast<ARGUnitBase>(Entity))
 		CastedUnit->SetSelected(false);
-	if(ARGBuildingBase* CastedBuilding = Cast<ARGBuildingBase>(Entity))
+	if (ARGBuildingBase* CastedBuilding = Cast<ARGBuildingBase>(Entity))
 		CastedBuilding->SetSelected(false);
+
+	if(SelectedEntities.Num() > 1)
+		SelectedEntities.Sort(CompareEntityImportance);
+
+	if(SelectedEntities.Num() > 0)
+		OnSelectedEntitiesChanged.Broadcast(SelectedEntities[0]);
 }
 
 void ARGPlayerPawn::ClearSelectedEntities()
 {
-	for (int32 i = SelectedEntities.Num() - 1; i >= 0; --i)
-		RemoveEntityFromSelected(SelectedEntities[i]);
+	SelectedEntities.Empty();
+	OnSelectedEntitiesChanged.Broadcast(nullptr);
 }
 
 bool ARGPlayerPawn::IsEntitySelected(AActor* Entity) const
@@ -66,4 +78,23 @@ void ARGPlayerPawn::BeginPlay()
 	if (PlayerController)
 		PlayerController->LeftMouseButtonInputPressedUninteractable.AddUObject(
 			this, &ARGPlayerPawn::HandleLeftMouseButtonInputPressedUninteractable);
+}
+
+bool ARGPlayerPawn::CompareEntityImportance(const AActor& A, const AActor& B)
+{
+	const auto* UnitA = Cast<ARGUnitBase>(&A);
+	const auto* UnitB = Cast<ARGUnitBase>(&B);
+	const auto* BuildingA = Cast<ARGBuildingBase>(&A);
+	const auto* BuildingB = Cast<ARGBuildingBase>(&B);
+
+	if(UnitA && UnitB)
+		return UnitA->GetImportance() < UnitB->GetImportance();
+	if(BuildingA && BuildingB)
+		return BuildingA->GetImportance() < BuildingB->GetImportance();
+	if(UnitA && BuildingB)
+		return UnitA->GetImportance() < BuildingB->GetImportance();
+	if(BuildingA && UnitB)
+		return BuildingA->GetImportance() < UnitB->GetImportance();
+	
+	return false;
 }

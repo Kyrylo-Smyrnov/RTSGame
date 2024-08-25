@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "EntitiesImportance.h"
 #include "GameFramework/Pawn.h"
 #include "RGBuildingBase.generated.h"
 
@@ -25,6 +26,8 @@ class RTSGAME_API ARGBuildingBase : public APawn
 	bool IsSeleted() const;
 	void SetSelected(bool bIsBuildingSelected);
 
+	int32 GetImportance() const;
+
   protected:
 	virtual void BeginPlay() override;
 
@@ -37,5 +40,6 @@ class RTSGAME_API ARGBuildingBase : public APawn
 	UPROPERTY()
 	ARGPlayerController* PlayerController;
 	
+	EFEntitiesImportance BuildingImportance;
 	bool bIsSelected = false;
 };
