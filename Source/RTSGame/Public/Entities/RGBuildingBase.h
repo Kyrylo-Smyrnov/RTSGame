@@ -4,27 +4,27 @@
 
 #include "CoreMinimal.h"
 #include "EntitiesImportance.h"
-#include "GameFramework/Character.h"
-#include "RGUnitBase.generated.h"
+#include "GameFramework/Pawn.h"
+#include "RGBuildingBase.generated.h"
 
 class ARGPlayerController;
 class UDecalComponent;
+class UStaticMeshComponent;
 
 UCLASS()
-class RTSGAME_API ARGUnitBase : public ACharacter
+class RTSGAME_API ARGBuildingBase : public APawn
 {
 	GENERATED_BODY()
 
   public:
-	ARGUnitBase();
+	ARGBuildingBase();
 	virtual void Tick(float DeltaTime) override;
 
 	UFUNCTION()
 	void HandleOnClicked(AActor* TouchedActor, FKey ButtonPressed);
 
-	UFUNCTION(BlueprintCallable)
-	bool IsSelected() const;
-	void SetSelected(bool bIsSelected);
+	bool IsSeleted() const;
+	void SetSelected(bool bIsBuildingSelected);
 
 	int32 GetImportance() const;
 
@@ -33,11 +33,14 @@ class RTSGAME_API ARGUnitBase : public ACharacter
 
 	UPROPERTY(EditDefaultsOnly, Category = "Components")
 	UDecalComponent* SelectionCircleDecal;
+	UPROPERTY(EditDefaultsOnly, Category = "Components")
+	UStaticMeshComponent* StaticMeshComponent;
 
   private:
 	UPROPERTY()
 	ARGPlayerController* PlayerController;
 
-	EFEntitiesImportance UnitImportance;
+	// TEST PURPOSE, TO REMOVE
+	EFEntitiesImportance BuildingImportance = Building;
 	bool bIsSelected = false;
 };

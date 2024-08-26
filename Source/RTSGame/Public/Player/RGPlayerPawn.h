@@ -30,6 +30,15 @@ class RTSGAME_API ARGPlayerPawn : public APawn
 	void ClearSelectedEntities();
 	bool IsEntitySelected(AActor* Entity) const;
 
+	// TEST PURPOSE, TO REMOVE
+	UFUNCTION(BlueprintCallable)
+	AActor* GetMostImportantEntity() const
+	{
+		if(SelectedEntities.Num() > 0)
+			return SelectedEntities[0];
+		return nullptr;
+	}
+
 	FOnSelectedEntitiesChanged OnSelectedEntitiesChanged;
 	
   protected:

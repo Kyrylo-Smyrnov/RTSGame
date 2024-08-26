@@ -7,5 +7,7 @@
 // of the first (most important) one is shown.
 enum EFEntitiesImportance
 {
-	
+	// TEST PURPOSE, TO REMOVE
+	Building = 0,
+	Unit = 1
 };

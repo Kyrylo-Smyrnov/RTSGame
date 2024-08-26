@@ -4,7 +4,6 @@
 #include "Kismet/GameplayStatics.h"
 #include "Player/RGPlayerPawn.h"
 #include "RGPlayerController.h"
-#include "Units/RGUnitBase.h"
 
 ARGPlayerHUD::ARGPlayerHUD()
 {

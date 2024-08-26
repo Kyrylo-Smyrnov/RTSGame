@@ -1,10 +1,10 @@
 // https://github.com/Kyrylo-Smyrnov/RTSGame
 
 #include "Player/RGPlayerPawn.h"
+#include "Entities/RGBuildingBase.h"
+#include "Entities/RGUnitBase.h"
 #include "Player/RGPlayerCameraComponent.h"
 #include "RGPlayerController.h"
-#include "Units/RGBuildingBase.h"
-#include "Units/RGUnitBase.h"
 
 ARGPlayerPawn::ARGPlayerPawn()
 {
@@ -37,10 +37,10 @@ void ARGPlayerPawn::AddEntityToSelected(AActor* Entity)
 	if (ARGBuildingBase* CastedBuilding = Cast<ARGBuildingBase>(Entity))
 		CastedBuilding->SetSelected(true);
 
-	if(SelectedEntities.Num() > 1)
+	if (SelectedEntities.Num() > 1)
 		SelectedEntities.Sort(CompareEntityImportance);
 
-	if(SelectedEntities.Num() > 0)
+	if (SelectedEntities.Num() > 0)
 		OnSelectedEntitiesChanged.Broadcast(SelectedEntities[0]);
 }
 
@@ -52,16 +52,18 @@ void ARGPlayerPawn::RemoveEntityFromSelected(AActor* Entity)
 	if (ARGBuildingBase* CastedBuilding = Cast<ARGBuildingBase>(Entity))
 		CastedBuilding->SetSelected(false);
 
-	if(SelectedEntities.Num() > 1)
+	if (SelectedEntities.Num() > 1)
 		SelectedEntities.Sort(CompareEntityImportance);
 
-	if(SelectedEntities.Num() > 0)
+	if (SelectedEntities.Num() > 0)
 		OnSelectedEntitiesChanged.Broadcast(SelectedEntities[0]);
 }
 
 void ARGPlayerPawn::ClearSelectedEntities()
 {
-	SelectedEntities.Empty();
+	for (int32 i = SelectedEntities.Num() - 1; i >= 0; --i)
+		RemoveEntityFromSelected(SelectedEntities[i]);
+
 	OnSelectedEntitiesChanged.Broadcast(nullptr);
 }
 
@@ -87,14 +89,14 @@ bool ARGPlayerPawn::CompareEntityImportance(const AActor& A, const AActor& B)
 	const auto* BuildingA = Cast<ARGBuildingBase>(&A);
 	const auto* BuildingB = Cast<ARGBuildingBase>(&B);
 
-	if(UnitA && UnitB)
+	if (UnitA && UnitB)
 		return UnitA->GetImportance() < UnitB->GetImportance();
-	if(BuildingA && BuildingB)
+	if (BuildingA && BuildingB)
 		return BuildingA->GetImportance() < BuildingB->GetImportance();
-	if(UnitA && BuildingB)
+	if (UnitA && BuildingB)
 		return UnitA->GetImportance() < BuildingB->GetImportance();
-	if(BuildingA && UnitB)
+	if (BuildingA && UnitB)
 		return BuildingA->GetImportance() < UnitB->GetImportance();
-	
+
 	return false;
 }
