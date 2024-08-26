@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include "Actionable.h"
 #include "CoreMinimal.h"
 #include "EntitiesImportance.h"
 #include "GameFramework/Character.h"
@@ -11,7 +12,7 @@ class ARGPlayerController;
 class UDecalComponent;
 
 UCLASS()
-class RTSGAME_API ARGUnitBase : public ACharacter
+class RTSGAME_API ARGUnitBase : public ACharacter, public IActionable
 {
 	GENERATED_BODY()
 
@@ -28,6 +29,9 @@ class RTSGAME_API ARGUnitBase : public ACharacter
 
 	int32 GetImportance() const;
 
+	virtual TArray<FActionData> GetAvailableActions_Implementation() const override;
+	virtual void PerformAction_Implementation(const FName& ActionName) override;
+
   protected:
 	virtual void BeginPlay() override;
 
@@ -37,8 +41,7 @@ class RTSGAME_API ARGUnitBase : public ACharacter
   private:
 	UPROPERTY()
 	ARGPlayerController* PlayerController;
-
-	// TEST PURPOSE, TO REMOVE
-	EFEntitiesImportance UnitImportance = Unit;
+	
+	EFEntitiesImportance UnitImportance;
 	bool bIsSelected = false;
 };

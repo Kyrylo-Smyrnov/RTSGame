@@ -39,8 +39,7 @@ class RTSGAME_API ARGBuildingBase : public APawn
   private:
 	UPROPERTY()
 	ARGPlayerController* PlayerController;
-
-	// TEST PURPOSE, TO REMOVE
-	EFEntitiesImportance BuildingImportance = Building;
+	
+	EFEntitiesImportance BuildingImportance;
 	bool bIsSelected = false;
 };

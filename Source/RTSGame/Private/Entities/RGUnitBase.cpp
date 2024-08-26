@@ -3,6 +3,7 @@
 #include "Entities/RGUnitBase.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/DecalComponent.h"
+#include "Entities/ActionsTooltips.h"
 #include "Kismet/GameplayStatics.h"
 #include "Player/RGPlayerPawn.h"
 #include "RGPlayerController.h"
@@ -78,6 +79,43 @@ void ARGUnitBase::SetSelected(bool bIsUnitSelected)
 int32 ARGUnitBase::GetImportance() const
 {
 	return UnitImportance;
+}
+
+TArray<FActionData> ARGUnitBase::GetAvailableActions_Implementation() const
+{
+	TArray<FActionData> BaseUnitActions;
+
+	FActionData AttackAction;
+	AttackAction.ActionName = "AttackAction";
+	AttackAction.ActionIcon = LoadObject<UTexture2D>(nullptr, TEXT("/Game/UI/Icons/T_IconAttack.T_IconAttack"));
+	AttackAction.ActionTooltip = Tooltips::AttackActionTooltip;
+	BaseUnitActions.Add(AttackAction);
+
+	FActionData HoldAction;
+	HoldAction.ActionName = "HoldAction";
+	HoldAction.ActionIcon = LoadObject<UTexture2D>(nullptr, TEXT("/Game/UI/Icons/T_IconHold.T_IconHold"));
+	HoldAction.ActionTooltip = Tooltips::HoldActionTooltip;
+	BaseUnitActions.Add(HoldAction);
+
+	FActionData MoveAction;
+	MoveAction.ActionName = "MoveAction";
+	MoveAction.ActionIcon = LoadObject<UTexture2D>(nullptr, TEXT("/Game/UI/Icons/T_IconMove.T_IconMove"));
+	MoveAction.ActionTooltip = Tooltips::MoveActionTooltip;
+	BaseUnitActions.Add(MoveAction);
+
+	FActionData MoveAttackAction;
+	MoveAttackAction.ActionName = "MoveAttackAction";
+	MoveAttackAction.ActionIcon =
+		LoadObject<UTexture2D>(nullptr, TEXT("/Game/UI/Icons/T_IconMoveAttack.T_IconMoveAttack"));
+	MoveAttackAction.ActionTooltip = Tooltips::MoveAttackActionTooltip;
+	BaseUnitActions.Add(MoveAttackAction);
+
+	return BaseUnitActions;
+}
+
+void ARGUnitBase::PerformAction_Implementation(const FName& ActionName)
+{
+	IActionable::PerformAction_Implementation(ActionName);
 }
 
 void ARGUnitBase::BeginPlay()

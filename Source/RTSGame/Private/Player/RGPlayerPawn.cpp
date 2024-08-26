@@ -29,6 +29,13 @@ void ARGPlayerPawn::HandleLeftMouseButtonInputPressedUninteractable()
 	ClearSelectedEntities();
 }
 
+AActor* ARGPlayerPawn::GetMostImportantEntity() const
+{
+	if (SelectedEntities.Num() > 0)
+		return SelectedEntities[0];
+	return nullptr;
+}
+
 void ARGPlayerPawn::AddEntityToSelected(AActor* Entity)
 {
 	SelectedEntities.AddUnique(Entity);
