@@ -42,13 +42,13 @@ void ARGBuildingBase::HandleOnClicked(AActor* TouchedActor, FKey ButtonPressed)
 			if (bIsShiftDown)
 			{
 				// Shift + Click: add a entity to selected
-				PlayerPawn->AddEntityToSelected(this);
+				PlayerPawn->AddEntitiesToSelected(this);
 			}
 			else
 			{
 				// Click without Shift: deselect all other entities and select clicked entity.
 				PlayerPawn->ClearSelectedEntities();
-				PlayerPawn->AddEntityToSelected(this);
+				PlayerPawn->AddEntitiesToSelected(this);
 			}
 		}
 		else if (bIsCtrlDown)
@@ -61,7 +61,7 @@ void ARGBuildingBase::HandleOnClicked(AActor* TouchedActor, FKey ButtonPressed)
 			// Click on an already selected entity without Shift and Ctrl
 			// Deselect all other entities and leave this one selected
 			PlayerPawn->ClearSelectedEntities();
-			PlayerPawn->AddEntityToSelected(this);
+			PlayerPawn->AddEntitiesToSelected(this);
 		}
 	}
 }

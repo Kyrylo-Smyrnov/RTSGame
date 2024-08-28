@@ -36,7 +36,7 @@ AActor* ARGPlayerPawn::GetMostImportantEntity() const
 	return nullptr;
 }
 
-void ARGPlayerPawn::AddEntityToSelected(AActor* Entity)
+void ARGPlayerPawn::AddEntitiesToSelected(AActor* Entity)
 {
 	SelectedEntities.AddUnique(Entity);
 	if (ARGUnitBase* CastedUnit = Cast<ARGUnitBase>(Entity))
@@ -47,8 +47,28 @@ void ARGPlayerPawn::AddEntityToSelected(AActor* Entity)
 	if (SelectedEntities.Num() > 1)
 		SelectedEntities.Sort(CompareEntityImportance);
 
-	if (SelectedEntities.Num() > 0)
-		OnSelectedEntitiesChanged.Broadcast(SelectedEntities[0]);
+	OnSelectedEntitiesChanged.Broadcast(GetMostImportantEntity());
+}
+
+void ARGPlayerPawn::AddEntitiesToSelected(TArray<AActor*> Entities)
+{
+	if(Entities.Num() == 0)
+		return;
+	
+	for(AActor* Entity : Entities)
+	{
+		SelectedEntities.AddUnique(Entity);
+		
+		if (ARGUnitBase* CastedUnit = Cast<ARGUnitBase>(Entity))
+			CastedUnit->SetSelected(true);
+		if (ARGBuildingBase* CastedBuilding = Cast<ARGBuildingBase>(Entity))
+			CastedBuilding->SetSelected(true);
+	}
+
+	if (SelectedEntities.Num() > 1)
+		SelectedEntities.Sort(CompareEntityImportance);
+
+	OnSelectedEntitiesChanged.Broadcast(GetMostImportantEntity());
 }
 
 void ARGPlayerPawn::RemoveEntityFromSelected(AActor* Entity)
@@ -62,16 +82,25 @@ void ARGPlayerPawn::RemoveEntityFromSelected(AActor* Entity)
 	if (SelectedEntities.Num() > 1)
 		SelectedEntities.Sort(CompareEntityImportance);
 
-	if (SelectedEntities.Num() > 0)
-		OnSelectedEntitiesChanged.Broadcast(SelectedEntities[0]);
+	OnSelectedEntitiesChanged.Broadcast(GetMostImportantEntity());
 }
 
 void ARGPlayerPawn::ClearSelectedEntities()
 {
-	for (int32 i = SelectedEntities.Num() - 1; i >= 0; --i)
-		RemoveEntityFromSelected(SelectedEntities[i]);
+	if(SelectedEntities.Num() == 0)
+		return;
+	
+	for (AActor* Entity : SelectedEntities)
+	{
+		if (ARGUnitBase* CastedUnit = Cast<ARGUnitBase>(Entity))
+			CastedUnit->SetSelected(false);
+		if (ARGBuildingBase* CastedBuilding = Cast<ARGBuildingBase>(Entity))
+			CastedBuilding->SetSelected(false);
+	}
 
-	OnSelectedEntitiesChanged.Broadcast(nullptr);
+	SelectedEntities.Empty();
+
+	OnSelectedEntitiesChanged.Broadcast(GetMostImportantEntity());
 }
 
 bool ARGPlayerPawn::IsEntitySelected(AActor* Entity) const

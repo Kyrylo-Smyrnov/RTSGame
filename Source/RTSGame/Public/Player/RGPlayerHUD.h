@@ -6,6 +6,7 @@
 #include "GameFramework/HUD.h"
 #include "RGPlayerHUD.generated.h"
 
+class URGActionGridWidget;
 class ARGPlayerController;
 class ARGPlayerPawn;
 
@@ -26,7 +27,7 @@ class RTSGAME_API ARGPlayerHUD : public AHUD
 	void HandleLeftMouseButtonInputReleased();
 
 	void DrawSelectionBox();
-	
+
 	UPROPERTY()
 	ARGPlayerController* PlayerController;
 
@@ -34,10 +35,13 @@ class RTSGAME_API ARGPlayerHUD : public AHUD
 	bool bIsSelectionBox = false;
 	FVector2D SelectionBoxStartPoint = FVector2D::ZeroVector;
 	FVector2D SelectionBoxEndPoint = FVector2D::ZeroVector;
-	
+
 	const FLinearColor SELECTION_BOX_OUTLINE_COLOR = FLinearColor(0.0f, 1.0f, 0.0f, 1.0f);
 	const float SELECTION_BOX_OUTLINE_THICKNESS = 1.0f;
 
+	UPROPERTY(EditDefaultsOnly, Category="Widgets")
+	TSubclassOf<UUserWidget> ActionGridWidgetClass;
+	
 	UPROPERTY()
 	TArray<AActor*> SelectedEntities;
 };

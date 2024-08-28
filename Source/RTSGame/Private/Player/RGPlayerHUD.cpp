@@ -4,6 +4,8 @@
 #include "Kismet/GameplayStatics.h"
 #include "Player/RGPlayerPawn.h"
 #include "RGPlayerController.h"
+#include "Blueprint/UserWidget.h"
+#include "Player/UI/RGActionGridWidget.h"
 
 ARGPlayerHUD::ARGPlayerHUD()
 {
@@ -27,6 +29,13 @@ void ARGPlayerHUD::BeginPlay()
 	PlayerController = Cast<ARGPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 	PlayerController->LeftMouseButtonInputPressed.AddUObject(this, &ARGPlayerHUD::HandleLeftMouseButtonInputPressed);
 	PlayerController->LeftMouseButtonInputReleased.AddUObject(this, &ARGPlayerHUD::HandleLeftMouseButtonInputReleased);
+
+	if(ActionGridWidgetClass)
+	{
+		URGActionGridWidget* ActionGridWidget = CreateWidget<URGActionGridWidget>(PlayerController, ActionGridWidgetClass);
+		if(ActionGridWidget)
+			ActionGridWidget->AddToViewport();
+	}
 }
 
 void ARGPlayerHUD::HandleLeftMouseButtonInputPressed(FVector2D MousePosition)
@@ -38,16 +47,15 @@ void ARGPlayerHUD::HandleLeftMouseButtonInputPressed(FVector2D MousePosition)
 void ARGPlayerHUD::HandleLeftMouseButtonInputReleased()
 {
 	bIsSelectionBoxDrawn = false;
-	
+
 	if (bIsSelectionBox)
 	{
 		ARGPlayerPawn* PlayerPawn = Cast<ARGPlayerPawn>(PlayerController->GetPawn());
 		if (PlayerPawn)
 		{
 			PlayerPawn->ClearSelectedEntities();
-			for(AActor* Entity : SelectedEntities)
-				PlayerPawn->AddEntityToSelected(Entity);
-			
+			PlayerPawn->AddEntitiesToSelected(SelectedEntities);
+
 			bIsSelectionBox = false;
 		}
 	}
@@ -65,7 +73,9 @@ void ARGPlayerHUD::DrawSelectionBox()
 			 SELECTION_BOX_OUTLINE_COLOR, SELECTION_BOX_OUTLINE_THICKNESS);
 
 	bIsSelectionBox = true;
-	
-	GetActorsInSelectionRectangle(APawn::StaticClass(), SelectionBoxStartPoint, SelectionBoxEndPoint,
-										  SelectedEntities, false, false);
+
+	GetActorsInSelectionRectangle(APawn::StaticClass(), SelectionBoxStartPoint, SelectionBoxEndPoint, SelectedEntities,
+								  false, false);
+
+	SelectedEntities.RemoveAll([](AActor* Actor) { return Actor->IsA(ARGPlayerPawn::StaticClass()); });
 }
