@@ -2,9 +2,12 @@
 
 #include "Player/UI/RGActionGridWidget.h"
 #include "Components/Button.h"
+#include "Components/CanvasPanel.h"
+#include "Components/CanvasPanelSlot.h"
 #include "Components/GridPanel.h"
 #include "Components/GridSlot.h"
 #include "Components/Image.h"
+#include "Components/SizeBox.h"
 #include "Entities/Actionable.h"
 #include "Kismet/GameplayStatics.h"
 #include "Player/RGPlayerPawn.h"
@@ -24,11 +27,10 @@ void URGActionGridWidget::NativeConstruct()
 void URGActionGridWidget::UpdateActionButtons(AActor* MostImportantEntity)
 {
 	if (!MostImportantEntity)
-		for(int32 i = 0; i < ActionButtons.Num(); ++i)
+		for (int32 i = 0; i < ActionButtons.Num(); ++i)
 		{
 			ActionButtons[i]->SetVisibility(ESlateVisibility::Visible);
 			ActionButtons[i]->SetIsEnabled(false);
-			ActionIcons[i]->SetVisibility(ESlateVisibility::Hidden);
 		}
 
 	if (IActionable* ActionableEntity = Cast<IActionable>(MostImportantEntity))
@@ -40,9 +42,8 @@ void URGActionGridWidget::UpdateActionButtons(AActor* MostImportantEntity)
 			if (i < AvailableActions.Num())
 			{
 				ActionButtons[i]->SetVisibility(ESlateVisibility::Visible);
+				ActionButtons[i]->SetToolTipText(AvailableActions[i].ActionTooltip);
 				ActionButtons[i]->SetIsEnabled(true);
-				ActionIcons[i]->SetVisibility(ESlateVisibility::Visible);
-				ActionIcons[i]->SetBrushFromTexture(AvailableActions[i].ActionIcon);
 			}
 			else
 			{
@@ -58,25 +59,34 @@ void URGActionGridWidget::InitializeGrid()
 	if (!ActionGrid)
 		return;
 
-	for (int32 Row = 0; Row < 3; ++Row)
+	const int32 ROWS = 3;
+	const int32 COLS = 4;
+	const float BUTTON_PADDING = 1.0f;
+	const float BUTTON_MARGIN = 20.0f;
+	const FVector2D BUTTON_SIZE(75.0f, 75.0f);
+
+	ActionGrid->SetRenderTranslation(
+		FVector2D(-BUTTON_SIZE.X * COLS - BUTTON_MARGIN, -BUTTON_SIZE.Y * ROWS - BUTTON_MARGIN));
+
+	for (int32 Row = 0; Row < ROWS; ++Row)
 	{
-		for (int32 Col = 0; Col < 4; ++Col)
+		for (int32 Col = 0; Col < COLS; ++Col)
 		{
 			UButton* ActionButton = NewObject<UButton>(this);
-			UImage* ActionImage = NewObject<UImage>(this);
 
-			ActionButton->AddChild(ActionImage);
-			ActionGrid->AddChild(ActionButton);
+			USizeBox* SizeBox = NewObject<USizeBox>(this);
+			SizeBox->SetWidthOverride(BUTTON_SIZE.X);
+			SizeBox->SetHeightOverride(BUTTON_SIZE.Y);
+			SizeBox->AddChild(ActionButton);
 
+			ActionGrid->AddChild(SizeBox);
 			ActionButtons.Add(ActionButton);
-			ActionIcons.Add(ActionImage);
 
-			UGridSlot* GridSlot = Cast<UGridSlot>(ActionGrid->AddChildToGrid(ActionButton));
+			UGridSlot* GridSlot = Cast<UGridSlot>(ActionGrid->AddChildToGrid(SizeBox, Row, Col));
 
 			if (GridSlot)
 			{
-				GridSlot->SetRow(Row);
-				GridSlot->SetColumn(Col);
+				GridSlot->SetPadding(FMargin(BUTTON_PADDING));
 			}
 
 			ActionButton->SetVisibility(ESlateVisibility::Visible);

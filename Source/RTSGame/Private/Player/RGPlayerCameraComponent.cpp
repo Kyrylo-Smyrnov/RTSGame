@@ -46,8 +46,8 @@ void URGPlayerCameraComponent::HandleCameraMovement()
 	PlayerController->GetMousePosition(MousePosition.X, MousePosition.Y);
 
 	PlayerController->GetViewportSize(ViewportSize.X, ViewportSize.Y);
-	CameraScrollBoundX = ViewportSize.X * 0.05f;
-	CameraScrollBoundY = ViewportSize.Y * 0.05f;
+	CameraScrollBoundX = ViewportSize.X * 0.01f;
+	CameraScrollBoundY = ViewportSize.Y * 0.01f;
 
 	float MovementX = 0.0f;
 	float MovementY = 0.0f;
