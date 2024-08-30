@@ -2,8 +2,6 @@
 
 #include "Player/UI/RGActionGridWidget.h"
 #include "Components/Button.h"
-#include "Components/CanvasPanel.h"
-#include "Components/CanvasPanelSlot.h"
 #include "Components/GridPanel.h"
 #include "Components/GridSlot.h"
 #include "Components/Image.h"
@@ -27,13 +25,15 @@ void URGActionGridWidget::NativeConstruct()
 void URGActionGridWidget::UpdateActionButtons(AActor* MostImportantEntity)
 {
 	if (!MostImportantEntity)
+	{
 		for (int32 i = 0; i < ActionButtons.Num(); ++i)
 		{
-			ActionButtons[i]->SetVisibility(ESlateVisibility::Visible);
+			ActionButtons[i]->SetToolTipText(FText::FromString(""));
 			ActionButtons[i]->SetIsEnabled(false);
+			ActionIcons[i]->SetVisibility(ESlateVisibility::Hidden);
 		}
-
-	if (IActionable* ActionableEntity = Cast<IActionable>(MostImportantEntity))
+	}
+	else if (IActionable* ActionableEntity = Cast<IActionable>(MostImportantEntity))
 	{
 		TArray<FActionData> AvailableActions = ActionableEntity->GetAvailableActions_Implementation();
 
@@ -41,13 +41,14 @@ void URGActionGridWidget::UpdateActionButtons(AActor* MostImportantEntity)
 		{
 			if (i < AvailableActions.Num())
 			{
-				ActionButtons[i]->SetVisibility(ESlateVisibility::Visible);
 				ActionButtons[i]->SetToolTipText(AvailableActions[i].ActionTooltip);
 				ActionButtons[i]->SetIsEnabled(true);
+
+				ActionIcons[i]->SetBrushFromTexture(AvailableActions[i].ActionIcon, false);
+				ActionIcons[i]->SetVisibility(ESlateVisibility::Visible);
 			}
 			else
 			{
-				ActionButtons[i]->SetVisibility(ESlateVisibility::Visible);
 				ActionButtons[i]->SetIsEnabled(false);
 			}
 		}
@@ -72,7 +73,16 @@ void URGActionGridWidget::InitializeGrid()
 	{
 		for (int32 Col = 0; Col < COLS; ++Col)
 		{
+			UImage* ActionIcon = NewObject<UImage>(this);
+			ActionIcon->SetVisibility(ESlateVisibility::Hidden);
+			ActionIcon->SetBrushSize(BUTTON_SIZE);
+			ActionIcons.Add(ActionIcon);
+
 			UButton* ActionButton = NewObject<UButton>(this);
+			ActionButton->SetVisibility(ESlateVisibility::Visible);
+			ActionButton->SetIsEnabled(false);
+			ActionButton->AddChild(ActionIcon);
+			ActionButtons.Add(ActionButton);
 
 			USizeBox* SizeBox = NewObject<USizeBox>(this);
 			SizeBox->SetWidthOverride(BUTTON_SIZE.X);
@@ -80,17 +90,11 @@ void URGActionGridWidget::InitializeGrid()
 			SizeBox->AddChild(ActionButton);
 
 			ActionGrid->AddChild(SizeBox);
-			ActionButtons.Add(ActionButton);
 
 			UGridSlot* GridSlot = Cast<UGridSlot>(ActionGrid->AddChildToGrid(SizeBox, Row, Col));
 
 			if (GridSlot)
-			{
 				GridSlot->SetPadding(FMargin(BUTTON_PADDING));
-			}
-
-			ActionButton->SetVisibility(ESlateVisibility::Visible);
-			ActionButton->SetIsEnabled(false);
 		}
 	}
 }

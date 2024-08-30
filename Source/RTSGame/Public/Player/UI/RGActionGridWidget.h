@@ -18,7 +18,6 @@ class RTSGAME_API URGActionGridWidget : public UUserWidget
 
   public:
 	void NativeConstruct() override;
-	
 	void UpdateActionButtons(AActor* MostImportantEntity);
 
   protected:
@@ -26,6 +25,8 @@ class RTSGAME_API URGActionGridWidget : public UUserWidget
 	UGridPanel* ActionGrid;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI")
 	TArray<UButton*> ActionButtons;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI")
+	TArray<UImage*> ActionIcons;
 
   private:
 	void InitializeGrid();
