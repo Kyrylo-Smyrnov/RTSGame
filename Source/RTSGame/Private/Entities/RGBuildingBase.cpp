@@ -19,7 +19,7 @@ ARGBuildingBase::ARGBuildingBase()
 	SelectionCircleDecal = CreateDefaultSubobject<UDecalComponent>("SelectionCircleDecal");
 	SelectionCircleDecal->SetupAttachment(GetRootComponent());
 	SelectionCircleDecal->SetVisibility(false);
-	
+
 	static ConstructorHelpers::FObjectFinder<UMaterialInterface> ValidPlacementMaterialFinder(
 		TEXT("/Game/Entities/Buildings/Materials/M_BuildingValidPlacement.M_BuildingValidPlacement"));
 	static ConstructorHelpers::FObjectFinder<UMaterialInterface> InValidPlacementMaterialFinder(
@@ -92,21 +92,29 @@ void ARGBuildingBase::SetSelected(bool bIsBuildingSelected)
 	SelectionCircleDecal->SetVisibility(bIsBuildingSelected);
 }
 
-void ARGBuildingBase::SetBuildingPlacementMaterial(const bool IsValidPlacement) const
+void ARGBuildingBase::SetBuildingPlacementMaterial(const bool IsValidPlacement)
 {
 	if (!StaticMeshComponent)
 		return;
-
+	
 	UMaterialInterface* PlacementMaterial = IsValidPlacement ? ValidPlacementMaterial : InValidPlacementMaterial;
 
 	for (int i = 0; i < StaticMeshComponent->GetMaterials().Num(); ++i)
 		StaticMeshComponent->SetMaterial(i, PlacementMaterial);
 }
 
+void ARGBuildingBase::SetBuildingMeshMaterials()
+{
+	for(int i = 0; i < BuildingMeshMaterials.Num(); ++i)
+		StaticMeshComponent->SetMaterial(i, BuildingMeshMaterials[i]);
+}
+
 void ARGBuildingBase::BeginPlay()
 {
 	Super::BeginPlay();
 	OnClicked.AddDynamic(this, &ARGBuildingBase::HandleOnClicked);
+
+	BuildingMeshMaterials = StaticMeshComponent->GetMaterials();
 
 	PlayerController = Cast<ARGPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 }

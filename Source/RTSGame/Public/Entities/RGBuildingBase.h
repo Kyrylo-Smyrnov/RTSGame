@@ -27,7 +27,8 @@ class RTSGAME_API ARGBuildingBase : public APawn
 	int32 GetImportance() const;
 
 	void SetSelected(bool bIsBuildingSelected);
-	void SetBuildingPlacementMaterial(const bool IsValidPlacement) const;
+	void SetBuildingPlacementMaterial(const bool IsValidPlacement);
+	void SetBuildingMeshMaterials();
 
   protected:
 	virtual void BeginPlay() override;
@@ -47,6 +48,8 @@ class RTSGAME_API ARGBuildingBase : public APawn
 	UMaterialInterface* ValidPlacementMaterial;
 	UPROPERTY()
 	UMaterialInterface* InValidPlacementMaterial;
+	UPROPERTY()
+	TArray<UMaterialInterface*> BuildingMeshMaterials;
 
 	bool bIsSelected = false;
 };
