@@ -24,16 +24,17 @@ class RTSGAME_API ARGBuildingBase : public APawn
 	void HandleOnClicked(AActor* TouchedActor, FKey ButtonPressed);
 
 	bool IsSeleted() const;
-	void SetSelected(bool bIsBuildingSelected);
-	
 	int32 GetImportance() const;
+
+	void SetSelected(bool bIsBuildingSelected);
+	void SetBuildingPlacementMaterial(const bool IsValidPlacement) const;
 
   protected:
 	virtual void BeginPlay() override;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Components")
 	UDecalComponent* SelectionCircleDecal;
-	UPROPERTY(EditDefaultsOnly, Category = "Components")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components")
 	UStaticMeshComponent* StaticMeshComponent;
 
 	EFEntitiesImportance BuildingImportance;
@@ -41,6 +42,11 @@ class RTSGAME_API ARGBuildingBase : public APawn
   private:
 	UPROPERTY()
 	ARGPlayerController* PlayerController;
-	
+
+	UPROPERTY()
+	UMaterialInterface* ValidPlacementMaterial;
+	UPROPERTY()
+	UMaterialInterface* InValidPlacementMaterial;
+
 	bool bIsSelected = false;
 };

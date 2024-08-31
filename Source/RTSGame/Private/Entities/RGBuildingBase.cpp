@@ -19,6 +19,16 @@ ARGBuildingBase::ARGBuildingBase()
 	SelectionCircleDecal = CreateDefaultSubobject<UDecalComponent>("SelectionCircleDecal");
 	SelectionCircleDecal->SetupAttachment(GetRootComponent());
 	SelectionCircleDecal->SetVisibility(false);
+	
+	static ConstructorHelpers::FObjectFinder<UMaterialInterface> ValidPlacementMaterialFinder(
+		TEXT("/Game/Entities/Buildings/Materials/M_BuildingValidPlacement.M_BuildingValidPlacement"));
+	static ConstructorHelpers::FObjectFinder<UMaterialInterface> InValidPlacementMaterialFinder(
+		TEXT("/Game/Entities/Buildings/Materials/M_BuildingInvalidPlacement.M_BuildingInvalidPlacement"));
+
+	if (ValidPlacementMaterialFinder.Succeeded())
+		ValidPlacementMaterial = ValidPlacementMaterialFinder.Object;
+	if (InValidPlacementMaterialFinder.Succeeded())
+		InValidPlacementMaterial = InValidPlacementMaterialFinder.Object;
 }
 
 void ARGBuildingBase::Tick(float DeltaTime)
@@ -71,15 +81,26 @@ bool ARGBuildingBase::IsSeleted() const
 	return bIsSelected;
 }
 
+int32 ARGBuildingBase::GetImportance() const
+{
+	return BuildingImportance;
+}
+
 void ARGBuildingBase::SetSelected(bool bIsBuildingSelected)
 {
 	bIsSelected = bIsBuildingSelected;
 	SelectionCircleDecal->SetVisibility(bIsBuildingSelected);
 }
 
-int32 ARGBuildingBase::GetImportance() const
+void ARGBuildingBase::SetBuildingPlacementMaterial(const bool IsValidPlacement) const
 {
-	return BuildingImportance;
+	if (!StaticMeshComponent)
+		return;
+
+	UMaterialInterface* PlacementMaterial = IsValidPlacement ? ValidPlacementMaterial : InValidPlacementMaterial;
+
+	for (int i = 0; i < StaticMeshComponent->GetMaterials().Num(); ++i)
+		StaticMeshComponent->SetMaterial(i, PlacementMaterial);
 }
 
 void ARGBuildingBase::BeginPlay()
