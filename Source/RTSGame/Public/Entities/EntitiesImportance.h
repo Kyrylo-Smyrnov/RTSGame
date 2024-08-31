@@ -7,5 +7,9 @@
 // of the first (most important) one is shown.
 enum EFEntitiesImportance
 {
-	
+	// Buildings
+	TownHall = 0,
+
+	// Units
+	Peasant = 1
 };

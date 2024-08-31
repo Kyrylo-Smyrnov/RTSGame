@@ -38,10 +38,11 @@ class RTSGAME_API ARGUnitBase : public ACharacter, public IActionable
 	UPROPERTY(EditDefaultsOnly, Category = "Components")
 	UDecalComponent* SelectionCircleDecal;
 
+	EFEntitiesImportance UnitImportance;
+
   private:
 	UPROPERTY()
 	ARGPlayerController* PlayerController;
 	
-	EFEntitiesImportance UnitImportance;
 	bool bIsSelected = false;
 };

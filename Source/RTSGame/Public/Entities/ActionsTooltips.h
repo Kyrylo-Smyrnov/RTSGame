@@ -2,9 +2,24 @@
 
 namespace Tooltips
 {
-FText AttackActionTooltip = FText::FromString("Order the selected unit to attack the targeted enemy.");
-FText HoldActionTooltip = FText::FromString("Command the selected unit to hold its current position.");
-FText MoveActionTooltip = FText::FromString("Command the selected unit to move to the targeted location.");
-FText MoveAttackActionTooltip = FText::FromString(
-	"Command the selected unit to move towards a target while attacking any enemies encountered along the way.");
+namespace Units
+{
+extern FText AttackActionTooltip;
+extern FText HoldActionTooltip;
+extern FText MoveActionTooltip;
+extern FText MoveAttackActionTooltip;
+
+namespace Peasant
+{
+extern FText BuildTownHall;
+} // namespace Peasant
+} // namespace Units
+
+namespace Buildings
+{
+namespace TownHall
+{
+extern FText BuildPeasantTooltip;
+} // namespace TownHall
+} // namespace Buildings
 } // namespace Tooltips

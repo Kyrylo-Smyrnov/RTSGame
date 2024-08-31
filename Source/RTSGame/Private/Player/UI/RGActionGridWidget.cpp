@@ -37,7 +37,7 @@ void URGActionGridWidget::UpdateActionButtons(AActor* MostImportantEntity)
 	{
 		TArray<FActionData> AvailableActions = ActionableEntity->GetAvailableActions_Implementation();
 
-		for (int32 i = 0; i < AvailableActions.Num(); ++i)
+		for (int32 i = 0; i < ActionButtons.Num(); ++i)
 		{
 			if (i < AvailableActions.Num())
 			{
@@ -49,7 +49,9 @@ void URGActionGridWidget::UpdateActionButtons(AActor* MostImportantEntity)
 			}
 			else
 			{
+				ActionButtons[i]->SetToolTipText(FText::FromString(""));
 				ActionButtons[i]->SetIsEnabled(false);
+				ActionIcons[i]->SetVisibility(ESlateVisibility::Hidden);
 			}
 		}
 	}

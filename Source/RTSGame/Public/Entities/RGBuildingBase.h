@@ -25,7 +25,7 @@ class RTSGAME_API ARGBuildingBase : public APawn
 
 	bool IsSeleted() const;
 	void SetSelected(bool bIsBuildingSelected);
-
+	
 	int32 GetImportance() const;
 
   protected:
@@ -36,10 +36,11 @@ class RTSGAME_API ARGBuildingBase : public APawn
 	UPROPERTY(EditDefaultsOnly, Category = "Components")
 	UStaticMeshComponent* StaticMeshComponent;
 
+	EFEntitiesImportance BuildingImportance;
+
   private:
 	UPROPERTY()
 	ARGPlayerController* PlayerController;
 	
-	EFEntitiesImportance BuildingImportance;
 	bool bIsSelected = false;
 };

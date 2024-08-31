@@ -88,26 +88,26 @@ TArray<FActionData> ARGUnitBase::GetAvailableActions_Implementation() const
 	FActionData AttackAction;
 	AttackAction.ActionName = "AttackAction";
 	AttackAction.ActionIcon = LoadObject<UTexture2D>(nullptr, TEXT("/Game/UI/Icons/Entities/Units/T_IconAttack"));
-	AttackAction.ActionTooltip = Tooltips::AttackActionTooltip;
+	AttackAction.ActionTooltip = Tooltips::Units::AttackActionTooltip;
 	BaseUnitActions.Add(AttackAction);
 
 	FActionData HoldAction;
 	HoldAction.ActionName = "HoldAction";
 	HoldAction.ActionIcon = LoadObject<UTexture2D>(nullptr, TEXT("/Game/UI/Icons/Entities/Units/T_IconHold"));
-	HoldAction.ActionTooltip = Tooltips::HoldActionTooltip;
+	HoldAction.ActionTooltip = Tooltips::Units::HoldActionTooltip;
 	BaseUnitActions.Add(HoldAction);
 
 	FActionData MoveAction;
 	MoveAction.ActionName = "MoveAction";
 	MoveAction.ActionIcon = LoadObject<UTexture2D>(nullptr, TEXT("/Game/UI/Icons/Entities/Units/T_IconMove"));
-	MoveAction.ActionTooltip = Tooltips::MoveActionTooltip;
+	MoveAction.ActionTooltip = Tooltips::Units::MoveActionTooltip;
 	BaseUnitActions.Add(MoveAction);
 
 	FActionData MoveAttackAction;
 	MoveAttackAction.ActionName = "MoveAttackAction";
 	MoveAttackAction.ActionIcon =
 		LoadObject<UTexture2D>(nullptr, TEXT("/Game/UI/Icons/Entities/Units/T_IconMoveAttack"));
-	MoveAttackAction.ActionTooltip = Tooltips::MoveAttackActionTooltip;
+	MoveAttackAction.ActionTooltip = Tooltips::Units::MoveAttackActionTooltip;
 	BaseUnitActions.Add(MoveAttackAction);
 
 	return BaseUnitActions;
