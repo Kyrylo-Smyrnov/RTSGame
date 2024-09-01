@@ -1,7 +1,7 @@
 // https://github.com/Kyrylo-Smyrnov/RTSGame
 
 #include "Entities/Buildings/RGBuildingTownHall.h"
-#include "Entities/ActionsTooltips.h"
+#include "Entities/Actions.h"
 
 ARGBuildingTownHall::ARGBuildingTownHall() : ARGBuildingBase()
 {
@@ -22,12 +22,7 @@ TArray<FActionData> ARGBuildingTownHall::GetAvailableActions_Implementation() co
 {
 	TArray<FActionData> TownHallActions;
 
-	FActionData BuildPeasant;
-	BuildPeasant.ActionName = "BuildPeasant";
-	BuildPeasant.ActionIcon =
-		LoadObject<UTexture2D>(nullptr, TEXT("/Game/UI/Icons/Entities/Buildings/TownHall/T_IconBuildPeasant"));
-	BuildPeasant.ActionTooltip = Tooltips::Buildings::TownHall::BuildPeasantTooltip;
-	TownHallActions.Add(BuildPeasant);
+	TownHallActions.Add(BuildingActions::TownHall_BuildPeasant);
 
 	return TownHallActions;
 }

@@ -26,33 +26,41 @@ void URGActionGridWidget::UpdateActionButtons(AActor* MostImportantEntity)
 {
 	if (!MostImportantEntity)
 	{
-		for (int32 i = 0; i < ActionButtons.Num(); ++i)
+		int32 Index = 0;
+		for (auto& Action : ActionButtons)
 		{
-			ActionButtons[i]->SetToolTipText(FText::FromString(""));
-			ActionButtons[i]->SetIsEnabled(false);
-			ActionIcons[i]->SetVisibility(ESlateVisibility::Hidden);
+			Action.Key->SetToolTipText(FText::FromString(""));
+			Action.Key->SetIsEnabled(false);
+			Action.Value = "";
+			ActionIcons[Index]->SetVisibility(ESlateVisibility::Hidden);
+
+			Index++;
 		}
 	}
 	else if (IActionable* ActionableEntity = Cast<IActionable>(MostImportantEntity))
 	{
 		TArray<FActionData> AvailableActions = ActionableEntity->GetAvailableActions_Implementation();
 
-		for (int32 i = 0; i < ActionButtons.Num(); ++i)
+		int32 Index = 0;
+		for (auto& Action : ActionButtons)
 		{
-			if (i < AvailableActions.Num())
+			if (Index < ActionButtons.Num() && Index < AvailableActions.Num())
 			{
-				ActionButtons[i]->SetToolTipText(AvailableActions[i].ActionTooltip);
-				ActionButtons[i]->SetIsEnabled(true);
-
-				ActionIcons[i]->SetBrushFromTexture(AvailableActions[i].ActionIcon, false);
-				ActionIcons[i]->SetVisibility(ESlateVisibility::Visible);
+				Action.Key->SetToolTipText(AvailableActions[Index].ActionTooltip);
+				Action.Key->SetIsEnabled(true);
+				Action.Value = AvailableActions[Index].ActionName;
+				ActionIcons[Index]->SetBrushFromTexture(AvailableActions[Index].ActionIcon, false);
+				ActionIcons[Index]->SetVisibility(ESlateVisibility::Visible);
 			}
 			else
 			{
-				ActionButtons[i]->SetToolTipText(FText::FromString(""));
-				ActionButtons[i]->SetIsEnabled(false);
-				ActionIcons[i]->SetVisibility(ESlateVisibility::Hidden);
+				Action.Key->SetToolTipText(FText::FromString(""));
+				Action.Key->SetIsEnabled(false);
+				Action.Value = "";
+				ActionIcons[Index]->SetVisibility(ESlateVisibility::Hidden);
 			}
+
+			Index++;
 		}
 	}
 }
@@ -84,7 +92,8 @@ void URGActionGridWidget::InitializeGrid()
 			ActionButton->SetVisibility(ESlateVisibility::Visible);
 			ActionButton->SetIsEnabled(false);
 			ActionButton->AddChild(ActionIcon);
-			ActionButtons.Add(ActionButton);
+			ActionButton->OnClicked.AddDynamic(this, &URGActionGridWidget::HandleButtonClick);
+			ActionButtons.Add(ActionButton, "");
 
 			USizeBox* SizeBox = NewObject<USizeBox>(this);
 			SizeBox->SetWidthOverride(BUTTON_SIZE.X);
@@ -97,6 +106,17 @@ void URGActionGridWidget::InitializeGrid()
 
 			if (GridSlot)
 				GridSlot->SetPadding(FMargin(BUTTON_PADDING));
+		}
+	}
+}
+
+void URGActionGridWidget::HandleButtonClick()
+{
+	for (auto& ActionButton : ActionButtons)
+	{
+		if (ActionButton.Key->IsHovered() && ActionButton.Key->GetIsEnabled())
+		{
+			// ActionButton - Clicked button, create logic here.
 		}
 	}
 }

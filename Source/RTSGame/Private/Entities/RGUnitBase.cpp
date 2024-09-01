@@ -3,7 +3,7 @@
 #include "Entities/RGUnitBase.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/DecalComponent.h"
-#include "Entities/ActionsTooltips.h"
+#include "Entities/Actions.h"
 #include "Kismet/GameplayStatics.h"
 #include "Player/RGPlayerPawn.h"
 #include "RGPlayerController.h"
@@ -85,30 +85,10 @@ TArray<FActionData> ARGUnitBase::GetAvailableActions_Implementation() const
 {
 	TArray<FActionData> BaseUnitActions;
 
-	FActionData AttackAction;
-	AttackAction.ActionName = "AttackAction";
-	AttackAction.ActionIcon = LoadObject<UTexture2D>(nullptr, TEXT("/Game/UI/Icons/Entities/Units/T_IconAttack"));
-	AttackAction.ActionTooltip = Tooltips::Units::AttackActionTooltip;
-	BaseUnitActions.Add(AttackAction);
-
-	FActionData HoldAction;
-	HoldAction.ActionName = "HoldAction";
-	HoldAction.ActionIcon = LoadObject<UTexture2D>(nullptr, TEXT("/Game/UI/Icons/Entities/Units/T_IconHold"));
-	HoldAction.ActionTooltip = Tooltips::Units::HoldActionTooltip;
-	BaseUnitActions.Add(HoldAction);
-
-	FActionData MoveAction;
-	MoveAction.ActionName = "MoveAction";
-	MoveAction.ActionIcon = LoadObject<UTexture2D>(nullptr, TEXT("/Game/UI/Icons/Entities/Units/T_IconMove"));
-	MoveAction.ActionTooltip = Tooltips::Units::MoveActionTooltip;
-	BaseUnitActions.Add(MoveAction);
-
-	FActionData MoveAttackAction;
-	MoveAttackAction.ActionName = "MoveAttackAction";
-	MoveAttackAction.ActionIcon =
-		LoadObject<UTexture2D>(nullptr, TEXT("/Game/UI/Icons/Entities/Units/T_IconMoveAttack"));
-	MoveAttackAction.ActionTooltip = Tooltips::Units::MoveAttackActionTooltip;
-	BaseUnitActions.Add(MoveAttackAction);
+	BaseUnitActions.Add(UnitActions::Base_Attack);
+	BaseUnitActions.Add(UnitActions::Base_Hold);
+	BaseUnitActions.Add(UnitActions::Base_Move);
+	BaseUnitActions.Add(UnitActions::Base_MoveAttack);
 
 	return BaseUnitActions;
 }

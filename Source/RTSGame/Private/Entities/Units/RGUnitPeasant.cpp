@@ -1,7 +1,7 @@
 // https://github.com/Kyrylo-Smyrnov/RTSGame
 
 #include "Entities/Units/RGUnitPeasant.h"
-#include "Entities/ActionsTooltips.h"
+#include "Entities/Actions.h"
 
 ARGUnitPeasant::ARGUnitPeasant() : ARGUnitBase()
 {
@@ -23,13 +23,7 @@ TArray<FActionData> ARGUnitPeasant::GetAvailableActions_Implementation() const
 	TArray<FActionData> PeasantActions;
 
 	PeasantActions.Append(Super::GetAvailableActions_Implementation());
-
-	FActionData BuildTownHall;
-	BuildTownHall.ActionName = "BuildTownHall";
-	BuildTownHall.ActionIcon =
-		LoadObject<UTexture2D>(nullptr, TEXT("/Game/UI/Icons/Entities/Units/Peasant/T_IconBuildTownHall"));
-	BuildTownHall.ActionTooltip = Tooltips::Units::Peasant::BuildTownHall;
-	PeasantActions.Add(BuildTownHall);
+	PeasantActions.Add(UnitActions::Peasant_BuildTownHall);
 
 	return PeasantActions;
 }

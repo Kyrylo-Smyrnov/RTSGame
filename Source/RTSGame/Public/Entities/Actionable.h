@@ -29,6 +29,12 @@ struct FActionData
 	FActionData()
 	{
 	}
+	FActionData(FName ActionName, UTexture2D* ActionIcon, FText ActionTooltip, int32 ActionManaCost,
+				int32 ActionGoldCost, int32 ActionWoodCost, int32 ActionCooldown)
+		: ActionName(ActionName), ActionIcon(ActionIcon), ActionTooltip(ActionTooltip), ActionManaCost(ActionManaCost),
+		  ActionGoldCost(ActionGoldCost), ActionWoodCost(ActionWoodCost), ActionCooldown(ActionCooldown)
+	{
+	}
 };
 
 UINTERFACE(MinimalAPI)

@@ -23,13 +23,16 @@ class RTSGAME_API URGActionGridWidget : public UUserWidget
   protected:
 	UPROPERTY(meta = (BindWidget))
 	UGridPanel* ActionGrid;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI")
-	TArray<UButton*> ActionButtons;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI");
+	TMap<UButton*, FName> ActionButtons;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI")
 	TArray<UImage*> ActionIcons;
 
   private:
 	void InitializeGrid();
+	UFUNCTION()
+	void HandleButtonClick();
 
 	UPROPERTY()
 	ARGPlayerController* PlayerController;

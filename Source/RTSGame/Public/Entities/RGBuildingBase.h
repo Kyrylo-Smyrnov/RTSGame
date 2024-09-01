@@ -41,6 +41,8 @@ class RTSGAME_API ARGBuildingBase : public APawn
 	EFEntitiesImportance BuildingImportance;
 
   private:
+	void HandleBuildingConstructing();
+	
 	UPROPERTY()
 	ARGPlayerController* PlayerController;
 
@@ -52,4 +54,5 @@ class RTSGAME_API ARGBuildingBase : public APawn
 	TArray<UMaterialInterface*> BuildingMeshMaterials;
 
 	bool bIsSelected = false;
+	bool bIsConstructing = false;
 };

@@ -13,6 +13,7 @@ ARGBuildingBase::ARGBuildingBase()
 
 	StaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>("StaticMeshComponent");
 	StaticMeshComponent->SetCollisionResponseToChannel(ECC_GameTraceChannel1, ECR_Block);
+	StaticMeshComponent->SetCollisionResponseToChannel(ECC_Visibility, ECR_Ignore);
 	StaticMeshComponent->bReceivesDecals = false;
 	SetRootComponent(StaticMeshComponent);
 
@@ -34,11 +35,18 @@ ARGBuildingBase::ARGBuildingBase()
 void ARGBuildingBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	if (bIsConstructing)
+		HandleBuildingConstructing();
 }
 
 void ARGBuildingBase::HandleOnClicked(AActor* TouchedActor, FKey ButtonPressed)
 {
-	if (PlayerController && ButtonPressed == EKeys::LeftMouseButton)
+	if(bIsConstructing)
+	{
+		bIsConstructing = false;
+		SetBuildingMeshMaterials();
+	}
+	else if (PlayerController && ButtonPressed == EKeys::LeftMouseButton)
 	{
 		ARGPlayerPawn* PlayerPawn = Cast<ARGPlayerPawn>(PlayerController->GetPawn());
 		if (!PlayerPawn)
@@ -96,7 +104,9 @@ void ARGBuildingBase::SetBuildingPlacementMaterial(const bool IsValidPlacement)
 {
 	if (!StaticMeshComponent)
 		return;
-	
+
+	bIsConstructing = true;
+	StaticMeshComponent->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
 	UMaterialInterface* PlacementMaterial = IsValidPlacement ? ValidPlacementMaterial : InValidPlacementMaterial;
 
 	for (int i = 0; i < StaticMeshComponent->GetMaterials().Num(); ++i)
@@ -105,7 +115,7 @@ void ARGBuildingBase::SetBuildingPlacementMaterial(const bool IsValidPlacement)
 
 void ARGBuildingBase::SetBuildingMeshMaterials()
 {
-	for(int i = 0; i < BuildingMeshMaterials.Num(); ++i)
+	for (int i = 0; i < BuildingMeshMaterials.Num(); ++i)
 		StaticMeshComponent->SetMaterial(i, BuildingMeshMaterials[i]);
 }
 
@@ -117,4 +127,14 @@ void ARGBuildingBase::BeginPlay()
 	BuildingMeshMaterials = StaticMeshComponent->GetMaterials();
 
 	PlayerController = Cast<ARGPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+}
+
+void ARGBuildingBase::HandleBuildingConstructing()
+{
+	FHitResult HitResult;
+	if (PlayerController->GetHitResultUnderCursorByChannel(UEngineTypes::ConvertToTraceType(ECC_Visibility), true,
+														   HitResult))
+	{
+		SetActorLocation(HitResult.Location);
+	}
 }
