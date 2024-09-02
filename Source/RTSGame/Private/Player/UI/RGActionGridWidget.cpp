@@ -10,6 +10,8 @@
 #include "Kismet/GameplayStatics.h"
 #include "Player/RGPlayerPawn.h"
 #include "RGPlayerController.h"
+#include "Entities/Buildings/RGBuildingTownHall.h"
+#include "Entities/Units/RGUnitPeasant.h"
 
 void URGActionGridWidget::NativeConstruct()
 {
@@ -112,11 +114,17 @@ void URGActionGridWidget::InitializeGrid()
 
 void URGActionGridWidget::HandleButtonClick()
 {
+	ARGPlayerPawn* PlayerPawn = Cast<ARGPlayerPawn>(PlayerController->GetPawn());
+	AActor* MostImportanEntity = PlayerPawn->GetMostImportantEntity();
+	
 	for (auto& ActionButton : ActionButtons)
 	{
 		if (ActionButton.Key->IsHovered() && ActionButton.Key->GetIsEnabled())
 		{
-			// ActionButton - Clicked button, create logic here.
+			if(ARGUnitPeasant* CastedPeasant = Cast<ARGUnitPeasant>(MostImportanEntity))
+				CastedPeasant->PerformAction_Implementation(ActionButton.Value);
+			else if(ARGBuildingTownHall* CastedTownHall = Cast<ARGBuildingTownHall>(MostImportanEntity))
+				CastedTownHall->PerformAction_Implementation(ActionButton.Value);
 		}
 	}
 }

@@ -3,6 +3,8 @@
 #include "Entities/Buildings/RGBuildingTownHall.h"
 #include "Entities/Actions.h"
 
+DEFINE_LOG_CATEGORY_STATIC(LogBuildingTownHall, All, All);
+
 ARGBuildingTownHall::ARGBuildingTownHall() : ARGBuildingBase()
 {
 	this->BuildingImportance = EFEntitiesImportance::TownHall;
@@ -29,5 +31,11 @@ TArray<FActionData> ARGBuildingTownHall::GetAvailableActions_Implementation() co
 
 void ARGBuildingTownHall::PerformAction_Implementation(const FName& ActionName)
 {
+	if(ActionName == "BuildPeasant")
+	{
+		UE_LOG(LogBuildingTownHall, Warning, TEXT("BuildPeasant logic is not implemented yet."));
+		return;
+	}
+	
 	IActionable::PerformAction_Implementation(ActionName);
 }

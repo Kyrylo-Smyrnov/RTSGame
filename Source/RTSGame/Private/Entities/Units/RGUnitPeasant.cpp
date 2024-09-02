@@ -3,6 +3,8 @@
 #include "Entities/Units/RGUnitPeasant.h"
 #include "Entities/Actions.h"
 
+DEFINE_LOG_CATEGORY_STATIC(LogUnitPeasant, All, All);
+
 ARGUnitPeasant::ARGUnitPeasant() : ARGUnitBase()
 {
 	this->UnitImportance = EFEntitiesImportance::Peasant;
@@ -30,5 +32,13 @@ TArray<FActionData> ARGUnitPeasant::GetAvailableActions_Implementation() const
 
 void ARGUnitPeasant::PerformAction_Implementation(const FName& ActionName)
 {
+	Super::PerformAction_Implementation(ActionName);
+
+	if(ActionName == "BuildTownHall")
+	{
+		UE_LOG(LogUnitPeasant, Warning, TEXT("BuildTownHall logic is not implemented yet."));
+		return;
+	}
+	
 	IActionable::PerformAction_Implementation(ActionName);
 }

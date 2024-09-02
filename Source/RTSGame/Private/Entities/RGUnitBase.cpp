@@ -8,6 +8,8 @@
 #include "Player/RGPlayerPawn.h"
 #include "RGPlayerController.h"
 
+DEFINE_LOG_CATEGORY_STATIC(LogUnitBase, All, All);
+
 ARGUnitBase::ARGUnitBase()
 {
 	PrimaryActorTick.bCanEverTick = true;
@@ -95,6 +97,27 @@ TArray<FActionData> ARGUnitBase::GetAvailableActions_Implementation() const
 
 void ARGUnitBase::PerformAction_Implementation(const FName& ActionName)
 {
+	if(ActionName == "AttackAction")
+	{
+		UE_LOG(LogUnitBase, Warning, TEXT("AttackAction logic is not implemented yet."));
+		return;
+	}
+	else if(ActionName == "HoldAction")
+	{
+		UE_LOG(LogUnitBase, Warning, TEXT("HoldAction logic is not implemented yet."));
+		return;
+	}
+	else if(ActionName == "MoveAction")
+	{
+		UE_LOG(LogUnitBase, Warning, TEXT("MoveAction logic is not implemented yet."));
+		return;
+	}
+	else if(ActionName == "MoveAttackAction")
+	{
+		UE_LOG(LogUnitBase, Warning, TEXT("MoveAttackAction logic is not implemented yet."));
+		return;
+	}
+	
 	IActionable::PerformAction_Implementation(ActionName);
 }
 
