@@ -2,6 +2,7 @@
 
 #include "Entities/Units/RGUnitPeasant.h"
 #include "Entities/Actions.h"
+#include "Entities/Buildings/RGBuildingTownHall.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogUnitPeasant, All, All);
 
@@ -34,11 +35,17 @@ void ARGUnitPeasant::PerformAction_Implementation(const FName& ActionName)
 {
 	Super::PerformAction_Implementation(ActionName);
 
-	if(ActionName == "BuildTownHall")
+	FActorSpawnParameters BuildParameters;
+	BuildParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+	if (ActionName == "BuildTownHall")
 	{
-		UE_LOG(LogUnitPeasant, Warning, TEXT("BuildTownHall logic is not implemented yet."));
+		ARGBuildingTownHall* SpawnedTownHall =
+			GetWorld()->SpawnActor<ARGBuildingTownHall>(BuildingTownHallBlueprintClass, BuildParameters);
+		SpawnedTownHall->SetBuildingPlacementMaterial(true);
+		
 		return;
 	}
-	
+
 	IActionable::PerformAction_Implementation(ActionName);
 }
