@@ -45,6 +45,7 @@ void ARGBuildingBase::HandleOnClicked(AActor* TouchedActor, FKey ButtonPressed)
 	{
 		bIsConstructing = false;
 		SetBuildingMeshMaterials();
+		StaticMeshComponent->SetCollisionResponseToChannel(ECC_Pawn, ECR_Block);
 	}
 	else if (PlayerController && ButtonPressed == EKeys::LeftMouseButton)
 	{
