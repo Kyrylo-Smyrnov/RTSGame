@@ -5,6 +5,8 @@
 ARGPlayerController::ARGPlayerController()
 {
 	bEnableClickEvents = true;
+	ClickEventKeys.AddUnique(EKeys::LeftMouseButton);
+	ClickEventKeys.AddUnique(EKeys::RightMouseButton);
 	DefaultClickTraceChannel = ECC_GameTraceChannel1;
 }
 

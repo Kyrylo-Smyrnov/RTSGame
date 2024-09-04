@@ -26,6 +26,9 @@ UCLASS() class RTSGAME_API ARGPlayerPawn : public APawn
 
 	UFUNCTION(BlueprintCallable)
 	AActor* GetMostImportantEntity() const;
+	UFUNCTION(BlueprintCallable)
+	TArray<AActor*> GetSelectedEntities() const;
+	
 	void AddEntitiesToSelected(AActor* Entity);
 	void AddEntitiesToSelected(TArray<AActor*> Entities);
 	void RemoveEntityFromSelected(AActor* Entity);

@@ -41,7 +41,7 @@ void ARGBuildingBase::Tick(float DeltaTime)
 
 void ARGBuildingBase::HandleOnClicked(AActor* TouchedActor, FKey ButtonPressed)
 {
-	if(bIsConstructing)
+	if (bIsConstructing)
 	{
 		bIsConstructing = false;
 		SetBuildingMeshMaterials();
@@ -123,10 +123,9 @@ void ARGBuildingBase::SetBuildingMeshMaterials()
 void ARGBuildingBase::BeginPlay()
 {
 	Super::BeginPlay();
+	
 	OnClicked.AddDynamic(this, &ARGBuildingBase::HandleOnClicked);
-
 	BuildingMeshMaterials = StaticMeshComponent->GetMaterials();
-
 	PlayerController = Cast<ARGPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 }
 

@@ -36,6 +36,11 @@ AActor* ARGPlayerPawn::GetMostImportantEntity() const
 	return nullptr;
 }
 
+TArray<AActor*> ARGPlayerPawn::GetSelectedEntities() const
+{
+	return SelectedEntities;
+}
+
 void ARGPlayerPawn::AddEntitiesToSelected(AActor* Entity)
 {
 	SelectedEntities.AddUnique(Entity);
@@ -52,13 +57,13 @@ void ARGPlayerPawn::AddEntitiesToSelected(AActor* Entity)
 
 void ARGPlayerPawn::AddEntitiesToSelected(TArray<AActor*> Entities)
 {
-	if(Entities.Num() == 0)
+	if (Entities.Num() == 0)
 		return;
-	
-	for(AActor* Entity : Entities)
+
+	for (AActor* Entity : Entities)
 	{
 		SelectedEntities.AddUnique(Entity);
-		
+
 		if (ARGUnitBase* CastedUnit = Cast<ARGUnitBase>(Entity))
 			CastedUnit->SetSelected(true);
 		if (ARGBuildingBase* CastedBuilding = Cast<ARGBuildingBase>(Entity))
@@ -87,9 +92,9 @@ void ARGPlayerPawn::RemoveEntityFromSelected(AActor* Entity)
 
 void ARGPlayerPawn::ClearSelectedEntities()
 {
-	if(SelectedEntities.Num() == 0)
+	if (SelectedEntities.Num() == 0)
 		return;
-	
+
 	for (AActor* Entity : SelectedEntities)
 	{
 		if (ARGUnitBase* CastedUnit = Cast<ARGUnitBase>(Entity))
