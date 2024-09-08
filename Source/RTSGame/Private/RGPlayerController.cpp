@@ -15,10 +15,13 @@ void ARGPlayerController::SetupInputComponent()
 	Super::SetupInputComponent();
 
 	InputComponent->BindAxis("MouseWheelInput", this, &ARGPlayerController::OnMouseWheelInput);
+	
 	InputComponent->BindAction("LeftMouseButtonInput", IE_Pressed, this,
 							   &ARGPlayerController::OnLeftMouseButtonInputPressed);
 	InputComponent->BindAction("LeftMouseButtonInput", IE_Released, this,
 							   &ARGPlayerController::OnLeftMouseButtonInputReleased);
+	InputComponent->BindAction("RightMouseButtonInput", IE_Pressed, this,
+							   &ARGPlayerController::OnRightMouseButtonInputPressed);
 }
 
 void ARGPlayerController::BeginPlay()
@@ -52,4 +55,11 @@ void ARGPlayerController::OnLeftMouseButtonInputPressed()
 void ARGPlayerController::OnLeftMouseButtonInputReleased()
 {
 	LeftMouseButtonInputReleased.Broadcast();
+}
+
+void ARGPlayerController::OnRightMouseButtonInputPressed()
+{
+	FHitResult HitResult;
+	if(!GetHitResultUnderCursor(ECC_GameTraceChannel1, true, HitResult))
+		RightMouseButtonInputPressedUninteractable.Broadcast();
 }
