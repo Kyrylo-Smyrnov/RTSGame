@@ -17,6 +17,9 @@ ARGResourceBase::ARGResourceBase()
 	StaticMeshComponent->SetCollisionResponseToChannel(ECC_GameTraceChannel1, ECR_Block);
 	StaticMeshComponent->bReceivesDecals = false;
 	SetRootComponent(StaticMeshComponent);
+
+	Health = 100.0f;
+	bIsDead = false;
 }
 
 void ARGResourceBase::Tick(float DeltaTime)
@@ -34,14 +37,22 @@ void ARGResourceBase::HandleOnClicked(AActor* TouchedActor, FKey ButtonPressed)
 			AAIController* AIController = Cast<AAIController>(Unit->GetController());
 			UBlackboardComponent* BlackboardComponent = AIController->GetBlackboardComponent();
 
-			UNavigationSystemV1* NavigationSystem = UNavigationSystemV1::GetCurrent(GetWorld());
-			FNavLocation TargetLocation;
-			NavigationSystem->GetRandomPointInNavigableRadius(GetActorLocation(), 50, TargetLocation);
-
 			// 1 - Attack
 			BlackboardComponent->SetValueAsEnum("UnitState", 1);
-			BlackboardComponent->SetValueAsVector("TargetLocationToMove", TargetLocation.Location);
+			BlackboardComponent->SetValueAsVector("TargetLocationToMove", GetActorLocation());
+			BlackboardComponent->SetValueAsObject("TargetActorToAttack", this);
 		}
+	}
+}
+
+void ARGResourceBase::DealDamage(const float Amount)
+{
+	Health -= Amount;
+	
+	if(Health <= 0)
+	{
+		bIsDead = true;
+		Destroy();
 	}
 }
 

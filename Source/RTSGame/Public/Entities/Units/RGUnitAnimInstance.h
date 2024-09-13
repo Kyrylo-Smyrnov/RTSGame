@@ -27,6 +27,6 @@ class RTSGAME_API URGUnitAnimInstance : public UAnimInstance
 	EUnitClass UnitClass;
 	UPROPERTY(BlueprintReadOnly, Category = "Movement")
 	float Speed;
-	UPROPERTY(BlueprintReadOnly, Category = "Actions")
+	UPROPERTY(BlueprintReadWrite, Category = "Actions")
 	bool bIsAttacking;
 };

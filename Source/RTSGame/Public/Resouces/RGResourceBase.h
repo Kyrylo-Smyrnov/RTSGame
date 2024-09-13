@@ -21,15 +21,22 @@ class RTSGAME_API ARGResourceBase : public AActor
 	UFUNCTION()
 	void HandleOnClicked(AActor* TouchedActor, FKey ButtonPressed);
 
+	UFUNCTION(BlueprintCallable)
+	void DealDamage(const float Amount);
+
   protected:
 	virtual void BeginPlay() override;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Components")
 	UStaticMeshComponent* StaticMeshComponent;
+	UPROPERTY(BlueprintReadOnly, Category = "Health")
+	bool bIsDead;
 
   private:
 	UPROPERTY()
 	ARGPlayerController* PlayerController;
 	UPROPERTY()
 	ARGPlayerPawn* PlayerPawn;
+
+	int32 Health;
 };
