@@ -12,6 +12,8 @@ ARGPlayerPawn::ARGPlayerPawn()
 	PlayerCameraComponent = CreateDefaultSubobject<URGPlayerCameraComponent>("PlayerCameraComponent");
 
 	SetRootComponent(PlayerCameraComponent);
+
+	PlayerWoodResource = 0;
 }
 
 void ARGPlayerPawn::Tick(float DeltaTime)
@@ -111,6 +113,12 @@ void ARGPlayerPawn::ClearSelectedEntities()
 bool ARGPlayerPawn::IsEntitySelected(AActor* Entity) const
 {
 	return SelectedEntities.Contains(Entity);
+}
+
+void ARGPlayerPawn::AddPlayerWoodResource(int32 Amount)
+{
+	PlayerWoodResource += Amount;
+	OnPlayerResourcesChanged.Broadcast(PlayerWoodResource);
 }
 
 void ARGPlayerPawn::BeginPlay()

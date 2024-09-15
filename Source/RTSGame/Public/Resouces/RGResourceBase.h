@@ -32,11 +32,12 @@ class RTSGAME_API ARGResourceBase : public AActor
 	UPROPERTY(BlueprintReadOnly, Category = "Health")
 	bool bIsDead;
 
+	UPROPERTY(BlueprintReadOnly)
+	int32 Health;
+
   private:
 	UPROPERTY()
 	ARGPlayerController* PlayerController;
 	UPROPERTY()
 	ARGPlayerPawn* PlayerPawn;
-
-	int32 Health;
 };

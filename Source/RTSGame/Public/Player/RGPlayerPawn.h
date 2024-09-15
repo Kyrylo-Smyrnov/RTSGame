@@ -10,6 +10,7 @@ class ARGPlayerController;
 class URGPlayerCameraComponent;
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnSelectedEntitiesChanged, AActor*);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnPlayerResourcesChanged, int32);
 
 UCLASS() class RTSGAME_API ARGPlayerPawn : public APawn
 {
@@ -28,14 +29,17 @@ UCLASS() class RTSGAME_API ARGPlayerPawn : public APawn
 	AActor* GetMostImportantEntity() const;
 	UFUNCTION(BlueprintCallable)
 	TArray<AActor*> GetSelectedEntities() const;
-	
+
 	void AddEntitiesToSelected(AActor* Entity);
 	void AddEntitiesToSelected(TArray<AActor*> Entities);
 	void RemoveEntityFromSelected(AActor* Entity);
 	void ClearSelectedEntities();
 	bool IsEntitySelected(AActor* Entity) const;
 
+	void AddPlayerWoodResource(int32 Amount);
+
 	FOnSelectedEntitiesChanged OnSelectedEntitiesChanged;
+	FOnPlayerResourcesChanged OnPlayerResourcesChanged;
 
   protected:
 	virtual void BeginPlay() override;
@@ -50,4 +54,6 @@ UCLASS() class RTSGAME_API ARGPlayerPawn : public APawn
 	ARGPlayerController* PlayerController;
 	UPROPERTY()
 	TArray<AActor*> SelectedEntities;
+
+	int32 PlayerWoodResource;
 };

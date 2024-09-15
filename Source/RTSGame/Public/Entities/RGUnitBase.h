@@ -8,6 +8,7 @@
 #include "GameFramework/Character.h"
 #include "RGUnitBase.generated.h"
 
+class ARGPlayerPawn;
 class ARGPlayerController;
 class UDecalComponent;
 
@@ -35,6 +36,9 @@ class RTSGAME_API ARGUnitBase : public ACharacter, public IActionable
   protected:
 	virtual void BeginPlay() override;
 
+	UPROPERTY()
+	ARGPlayerPawn* PlayerPawn;
+
 	UPROPERTY(EditDefaultsOnly, Category = "Components")
 	UDecalComponent* SelectionCircleDecal;
 
@@ -43,6 +47,6 @@ class RTSGAME_API ARGUnitBase : public ACharacter, public IActionable
   private:
 	UPROPERTY()
 	ARGPlayerController* PlayerController;
-	
+
 	bool bIsSelected = false;
 };

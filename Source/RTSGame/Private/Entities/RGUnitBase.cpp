@@ -31,7 +31,6 @@ void ARGUnitBase::HandleOnClicked(AActor* TouchedActor, FKey ButtonPressed)
 {
 	if (PlayerController && ButtonPressed == EKeys::LeftMouseButton)
 	{
-		ARGPlayerPawn* PlayerPawn = Cast<ARGPlayerPawn>(PlayerController->GetPawn());
 		if (!PlayerPawn)
 			return;
 
@@ -127,4 +126,5 @@ void ARGUnitBase::BeginPlay()
 	OnClicked.AddDynamic(this, &ARGUnitBase::HandleOnClicked);
 
 	PlayerController = Cast<ARGPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	PlayerPawn = Cast<ARGPlayerPawn>(PlayerController->GetPawn());
 }

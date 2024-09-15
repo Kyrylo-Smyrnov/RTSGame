@@ -41,6 +41,8 @@ class RTSGAME_API ARGPlayerHUD : public AHUD
 
 	UPROPERTY(EditDefaultsOnly, Category="Widgets")
 	TSubclassOf<UUserWidget> ActionGridWidgetClass;
+	UPROPERTY(EditDefaultsOnly, Category="Widgets")
+	TSubclassOf<UUserWidget> ResourceWidgetClass;
 	
 	UPROPERTY()
 	TArray<AActor*> SelectedEntities;

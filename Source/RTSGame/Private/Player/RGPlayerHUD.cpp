@@ -1,11 +1,11 @@
 // https://github.com/Kyrylo-Smyrnov/RTSGame
 
 #include "Player/RGPlayerHUD.h"
+#include "Blueprint/UserWidget.h"
 #include "Kismet/GameplayStatics.h"
 #include "Player/RGPlayerPawn.h"
-#include "RGPlayerController.h"
-#include "Blueprint/UserWidget.h"
 #include "Player/UI/RGActionGridWidget.h"
+#include "RGPlayerController.h"
 
 ARGPlayerHUD::ARGPlayerHUD()
 {
@@ -30,10 +30,10 @@ void ARGPlayerHUD::BeginPlay()
 	PlayerController->LeftMouseButtonInputPressed.AddUObject(this, &ARGPlayerHUD::HandleLeftMouseButtonInputPressed);
 	PlayerController->LeftMouseButtonInputReleased.AddUObject(this, &ARGPlayerHUD::HandleLeftMouseButtonInputReleased);
 
-	if(ActionGridWidgetClass)
+	if (ActionGridWidgetClass)
 	{
 		URGActionGridWidget* ActionGridWidget = CreateWidget<URGActionGridWidget>(PlayerController, ActionGridWidgetClass);
-		if(ActionGridWidget)
+		if (ActionGridWidget)
 			ActionGridWidget->AddToViewport();
 	}
 }

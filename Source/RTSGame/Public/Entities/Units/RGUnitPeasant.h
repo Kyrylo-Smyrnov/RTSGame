@@ -19,6 +19,11 @@ class RTSGAME_API ARGUnitPeasant : public ARGUnitBase
 
 	virtual void PerformAction_Implementation(const FName& ActionName) override;
 
+	UFUNCTION(BlueprintCallable, Category = "Resources")
+	void AddCarryingWood(int32 Amount);
+	UFUNCTION(BlueprintCallable, Category = "Resources")
+	void PutCarryingResources();
+
   protected:
 	virtual void BeginPlay() override;
 
@@ -27,4 +32,6 @@ class RTSGAME_API ARGUnitPeasant : public ARGUnitBase
   private:
 	UPROPERTY(EditDefaultsOnly, Category = "Actions")
 	TSubclassOf<ARGBuildingTownHall> BuildingTownHallBlueprintClass;
+
+	int32 CarryingWood;
 };
