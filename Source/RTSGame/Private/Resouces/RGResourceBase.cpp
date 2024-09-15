@@ -34,13 +34,16 @@ void ARGResourceBase::HandleOnClicked(AActor* TouchedActor, FKey ButtonPressed)
 		for (AActor* SelectedEntity : PlayerPawn->GetSelectedEntities())
 		{
 			ARGUnitBase* Unit = Cast<ARGUnitBase>(SelectedEntity);
-			AAIController* AIController = Cast<AAIController>(Unit->GetController());
-			UBlackboardComponent* BlackboardComponent = AIController->GetBlackboardComponent();
+			if(Unit)
+			{
+				AAIController* AIController = Cast<AAIController>(Unit->GetController());
+				UBlackboardComponent* BlackboardComponent = AIController->GetBlackboardComponent();
 
-			// 1 - Attack
-			BlackboardComponent->SetValueAsEnum("UnitState", 1);
-			BlackboardComponent->SetValueAsVector("TargetLocationToMove", GetActorLocation());
-			BlackboardComponent->SetValueAsObject("TargetActorToAttack", this);
+				// 1 - Attack
+				BlackboardComponent->SetValueAsEnum("UnitState", 1);
+				BlackboardComponent->SetValueAsVector("TargetLocationToMove", GetActorLocation());
+				BlackboardComponent->SetValueAsObject("TargetActorToAttack", this);
+			}
 		}
 	}
 }
