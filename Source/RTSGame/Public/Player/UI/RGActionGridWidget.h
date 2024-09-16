@@ -18,7 +18,7 @@ class RTSGAME_API URGActionGridWidget : public UUserWidget
 
   public:
 	void NativeConstruct() override;
-	void UpdateActionButtons(AActor* MostImportantEntity);
+	void UpdateWidget(AActor* MostImportantEntity);
 
   protected:
 	UPROPERTY(meta = (BindWidget))
@@ -31,7 +31,7 @@ class RTSGAME_API URGActionGridWidget : public UUserWidget
 	TArray<UImage*> ActionIcons;
 
   private:
-	void InitializeGrid();
+	void InitializeWidget();
 	UFUNCTION()
 	void HandleButtonClick();
 

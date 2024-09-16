@@ -19,7 +19,7 @@ void URGActionGridWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	InitializeGrid();
+	InitializeWidget();
 
 	PlayerController = Cast<ARGPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 	if (!PlayerController)
@@ -35,10 +35,10 @@ void URGActionGridWidget::NativeConstruct()
 		return;
 	}
 	
-	PlayerPawn->OnSelectedEntitiesChanged.AddUObject(this, &URGActionGridWidget::UpdateActionButtons);
+	PlayerPawn->OnSelectedEntitiesChanged.AddUObject(this, &URGActionGridWidget::UpdateWidget);
 }
 
-void URGActionGridWidget::UpdateActionButtons(AActor* MostImportantEntity)
+void URGActionGridWidget::UpdateWidget(AActor* MostImportantEntity)
 {
 	if (!MostImportantEntity)
 	{
@@ -81,7 +81,7 @@ void URGActionGridWidget::UpdateActionButtons(AActor* MostImportantEntity)
 	}
 }
 
-void URGActionGridWidget::InitializeGrid()
+void URGActionGridWidget::InitializeWidget()
 {
 	if (!ActionGrid)
 		return;

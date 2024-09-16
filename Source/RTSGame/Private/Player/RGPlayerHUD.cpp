@@ -5,6 +5,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Player/RGPlayerPawn.h"
 #include "Player/UI/RGActionGridWidget.h"
+#include "Player/UI/RGPlayerResourcesWidget.h"
 #include "RGPlayerController.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogRGPlayerHud, All, All);
@@ -42,6 +43,12 @@ void ARGPlayerHUD::BeginPlay()
 		URGActionGridWidget* ActionGridWidget = CreateWidget<URGActionGridWidget>(PlayerController, ActionGridWidgetClass);
 		if (ActionGridWidget)
 			ActionGridWidget->AddToViewport();
+	}
+	if (ResourceWidgetClass)
+	{
+		URGPlayerResourcesWidget* ResourcesWidget = CreateWidget<URGPlayerResourcesWidget>(PlayerController, ResourceWidgetClass);
+		if (ResourcesWidget)
+			ResourcesWidget->AddToViewport();
 	}
 }
 
