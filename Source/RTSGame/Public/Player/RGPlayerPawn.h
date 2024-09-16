@@ -12,7 +12,8 @@ class URGPlayerCameraComponent;
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnSelectedEntitiesChanged, AActor*);
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnPlayerResourcesChanged, int32);
 
-UCLASS() class RTSGAME_API ARGPlayerPawn : public APawn
+UCLASS()
+class RTSGAME_API ARGPlayerPawn : public APawn
 {
 	GENERATED_BODY()
 
@@ -29,6 +30,8 @@ UCLASS() class RTSGAME_API ARGPlayerPawn : public APawn
 	UFUNCTION(BlueprintCallable)
 	TArray<AActor*> GetSelectedEntities() const;
 
+	void AddEntitiesToContolled(AActor* Entity);
+	void RemoveEntityFromControlled(AActor* Entity);
 	void AddEntitiesToSelected(AActor* Entity);
 	void AddEntitiesToSelected(TArray<AActor*> Entities);
 	void RemoveEntityFromSelected(AActor* Entity);
@@ -46,12 +49,15 @@ UCLASS() class RTSGAME_API ARGPlayerPawn : public APawn
 	UPROPERTY(EditDefaultsOnly, Category = "Camera")
 	URGPlayerCameraComponent* PlayerCameraComponent;
 
+	UPROPERTY(BlueprintReadOnly, Category = "Entities")
+	TArray<AActor*> ControlledEntities;
+
   private:
 	static bool CompareEntityImportance(const AActor& A, const AActor& B);
 
 	UPROPERTY()
 	ARGPlayerController* PlayerController;
-	
+
 	UPROPERTY()
 	TArray<AActor*> SelectedEntities;
 

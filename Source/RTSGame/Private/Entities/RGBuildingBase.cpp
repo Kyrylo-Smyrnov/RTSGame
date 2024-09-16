@@ -162,6 +162,15 @@ void ARGBuildingBase::BeginPlay()
 	PlayerController = Cast<ARGPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 	if (!PlayerController)
 		UE_LOG(LogRGBuildingBase, Warning, TEXT("[BeginPlay] PlayerController is nullptr."));
+
+	ARGPlayerPawn* PlayerPawn = Cast<ARGPlayerPawn>(PlayerController->GetPawn());
+	if(!PlayerPawn)
+	{
+		UE_LOG(LogRGBuildingBase, Warning, TEXT("[BeginPlay] PlayerPawn is nullptr."));
+		return;
+	}
+
+	PlayerPawn->AddEntitiesToContolled(this);
 }
 
 void ARGBuildingBase::HandleBuildingConstructing()

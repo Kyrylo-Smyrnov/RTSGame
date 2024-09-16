@@ -8,7 +8,7 @@
 #include "Player/RGPlayerPawn.h"
 #include "RGPlayerController.h"
 
-DEFINE_LOG_CATEGORY_STATIC(LogUnitBase, All, All);
+DEFINE_LOG_CATEGORY_STATIC(LogRGUnitBase, All, All);
 
 ARGUnitBase::ARGUnitBase() : bIsSelected(false)
 {
@@ -33,7 +33,7 @@ void ARGUnitBase::HandleOnClicked(AActor* TouchedActor, FKey ButtonPressed)
 	{
 		if (!PlayerPawn)
 		{
-			UE_LOG(LogUnitBase, Warning, TEXT("[HandleOnClicked] PlayerPawn is nullptr."))
+			UE_LOG(LogRGUnitBase, Warning, TEXT("[HandleOnClicked] PlayerPawn is nullptr."))
 			return;
 		}
 
@@ -78,7 +78,7 @@ void ARGUnitBase::SetSelected(bool bIsUnitSelected)
 {
 	if(!SelectionCircleDecal)
 	{
-		UE_LOG(LogUnitBase, Warning, TEXT("[SetSelected] SelectionCircleDecal is nullptr."));
+		UE_LOG(LogRGUnitBase, Warning, TEXT("[SetSelected] SelectionCircleDecal is nullptr."));
 		return;
 	}
 	
@@ -107,22 +107,22 @@ void ARGUnitBase::PerformAction_Implementation(const FName& ActionName)
 {
 	if(ActionName == "AttackAction")
 	{
-		UE_LOG(LogUnitBase, Warning, TEXT("AttackAction logic is not implemented yet."));
+		UE_LOG(LogRGUnitBase, Warning, TEXT("AttackAction logic is not implemented yet."));
 		return;
 	}
 	else if(ActionName == "HoldAction")
 	{
-		UE_LOG(LogUnitBase, Warning, TEXT("HoldAction logic is not implemented yet."));
+		UE_LOG(LogRGUnitBase, Warning, TEXT("HoldAction logic is not implemented yet."));
 		return;
 	}
 	else if(ActionName == "MoveAction")
 	{
-		UE_LOG(LogUnitBase, Warning, TEXT("MoveAction logic is not implemented yet."));
+		UE_LOG(LogRGUnitBase, Warning, TEXT("MoveAction logic is not implemented yet."));
 		return;
 	}
 	else if(ActionName == "MoveAttackAction")
 	{
-		UE_LOG(LogUnitBase, Warning, TEXT("MoveAttackAction logic is not implemented yet."));
+		UE_LOG(LogRGUnitBase, Warning, TEXT("MoveAttackAction logic is not implemented yet."));
 		return;
 	}
 	
@@ -137,14 +137,16 @@ void ARGUnitBase::BeginPlay()
 	PlayerController = Cast<ARGPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 	if(!PlayerController)
 	{
-		UE_LOG(LogUnitBase, Warning, TEXT("[BeginPlay] PlayerController is nullptr."));
+		UE_LOG(LogRGUnitBase, Warning, TEXT("[BeginPlay] PlayerController is nullptr."));
 		return;
 	}
 	
 	PlayerPawn = Cast<ARGPlayerPawn>(PlayerController->GetPawn());
 	if(!PlayerPawn)
 	{
-		UE_LOG(LogUnitBase, Warning, TEXT("[BeginPlay] PlayerPawn is nullptr."));
+		UE_LOG(LogRGUnitBase, Warning, TEXT("[BeginPlay] PlayerPawn is nullptr."));
 		return;
 	}
+
+	PlayerPawn->AddEntitiesToContolled(this);
 }

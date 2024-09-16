@@ -46,6 +46,28 @@ TArray<AActor*> ARGPlayerPawn::GetSelectedEntities() const
 	return SelectedEntities;
 }
 
+void ARGPlayerPawn::AddEntitiesToContolled(AActor* Entity)
+{
+	if (Entity == nullptr)
+	{
+		UE_LOG(LogRGPlayerPawn, Warning, TEXT("[AddEntitiesToContolled] Entity is nullptr."));
+		return;
+	}
+
+	ControlledEntities.AddUnique(Entity);
+}
+
+void ARGPlayerPawn::RemoveEntityFromControlled(AActor* Entity)
+{
+	if (Entity == nullptr)
+	{
+		UE_LOG(LogRGPlayerPawn, Warning, TEXT("[RemoveEntityFromControlled] Entity is nullptr."));
+		return;
+	}
+
+	ControlledEntities.Remove(Entity);
+}
+
 void ARGPlayerPawn::AddEntitiesToSelected(AActor* Entity)
 {
 	if (Entity == nullptr)
@@ -100,7 +122,6 @@ void ARGPlayerPawn::RemoveEntityFromSelected(AActor* Entity)
 	{
 		UE_LOG(LogRGPlayerPawn, Warning, TEXT("[RemoveEntityFromSelected] Entity is nullptr."));
 		return;
-		;
 	}
 
 	SelectedEntities.Remove(Entity);
