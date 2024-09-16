@@ -14,18 +14,17 @@ void URGUnitAnimInstance::NativeInitializeAnimation()
 {
 	Super::NativeInitializeAnimation();
 
-	bIsAttacking = false;
-
 	APawn* Pawn = TryGetPawnOwner();
-	if (Pawn)
-	{
-		if (Cast<ARGUnitPeasant>(Pawn))
-			UnitClass = EUnitClass::UC_Peasant;
-	}
-	else
+	if(!Pawn)
 	{
 		UE_LOG(LogRGUnitAnimInstance, Warning, TEXT("[NativeInitializeAnimation]: !Pawn"));
+		return;
 	}
+	
+	if (Cast<ARGUnitPeasant>(Pawn))
+		UnitClass = EUnitClass::UC_Peasant;
+
+	bIsAttacking = false;
 }
 
 void URGUnitAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
@@ -33,12 +32,11 @@ void URGUnitAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	Super::NativeUpdateAnimation(DeltaSeconds);
 
 	APawn* Pawn = TryGetPawnOwner();
-	if (Pawn)
+	if(!Pawn)
 	{
-		Speed = Pawn->GetVelocity().Size();
+		UE_LOG(LogRGUnitAnimInstance, Warning, TEXT("[NativeInitializeAnimation]: !Pawn"));
+		return;
 	}
-	else
-	{
-		UE_LOG(LogRGUnitAnimInstance, Warning, TEXT("[NativeUpdateAnimation]: !Pawn"));
-	}
+	
+	Speed = Pawn->GetVelocity().Size();
 }

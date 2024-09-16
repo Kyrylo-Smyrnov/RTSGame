@@ -7,7 +7,9 @@
 #include "Player/RGPlayerPawn.h"
 #include "RGPlayerController.h"
 
-ARGBuildingBase::ARGBuildingBase()
+DEFINE_LOG_CATEGORY_STATIC(LogRGBuildingBase, All, All);
+
+ARGBuildingBase::ARGBuildingBase() : bIsSelected(false), bIsConstructing(false)
 {
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -28,8 +30,13 @@ ARGBuildingBase::ARGBuildingBase()
 
 	if (ValidPlacementMaterialFinder.Succeeded())
 		ValidPlacementMaterial = ValidPlacementMaterialFinder.Object;
+	else
+		UE_LOG(LogRGBuildingBase, Warning, TEXT("[Constructor] ValidPlacementMaterial not found."));
+
 	if (InValidPlacementMaterialFinder.Succeeded())
 		InValidPlacementMaterial = InValidPlacementMaterialFinder.Object;
+	else
+		UE_LOG(LogRGBuildingBase, Warning, TEXT("[Constructor] ValidPlacementMaterial not found."));
 }
 
 void ARGBuildingBase::Tick(float DeltaTime)
@@ -41,13 +48,19 @@ void ARGBuildingBase::Tick(float DeltaTime)
 
 void ARGBuildingBase::HandleOnClicked(AActor* TouchedActor, FKey ButtonPressed)
 {
+	if (!PlayerController)
+	{
+		UE_LOG(LogRGBuildingBase, Warning, TEXT("[HandleOnClicked] PlayerController is nullptr."));
+		return;
+	}
+
 	if (bIsConstructing)
 	{
 		bIsConstructing = false;
 		SetBuildingMeshMaterials();
 		StaticMeshComponent->SetCollisionResponseToChannel(ECC_Pawn, ECR_Block);
 	}
-	else if (PlayerController && ButtonPressed == EKeys::LeftMouseButton)
+	else if (ButtonPressed == EKeys::LeftMouseButton)
 	{
 		ARGPlayerPawn* PlayerPawn = Cast<ARGPlayerPawn>(PlayerController->GetPawn());
 		if (!PlayerPawn)
@@ -85,7 +98,7 @@ void ARGBuildingBase::HandleOnClicked(AActor* TouchedActor, FKey ButtonPressed)
 	}
 }
 
-bool ARGBuildingBase::IsSeleted() const
+bool ARGBuildingBase::IsSelected() const
 {
 	return bIsSelected;
 }
@@ -97,6 +110,12 @@ int32 ARGBuildingBase::GetImportance() const
 
 void ARGBuildingBase::SetSelected(bool bIsBuildingSelected)
 {
+	if (!SelectionCircleDecal)
+	{
+		UE_LOG(LogRGBuildingBase, Warning, TEXT("[SetSelected] SelectionCircleDecal is nullptr."));
+		return;
+	}
+
 	bIsSelected = bIsBuildingSelected;
 	SelectionCircleDecal->SetVisibility(bIsBuildingSelected);
 }
@@ -104,7 +123,15 @@ void ARGBuildingBase::SetSelected(bool bIsBuildingSelected)
 void ARGBuildingBase::SetBuildingPlacementMaterial(const bool IsValidPlacement)
 {
 	if (!StaticMeshComponent)
+	{
+		UE_LOG(LogRGBuildingBase, Warning, TEXT("[SetBuildingPlacementMaterial] StaticMeshComponent is nullptr."));
 		return;
+	}
+	if (!ValidPlacementMaterial || !InValidPlacementMaterial)
+	{
+		UE_LOG(LogRGBuildingBase, Warning, TEXT("[SetBuildingPlacementMaterial] Placement materials aren't set."));
+		return;
+	}
 
 	bIsConstructing = true;
 	StaticMeshComponent->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
@@ -116,6 +143,11 @@ void ARGBuildingBase::SetBuildingPlacementMaterial(const bool IsValidPlacement)
 
 void ARGBuildingBase::SetBuildingMeshMaterials()
 {
+	if (!StaticMeshComponent)
+	{
+		UE_LOG(LogRGBuildingBase, Warning, TEXT("[SetBuildingMeshMaterials] StaticMeshComponent is nullptr."));
+	}
+
 	for (int i = 0; i < BuildingMeshMaterials.Num(); ++i)
 		StaticMeshComponent->SetMaterial(i, BuildingMeshMaterials[i]);
 }
@@ -123,17 +155,19 @@ void ARGBuildingBase::SetBuildingMeshMaterials()
 void ARGBuildingBase::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 	OnClicked.AddDynamic(this, &ARGBuildingBase::HandleOnClicked);
 	BuildingMeshMaterials = StaticMeshComponent->GetMaterials();
+
 	PlayerController = Cast<ARGPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	if (!PlayerController)
+		UE_LOG(LogRGBuildingBase, Warning, TEXT("[BeginPlay] PlayerController is nullptr."));
 }
 
 void ARGBuildingBase::HandleBuildingConstructing()
 {
 	FHitResult HitResult;
-	if (PlayerController->GetHitResultUnderCursorByChannel(UEngineTypes::ConvertToTraceType(ECC_Visibility), true,
-														   HitResult))
+	if (PlayerController && PlayerController->GetHitResultUnderCursorByChannel(UEngineTypes::ConvertToTraceType(ECC_Visibility), true, HitResult))
 	{
 		SetActorLocation(HitResult.Location);
 	}

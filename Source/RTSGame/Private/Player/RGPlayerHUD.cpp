@@ -7,15 +7,14 @@
 #include "Player/UI/RGActionGridWidget.h"
 #include "RGPlayerController.h"
 
-ARGPlayerHUD::ARGPlayerHUD()
-{
-}
+DEFINE_LOG_CATEGORY_STATIC(LogRGPlayerHud, All, All);
 
 void ARGPlayerHUD::DrawHUD()
 {
 	if (bIsSelectionBoxDrawn)
 	{
-		PlayerController->GetMousePosition(SelectionBoxEndPoint.X, SelectionBoxEndPoint.Y);
+		if(PlayerController)
+			PlayerController->GetMousePosition(SelectionBoxEndPoint.X, SelectionBoxEndPoint.Y);
 
 		if (FVector2D::Distance(SelectionBoxStartPoint, SelectionBoxEndPoint) > 10.0f)
 			DrawSelectionBox();
@@ -27,8 +26,16 @@ void ARGPlayerHUD::BeginPlay()
 	Super::BeginPlay();
 
 	PlayerController = Cast<ARGPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
-	PlayerController->LeftMouseButtonInputPressed.AddUObject(this, &ARGPlayerHUD::HandleLeftMouseButtonInputPressed);
-	PlayerController->LeftMouseButtonInputReleased.AddUObject(this, &ARGPlayerHUD::HandleLeftMouseButtonInputReleased);
+	if (PlayerController)
+	{
+		PlayerController->LeftMouseButtonInputPressed.AddUObject(this, &ARGPlayerHUD::HandleLeftMouseButtonInputPressed);
+		PlayerController->LeftMouseButtonInputReleased.AddUObject(this, &ARGPlayerHUD::HandleLeftMouseButtonInputReleased);
+	}
+	else
+	{
+		UE_LOG(LogRGPlayerHud, Warning, TEXT("[BeginPlay] PlayerController is nullptr."));
+		return;
+	}
 
 	if (ActionGridWidgetClass)
 	{
@@ -74,8 +81,6 @@ void ARGPlayerHUD::DrawSelectionBox()
 
 	bIsSelectionBox = true;
 
-	GetActorsInSelectionRectangle(APawn::StaticClass(), SelectionBoxStartPoint, SelectionBoxEndPoint, SelectedEntities,
-								  false, false);
-
+	GetActorsInSelectionRectangle(APawn::StaticClass(), SelectionBoxStartPoint, SelectionBoxEndPoint, SelectedEntities, false, false);
 	SelectedEntities.RemoveAll([](AActor* Actor) { return Actor->IsA(ARGPlayerPawn::StaticClass()); });
 }

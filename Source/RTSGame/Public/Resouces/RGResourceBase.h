@@ -29,10 +29,10 @@ class RTSGAME_API ARGResourceBase : public AActor
 
 	UPROPERTY(EditDefaultsOnly, Category = "Components")
 	UStaticMeshComponent* StaticMeshComponent;
+
 	UPROPERTY(BlueprintReadOnly, Category = "Health")
 	bool bIsDead;
-
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(BlueprintReadOnly, Category = "Health")
 	int32 Health;
 
   private:
@@ -40,4 +40,8 @@ class RTSGAME_API ARGResourceBase : public AActor
 	ARGPlayerController* PlayerController;
 	UPROPERTY()
 	ARGPlayerPawn* PlayerPawn;
+
+	const FName BLACKBOARD_KEY_UNITSTATE = "UnitState";
+	const FName BLACKBOARD_KEY_TARGETLOCATIONTOMOVE = "TargetLocationToMove";
+	const FName BLACKBOARD_KEY_TARGETACTORTOATTACK = "TargetActorToAttack";
 };

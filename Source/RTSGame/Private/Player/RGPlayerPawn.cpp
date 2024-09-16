@@ -6,11 +6,13 @@
 #include "Player/RGPlayerCameraComponent.h"
 #include "RGPlayerController.h"
 
+DEFINE_LOG_CATEGORY_STATIC(LogRGPlayerPawn, All, All);
+
 ARGPlayerPawn::ARGPlayerPawn()
 {
 	PrimaryActorTick.bCanEverTick = true;
-	PlayerCameraComponent = CreateDefaultSubobject<URGPlayerCameraComponent>("PlayerCameraComponent");
 
+	PlayerCameraComponent = CreateDefaultSubobject<URGPlayerCameraComponent>("PlayerCameraComponent");
 	SetRootComponent(PlayerCameraComponent);
 
 	PlayerWoodResource = 0;
@@ -35,6 +37,7 @@ AActor* ARGPlayerPawn::GetMostImportantEntity() const
 {
 	if (SelectedEntities.Num() > 0)
 		return SelectedEntities[0];
+
 	return nullptr;
 }
 
@@ -45,7 +48,14 @@ TArray<AActor*> ARGPlayerPawn::GetSelectedEntities() const
 
 void ARGPlayerPawn::AddEntitiesToSelected(AActor* Entity)
 {
+	if (Entity == nullptr)
+	{
+		UE_LOG(LogRGPlayerPawn, Warning, TEXT("[AddEntitiesToSelected] Entity is nullptr."));
+		return;
+	}
+
 	SelectedEntities.AddUnique(Entity);
+
 	if (ARGUnitBase* CastedUnit = Cast<ARGUnitBase>(Entity))
 		CastedUnit->SetSelected(true);
 	if (ARGBuildingBase* CastedBuilding = Cast<ARGBuildingBase>(Entity))
@@ -64,6 +74,12 @@ void ARGPlayerPawn::AddEntitiesToSelected(TArray<AActor*> Entities)
 
 	for (AActor* Entity : Entities)
 	{
+		if (Entity == nullptr)
+		{
+			UE_LOG(LogRGPlayerPawn, Warning, TEXT("[AddEntitiesToSelected] Entity is nullptr."));
+			continue;
+		}
+
 		SelectedEntities.AddUnique(Entity);
 
 		if (ARGUnitBase* CastedUnit = Cast<ARGUnitBase>(Entity))
@@ -80,7 +96,15 @@ void ARGPlayerPawn::AddEntitiesToSelected(TArray<AActor*> Entities)
 
 void ARGPlayerPawn::RemoveEntityFromSelected(AActor* Entity)
 {
+	if (Entity == nullptr)
+	{
+		UE_LOG(LogRGPlayerPawn, Warning, TEXT("[RemoveEntityFromSelected] Entity is nullptr."));
+		return;
+		;
+	}
+
 	SelectedEntities.Remove(Entity);
+
 	if (ARGUnitBase* CastedUnit = Cast<ARGUnitBase>(Entity))
 		CastedUnit->SetSelected(false);
 	if (ARGBuildingBase* CastedBuilding = Cast<ARGBuildingBase>(Entity))
@@ -127,8 +151,9 @@ void ARGPlayerPawn::BeginPlay()
 	PlayerController = Cast<ARGPlayerController>(GetController());
 
 	if (PlayerController)
-		PlayerController->LeftMouseButtonInputPressedUninteractable.AddUObject(
-			this, &ARGPlayerPawn::HandleLeftMouseButtonInputPressedUninteractable);
+		PlayerController->LeftMouseButtonInputPressedUninteractable.AddUObject(this, &ARGPlayerPawn::HandleLeftMouseButtonInputPressedUninteractable);
+	else
+		UE_LOG(LogRGPlayerPawn, Warning, TEXT("[BeginPlay] PlayerController is nullptr."))
 }
 
 bool ARGPlayerPawn::CompareEntityImportance(const AActor& A, const AActor& B)

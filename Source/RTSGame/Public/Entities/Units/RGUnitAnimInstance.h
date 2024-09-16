@@ -16,9 +16,10 @@ UCLASS()
 class RTSGAME_API URGUnitAnimInstance : public UAnimInstance
 {
 	GENERATED_BODY()
+	
   public:
 	void SetIsAttacking(bool IsAttacking);
-	
+
   protected:
 	virtual void NativeInitializeAnimation() override;
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;

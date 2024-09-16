@@ -31,7 +31,7 @@ TArray<FActionData> ARGBuildingTownHall::GetAvailableActions_Implementation() co
 
 void ARGBuildingTownHall::PerformAction_Implementation(const FName& ActionName)
 {
-	if(ActionName == "BuildPeasant")
+	if(ActionName == ACTION_BUILDPEASANT)
 	{
 		UE_LOG(LogBuildingTownHall, Warning, TEXT("BuildPeasant logic is not implemented yet."));
 		return;

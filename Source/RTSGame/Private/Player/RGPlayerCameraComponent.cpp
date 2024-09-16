@@ -1,11 +1,12 @@
 // https://github.com/Kyrylo-Smyrnov/RTSGame
 
 #include "Player/RGPlayerCameraComponent.h"
-
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "RGPlayerController.h"
+
+DEFINE_LOG_CATEGORY_STATIC(LogRGPlayerCameraComponent, All, All);
 
 URGPlayerCameraComponent::URGPlayerCameraComponent()
 {
@@ -24,11 +25,9 @@ URGPlayerCameraComponent::URGPlayerCameraComponent()
 	CameraComponent->SetupAttachment(SpringArmComponent);
 }
 
-void URGPlayerCameraComponent::TickComponent(float DeltaTime, ELevelTick TickType,
-											 FActorComponentTickFunction* ThisTickFunction)
+void URGPlayerCameraComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
 	HandleCameraMovement();
 }
 
@@ -37,17 +36,26 @@ void URGPlayerCameraComponent::BeginPlay()
 	Super::BeginPlay();
 
 	PlayerController = Cast<ARGPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
-	PlayerController->MouseWheelInput.AddUObject(this, &URGPlayerCameraComponent::HandleMouseWheelInput);
+	if (PlayerController)
+		PlayerController->MouseWheelInput.AddUObject(this, &URGPlayerCameraComponent::HandleMouseWheelInput);
+	else
+		UE_LOG(LogRGPlayerCameraComponent, Warning, TEXT("[BeginPlay] PlayerController is nullptr."));
 }
 
 void URGPlayerCameraComponent::HandleCameraMovement()
 {
+	if (!CameraRootComponent)
+	{
+		UE_LOG(LogRGPlayerCameraComponent, Warning, TEXT("[HandleCameraMovement] CameraRootComponent is nullptr."));
+		return;
+	}
+
 	FVector2D MousePosition = FVector2D::ZeroVector;
 	PlayerController->GetMousePosition(MousePosition.X, MousePosition.Y);
 
 	PlayerController->GetViewportSize(ViewportSize.X, ViewportSize.Y);
-	CameraScrollBoundX = ViewportSize.X * 0.01f;
-	CameraScrollBoundY = ViewportSize.Y * 0.01f;
+	CameraScrollBoundX = ViewportSize.X * SCROLL_BOUNDARY_FRACTION;
+	CameraScrollBoundY = ViewportSize.Y * SCROLL_BOUNDARY_FRACTION;
 
 	float MovementX = 0.0f;
 	float MovementY = 0.0f;
@@ -67,7 +75,12 @@ void URGPlayerCameraComponent::HandleCameraMovement()
 
 void URGPlayerCameraComponent::HandleMouseWheelInput(float Amount)
 {
+	if (!SpringArmComponent)
+	{
+		UE_LOG(LogRGPlayerCameraComponent, Warning, TEXT("[HandleMouseWheelInput] SpringArmComponent is nullptr."));
+		return;
+	}
+
 	CameraZoomFactor = FMath::Clamp(CameraZoomFactor += Amount, 0.0f, 10.0f);
-	SpringArmComponent->TargetArmLength =
-		MAX_SPRING_ARM_LENGTH - (MAX_SPRING_ARM_LENGTH - MIN_SPRING_ARM_LENGTH) / 10.0f * CameraZoomFactor;
+	SpringArmComponent->TargetArmLength = MAX_SPRING_ARM_LENGTH - (MAX_SPRING_ARM_LENGTH - MIN_SPRING_ARM_LENGTH) / 10.0f * CameraZoomFactor;
 }

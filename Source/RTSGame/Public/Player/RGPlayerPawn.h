@@ -18,7 +18,6 @@ UCLASS() class RTSGAME_API ARGPlayerPawn : public APawn
 
   public:
 	ARGPlayerPawn();
-
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
@@ -52,6 +51,7 @@ UCLASS() class RTSGAME_API ARGPlayerPawn : public APawn
 
 	UPROPERTY()
 	ARGPlayerController* PlayerController;
+	
 	UPROPERTY()
 	TArray<AActor*> SelectedEntities;
 

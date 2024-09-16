@@ -16,7 +16,6 @@ class RTSGAME_API ARGPlayerHUD : public AHUD
 	GENERATED_BODY()
 
   public:
-	ARGPlayerHUD();
 	virtual void DrawHUD() override;
 
   protected:

@@ -13,6 +13,8 @@
 #include "Entities/Buildings/RGBuildingTownHall.h"
 #include "Entities/Units/RGUnitPeasant.h"
 
+DEFINE_LOG_CATEGORY_STATIC(LogRGActionGridWidget, All, All);
+
 void URGActionGridWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
@@ -20,7 +22,19 @@ void URGActionGridWidget::NativeConstruct()
 	InitializeGrid();
 
 	PlayerController = Cast<ARGPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	if (!PlayerController)
+	{
+		UE_LOG(LogRGActionGridWidget, Warning, TEXT("[NativeConstruct] PlayerController is nullptr."))
+		return;
+	}
+	
 	ARGPlayerPawn* PlayerPawn = Cast<ARGPlayerPawn>(PlayerController->GetPawn());
+	if (!PlayerPawn)
+	{
+		UE_LOG(LogRGActionGridWidget, Warning, TEXT("[NativeConstruct] PlayerPawn is nullptr."))
+		return;
+	}
+	
 	PlayerPawn->OnSelectedEntitiesChanged.AddUObject(this, &URGActionGridWidget::UpdateActionButtons);
 }
 
@@ -115,7 +129,18 @@ void URGActionGridWidget::InitializeGrid()
 void URGActionGridWidget::HandleButtonClick()
 {
 	ARGPlayerPawn* PlayerPawn = Cast<ARGPlayerPawn>(PlayerController->GetPawn());
+	if (!PlayerPawn)
+	{
+		UE_LOG(LogRGActionGridWidget, Warning, TEXT("[HandleButtonClick] PlayerPawn is nullptr."))
+		return;
+	}
+	
 	AActor* MostImportanEntity = PlayerPawn->GetMostImportantEntity();
+	if (!MostImportanEntity)
+	{
+		UE_LOG(LogRGActionGridWidget, Warning, TEXT("[HandleButtonClick] MostImportanEntity is nullptr."))
+		return;
+	}
 	
 	for (auto& ActionButton : ActionButtons)
 	{

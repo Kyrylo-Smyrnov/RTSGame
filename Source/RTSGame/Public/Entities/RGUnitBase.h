@@ -38,7 +38,6 @@ class RTSGAME_API ARGUnitBase : public ACharacter, public IActionable
 
 	UPROPERTY()
 	ARGPlayerPawn* PlayerPawn;
-
 	UPROPERTY(EditDefaultsOnly, Category = "Components")
 	UDecalComponent* SelectionCircleDecal;
 
@@ -48,5 +47,5 @@ class RTSGAME_API ARGUnitBase : public ACharacter, public IActionable
 	UPROPERTY()
 	ARGPlayerController* PlayerController;
 
-	bool bIsSelected = false;
+	bool bIsSelected;
 };

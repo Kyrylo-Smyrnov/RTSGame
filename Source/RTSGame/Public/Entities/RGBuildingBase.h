@@ -23,7 +23,7 @@ class RTSGAME_API ARGBuildingBase : public APawn
 	UFUNCTION()
 	void HandleOnClicked(AActor* TouchedActor, FKey ButtonPressed);
 
-	bool IsSeleted() const;
+	bool IsSelected() const;
 	int32 GetImportance() const;
 
 	void SetSelected(bool bIsBuildingSelected);
@@ -53,6 +53,6 @@ class RTSGAME_API ARGBuildingBase : public APawn
 	UPROPERTY()
 	TArray<UMaterialInterface*> BuildingMeshMaterials;
 
-	bool bIsSelected = false;
-	bool bIsConstructing = false;
+	bool bIsSelected;
+	bool bIsConstructing;
 };

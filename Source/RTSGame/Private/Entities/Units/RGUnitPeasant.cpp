@@ -1,18 +1,15 @@
 // https://github.com/Kyrylo-Smyrnov/RTSGame
 
 #include "Entities/Units/RGUnitPeasant.h"
-
 #include "Entities/Actions.h"
 #include "Entities/Buildings/RGBuildingTownHall.h"
 #include "Player/RGPlayerPawn.h"
-#include "RGPlayerController.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogUnitPeasant, All, All);
 
-ARGUnitPeasant::ARGUnitPeasant() : ARGUnitBase()
+ARGUnitPeasant::ARGUnitPeasant() : ARGUnitBase(), CarryingWood(0)
 {
-	this->UnitImportance = EFEntitiesImportance::Peasant;
-	this->CarryingWood = 0;
+	UnitImportance = EFEntitiesImportance::Peasant;
 }
 
 void ARGUnitPeasant::Tick(float DeltaSeconds)
@@ -44,9 +41,15 @@ void ARGUnitPeasant::PerformAction_Implementation(const FName& ActionName)
 
 	if (ActionName == "BuildTownHall")
 	{
-		ARGBuildingTownHall* SpawnedTownHall =
-			GetWorld()->SpawnActor<ARGBuildingTownHall>(BuildingTownHallBlueprintClass, BuildParameters);
-		SpawnedTownHall->SetBuildingPlacementMaterial(true);
+		if(!BuildingTownHallBlueprintClass)
+		{
+			UE_LOG(LogUnitPeasant, Warning, TEXT("[PerformAction_Implementation] BuildingTownHallBlueprintClass is nullptr."));
+			return;
+		}
+		
+		ARGBuildingTownHall* SpawnedTownHall = GetWorld()->SpawnActor<ARGBuildingTownHall>(BuildingTownHallBlueprintClass, BuildParameters);
+		if(SpawnedTownHall)
+			SpawnedTownHall->SetBuildingPlacementMaterial(true);
 
 		return;
 	}
@@ -61,6 +64,12 @@ void ARGUnitPeasant::AddCarryingWood(int32 Amount)
 
 void ARGUnitPeasant::PutCarryingResources()
 {
+	if(!PlayerPawn)
+	{
+		UE_LOG(LogUnitPeasant, Warning, TEXT("[PutCarryingResources] PlayerPawn is nullptr."));
+		return;
+	}
+	
 	PlayerPawn->AddPlayerWoodResource(CarryingWood);
 	CarryingWood = 0;
 }

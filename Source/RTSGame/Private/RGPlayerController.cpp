@@ -2,6 +2,8 @@
 
 #include "RGPlayerController.h"
 
+DEFINE_LOG_CATEGORY_STATIC(LogRGPlayerController, All, All);
+
 ARGPlayerController::ARGPlayerController()
 {
 	bEnableClickEvents = true;
@@ -14,14 +16,17 @@ void ARGPlayerController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
 
+	if (!InputComponent)
+	{
+		UE_LOG(LogRGPlayerController, Warning, TEXT("[SetupInputComponent] InputComponent is nullptr."));
+		return;
+	}
+
 	InputComponent->BindAxis("MouseWheelInput", this, &ARGPlayerController::OnMouseWheelInput);
-	
-	InputComponent->BindAction("LeftMouseButtonInput", IE_Pressed, this,
-							   &ARGPlayerController::OnLeftMouseButtonInputPressed);
-	InputComponent->BindAction("LeftMouseButtonInput", IE_Released, this,
-							   &ARGPlayerController::OnLeftMouseButtonInputReleased);
-	InputComponent->BindAction("RightMouseButtonInput", IE_Pressed, this,
-							   &ARGPlayerController::OnRightMouseButtonInputPressed);
+
+	InputComponent->BindAction("LeftMouseButtonInput", IE_Pressed, this, &ARGPlayerController::OnLeftMouseButtonInputPressed);
+	InputComponent->BindAction("LeftMouseButtonInput", IE_Released, this, &ARGPlayerController::OnLeftMouseButtonInputReleased);
+	InputComponent->BindAction("RightMouseButtonInput", IE_Pressed, this, &ARGPlayerController::OnRightMouseButtonInputPressed);
 }
 
 void ARGPlayerController::BeginPlay()
@@ -38,28 +43,31 @@ void ARGPlayerController::BeginPlay()
 
 void ARGPlayerController::OnMouseWheelInput(float Amount)
 {
-	MouseWheelInput.Broadcast(Amount);
+	if (MouseWheelInput.IsBound())
+		MouseWheelInput.Broadcast(Amount);
 }
 
 void ARGPlayerController::OnLeftMouseButtonInputPressed()
 {
 	FVector2D MousePosition;
 	GetMousePosition(MousePosition.X, MousePosition.Y);
-	LeftMouseButtonInputPressed.Broadcast(MousePosition);
+	if (LeftMouseButtonInputPressed.IsBound())
+		LeftMouseButtonInputPressed.Broadcast(MousePosition);
 
 	FHitResult HitResult;
-	if (!GetHitResultUnderCursor(ECC_GameTraceChannel1, true, HitResult))
+	if (!GetHitResultUnderCursor(ECC_GameTraceChannel1, true, HitResult) && LeftMouseButtonInputPressedUninteractable.IsBound())
 		LeftMouseButtonInputPressedUninteractable.Broadcast();
 }
 
 void ARGPlayerController::OnLeftMouseButtonInputReleased()
 {
-	LeftMouseButtonInputReleased.Broadcast();
+	if (LeftMouseButtonInputReleased.IsBound())
+		LeftMouseButtonInputReleased.Broadcast();
 }
 
 void ARGPlayerController::OnRightMouseButtonInputPressed()
 {
 	FHitResult HitResult;
-	if(!GetHitResultUnderCursor(ECC_GameTraceChannel1, true, HitResult))
+	if (!GetHitResultUnderCursor(ECC_GameTraceChannel1, true, HitResult) && RightMouseButtonInputPressedUninteractable.IsBound())
 		RightMouseButtonInputPressedUninteractable.Broadcast();
 }

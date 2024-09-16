@@ -18,9 +18,7 @@ class RTSGAME_API URGPlayerCameraComponent : public USceneComponent
 
   public:
 	URGPlayerCameraComponent();
-
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType,
-							   FActorComponentTickFunction* ThisTickFunction) override;
+	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
   protected:
 	virtual void BeginPlay() override;
@@ -46,6 +44,7 @@ class RTSGAME_API URGPlayerCameraComponent : public USceneComponent
 	
 	int CameraScrollBoundX = 0.0f;
 	int CameraScrollBoundY = 0.0f;
+	const float SCROLL_BOUNDARY_FRACTION = 0.1f;
 
 	float CameraZoomFactor = 0.0f;
 	const float MAX_SPRING_ARM_LENGTH = 2000.0f;

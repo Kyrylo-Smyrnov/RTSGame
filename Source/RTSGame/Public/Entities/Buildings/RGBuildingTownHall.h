@@ -22,4 +22,7 @@ class RTSGAME_API ARGBuildingTownHall : public ARGBuildingBase, public IActionab
 	virtual void BeginPlay() override;
 
 	virtual TArray<FActionData> GetAvailableActions_Implementation() const override;
+
+  private:
+	const FName ACTION_BUILDPEASANT = "BuildPeasant";
 };

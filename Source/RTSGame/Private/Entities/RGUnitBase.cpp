@@ -10,7 +10,7 @@
 
 DEFINE_LOG_CATEGORY_STATIC(LogUnitBase, All, All);
 
-ARGUnitBase::ARGUnitBase()
+ARGUnitBase::ARGUnitBase() : bIsSelected(false)
 {
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -32,7 +32,10 @@ void ARGUnitBase::HandleOnClicked(AActor* TouchedActor, FKey ButtonPressed)
 	if (PlayerController && ButtonPressed == EKeys::LeftMouseButton)
 	{
 		if (!PlayerPawn)
+		{
+			UE_LOG(LogUnitBase, Warning, TEXT("[HandleOnClicked] PlayerPawn is nullptr."))
 			return;
+		}
 
 		bool bIsShiftDown = PlayerController->IsInputKeyDown(EKeys::LeftShift);
 		bool bIsCtrlDown = PlayerController->IsInputKeyDown(EKeys::LeftControl);
@@ -73,6 +76,12 @@ bool ARGUnitBase::IsSelected() const
 
 void ARGUnitBase::SetSelected(bool bIsUnitSelected)
 {
+	if(!SelectionCircleDecal)
+	{
+		UE_LOG(LogUnitBase, Warning, TEXT("[SetSelected] SelectionCircleDecal is nullptr."));
+		return;
+	}
+	
 	bIsSelected = bIsUnitSelected;
 	SelectionCircleDecal->SetVisibility(bIsUnitSelected);
 }
@@ -126,5 +135,16 @@ void ARGUnitBase::BeginPlay()
 	OnClicked.AddDynamic(this, &ARGUnitBase::HandleOnClicked);
 
 	PlayerController = Cast<ARGPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	if(!PlayerController)
+	{
+		UE_LOG(LogUnitBase, Warning, TEXT("[BeginPlay] PlayerController is nullptr."));
+		return;
+	}
+	
 	PlayerPawn = Cast<ARGPlayerPawn>(PlayerController->GetPawn());
+	if(!PlayerPawn)
+	{
+		UE_LOG(LogUnitBase, Warning, TEXT("[BeginPlay] PlayerPawn is nullptr."));
+		return;
+	}
 }

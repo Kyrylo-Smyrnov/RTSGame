@@ -26,6 +26,7 @@ class RTSGAME_API URGActionGridWidget : public UUserWidget
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI");
 	TMap<UButton*, FName> ActionButtons;
+	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI")
 	TArray<UImage*> ActionIcons;
 

@@ -3,3 +3,4 @@ BasedOnStyle: Microsoft
 Language: Cpp
 UseTab: Always
 PointerAlignment: Left
+ColumnLimit: 0
