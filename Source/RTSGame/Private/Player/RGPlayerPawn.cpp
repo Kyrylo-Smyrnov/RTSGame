@@ -160,10 +160,15 @@ bool ARGPlayerPawn::IsEntitySelected(AActor* Entity) const
 	return SelectedEntities.Contains(Entity);
 }
 
-void ARGPlayerPawn::AddPlayerWoodResource(int32 Amount)
+void ARGPlayerPawn::AddPlayerResources(int32 Amount)
 {
 	PlayerWoodResource += Amount;
 	OnPlayerResourcesChanged.Broadcast(PlayerWoodResource);
+}
+
+int32 ARGPlayerPawn::GetPlayerResources()
+{
+	return PlayerWoodResource;
 }
 
 void ARGPlayerPawn::BeginPlay()

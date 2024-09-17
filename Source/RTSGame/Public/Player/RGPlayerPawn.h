@@ -38,7 +38,8 @@ class RTSGAME_API ARGPlayerPawn : public APawn
 	void ClearSelectedEntities();
 	bool IsEntitySelected(AActor* Entity) const;
 
-	void AddPlayerWoodResource(int32 Amount);
+	void AddPlayerResources(int32 Amount);
+	int32 GetPlayerResources();
 
 	FOnSelectedEntitiesChanged OnSelectedEntitiesChanged;
 	FOnPlayerResourcesChanged OnPlayerResourcesChanged;

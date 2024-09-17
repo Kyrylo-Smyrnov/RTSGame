@@ -1,6 +1,12 @@
 // https://github.com/Kyrylo-Smyrnov/RTSGame
 
 #include "Entities/Actionable.h"
+#include "Player/RGPlayerPawn.h"
+
+namespace ActionsUtility
+{
+bool IsEnoughResourcesToBuild(ARGPlayerPawn* PlayerPawn, int32 WoodCost);
+}
 
 namespace BuildingActions
 {

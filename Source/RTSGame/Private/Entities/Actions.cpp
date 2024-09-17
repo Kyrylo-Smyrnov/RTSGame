@@ -1,5 +1,15 @@
 #include "Entities/Actions.h"
 
+namespace ActionsUtility
+{
+bool IsEnoughResourcesToBuild(ARGPlayerPawn* PlayerPawn, int32 WoodCost)
+{
+	int32 PlayerResources = PlayerPawn->GetPlayerResources();
+	
+	return PlayerResources >= WoodCost;
+}
+}
+
 namespace BuildingActions
 {
 FActionData TownHall_BuildPeasant = FActionData{
@@ -58,7 +68,7 @@ FActionData Peasant_BuildTownHall = FActionData{
 	FText::FromString("Capable of constructing various buildings to expand your base and strengthen your position."),
 	0,
 	0,
-	0,
+	200,
 	0};
 
 } // namespace UnitActions
