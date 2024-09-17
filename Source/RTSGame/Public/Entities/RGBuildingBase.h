@@ -53,6 +53,8 @@ class RTSGAME_API ARGBuildingBase : public APawn
 	UPROPERTY()
 	TArray<UMaterialInterface*> BuildingMeshMaterials;
 
+	bool CheckForOverlap();
+
 	bool bIsSelected;
 	bool bIsConstructing;
 };

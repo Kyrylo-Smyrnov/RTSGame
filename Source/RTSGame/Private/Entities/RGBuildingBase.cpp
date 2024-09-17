@@ -9,13 +9,15 @@
 
 DEFINE_LOG_CATEGORY_STATIC(LogRGBuildingBase, All, All);
 
-ARGBuildingBase::ARGBuildingBase() : bIsSelected(false), bIsConstructing(false)
+ARGBuildingBase::ARGBuildingBase()
+	: bIsSelected(false), bIsConstructing(false)
 {
 	PrimaryActorTick.bCanEverTick = true;
 
 	StaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>("StaticMeshComponent");
 	StaticMeshComponent->SetCollisionResponseToChannel(ECC_GameTraceChannel1, ECR_Block);
 	StaticMeshComponent->SetCollisionResponseToChannel(ECC_Visibility, ECR_Ignore);
+	StaticMeshComponent->SetGenerateOverlapEvents(true);
 	StaticMeshComponent->bReceivesDecals = false;
 	SetRootComponent(StaticMeshComponent);
 
@@ -54,13 +56,14 @@ void ARGBuildingBase::HandleOnClicked(AActor* TouchedActor, FKey ButtonPressed)
 		return;
 	}
 
-	if (bIsConstructing)
+	if (bIsConstructing && CheckForOverlap())
 	{
+		StaticMeshComponent->SetCollisionResponseToChannel(ECC_Pawn, ECR_Block);
+		StaticMeshComponent->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Block);
 		bIsConstructing = false;
 		SetBuildingMeshMaterials();
-		StaticMeshComponent->SetCollisionResponseToChannel(ECC_Pawn, ECR_Block);
 	}
-	else if (ButtonPressed == EKeys::LeftMouseButton)
+	else if (ButtonPressed == EKeys::LeftMouseButton && !bIsConstructing)
 	{
 		ARGPlayerPawn* PlayerPawn = Cast<ARGPlayerPawn>(PlayerController->GetPawn());
 		if (!PlayerPawn)
@@ -134,7 +137,6 @@ void ARGBuildingBase::SetBuildingPlacementMaterial(const bool IsValidPlacement)
 	}
 
 	bIsConstructing = true;
-	StaticMeshComponent->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
 	UMaterialInterface* PlacementMaterial = IsValidPlacement ? ValidPlacementMaterial : InValidPlacementMaterial;
 
 	for (int i = 0; i < StaticMeshComponent->GetMaterials().Num(); ++i)
@@ -144,9 +146,7 @@ void ARGBuildingBase::SetBuildingPlacementMaterial(const bool IsValidPlacement)
 void ARGBuildingBase::SetBuildingMeshMaterials()
 {
 	if (!StaticMeshComponent)
-	{
 		UE_LOG(LogRGBuildingBase, Warning, TEXT("[SetBuildingMeshMaterials] StaticMeshComponent is nullptr."));
-	}
 
 	for (int i = 0; i < BuildingMeshMaterials.Num(); ++i)
 		StaticMeshComponent->SetMaterial(i, BuildingMeshMaterials[i]);
@@ -164,7 +164,7 @@ void ARGBuildingBase::BeginPlay()
 		UE_LOG(LogRGBuildingBase, Warning, TEXT("[BeginPlay] PlayerController is nullptr."));
 
 	ARGPlayerPawn* PlayerPawn = Cast<ARGPlayerPawn>(PlayerController->GetPawn());
-	if(!PlayerPawn)
+	if (!PlayerPawn)
 	{
 		UE_LOG(LogRGBuildingBase, Warning, TEXT("[BeginPlay] PlayerPawn is nullptr."));
 		return;
@@ -178,6 +178,27 @@ void ARGBuildingBase::HandleBuildingConstructing()
 	FHitResult HitResult;
 	if (PlayerController && PlayerController->GetHitResultUnderCursorByChannel(UEngineTypes::ConvertToTraceType(ECC_Visibility), true, HitResult))
 	{
+		StaticMeshComponent->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+		StaticMeshComponent->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Overlap);
+		
 		SetActorLocation(HitResult.Location);
+		SetBuildingPlacementMaterial(CheckForOverlap());
 	}
+}
+
+bool ARGBuildingBase::CheckForOverlap()
+{
+	TArray<AActor*> OverlappingActors;
+	StaticMeshComponent->GetOverlappingActors(OverlappingActors);
+
+	for (AActor* Actor : OverlappingActors)
+	{
+		if (Actor->GetRootComponent()->GetCollisionObjectType() == ECC_Pawn ||
+			Actor->GetRootComponent()->GetCollisionObjectType() == ECC_WorldDynamic)
+		{
+			return false;
+		}
+	}
+
+	return true;
 }

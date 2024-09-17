@@ -36,10 +36,12 @@ void ARGUnitPeasant::PerformAction_Implementation(const FName& ActionName)
 {
 	Super::PerformAction_Implementation(ActionName);
 
-	TArray<FActionData> AvailableActions = GetAvailableActions_Implementation();
-
 	FActorSpawnParameters BuildParameters;
 	BuildParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+	TArray<FActionData> AvailableActions = GetAvailableActions_Implementation();
+	FActionData* ActionData = AvailableActions.FindByPredicate([&](const FActionData& Action)
+			{ return Action.ActionName == ActionName; });
 
 	if (ActionName == "BuildTownHall")
 	{
@@ -48,17 +50,14 @@ void ARGUnitPeasant::PerformAction_Implementation(const FName& ActionName)
 			UE_LOG(LogUnitPeasant, Warning, TEXT("[PerformAction_Implementation] BuildingTownHallBlueprintClass is nullptr."));
 			return;
 		}
-
-		FActionData* FoundAction = AvailableActions.FindByPredicate([&](const FActionData& Action)
-			{ return Action.ActionName == "BuildTownHall"; });
 		
-		if(ActionsUtility::IsEnoughResourcesToBuild(PlayerPawn, FoundAction->ActionWoodCost))
+		if(ActionsUtility::IsEnoughResourcesToBuild(PlayerPawn, ActionData->ActionWoodCost))
 		{
 			ARGBuildingTownHall* SpawnedTownHall = GetWorld()->SpawnActor<ARGBuildingTownHall>(BuildingTownHallBlueprintClass, BuildParameters);
 			if(SpawnedTownHall)
 				SpawnedTownHall->SetBuildingPlacementMaterial(true);
 
-			PlayerPawn->AddPlayerResources(-FoundAction->ActionWoodCost);
+			PlayerPawn->AddPlayerResources(-ActionData->ActionWoodCost);
 		}
 
 		return;

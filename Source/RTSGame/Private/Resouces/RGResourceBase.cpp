@@ -17,6 +17,7 @@ ARGResourceBase::ARGResourceBase()
 
 	StaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>("StaticMeshComponent");
 	StaticMeshComponent->SetCollisionResponseToChannel(ECC_GameTraceChannel1, ECR_Block);
+	StaticMeshComponent->SetCollisionResponseToChannel(ECC_Visibility, ECR_Ignore);
 	StaticMeshComponent->bReceivesDecals = false;
 	SetRootComponent(StaticMeshComponent);
 }
