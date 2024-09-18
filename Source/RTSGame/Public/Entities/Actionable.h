@@ -25,14 +25,16 @@ struct FActionData
 	int32 ActionWoodCost = 0;
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "Action")
 	int32 ActionCooldown = 0;
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "Action")
+	int32 UnitSpawnTime = 0;
 
 	FActionData()
 	{
 	}
 	FActionData(FName ActionName, UTexture2D* ActionIcon, FText ActionTooltip, int32 ActionManaCost,
-				int32 ActionGoldCost, int32 ActionWoodCost, int32 ActionCooldown)
+				int32 ActionGoldCost, int32 ActionWoodCost, int32 ActionCooldown, int32 UnitSpawnTime)
 		: ActionName(ActionName), ActionIcon(ActionIcon), ActionTooltip(ActionTooltip), ActionManaCost(ActionManaCost),
-		  ActionGoldCost(ActionGoldCost), ActionWoodCost(ActionWoodCost), ActionCooldown(ActionCooldown)
+		  ActionGoldCost(ActionGoldCost), ActionWoodCost(ActionWoodCost), ActionCooldown(ActionCooldown), UnitSpawnTime(UnitSpawnTime)
 	{
 	}
 };

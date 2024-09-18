@@ -48,4 +48,9 @@ class RTSGAME_API ARGUnitBase : public ACharacter, public IActionable
 	ARGPlayerController* PlayerController;
 
 	bool bIsSelected;
+
+	const FName ACTION_ATTACK = "AttackAction";
+	const FName ACTION_HOLDATTACK = "HoldAction";
+	const FName ACTION_MOVE = "MoveAction";
+	const FName ACTION_MOVEATTACK = "MoveAttackAction";
 };

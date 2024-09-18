@@ -2,10 +2,12 @@
 
 #include "Entities/Buildings/RGBuildingTownHall.h"
 #include "Entities/Actions.h"
+#include "Entities/Units/RGUnitPeasant.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogBuildingTownHall, All, All);
 
-ARGBuildingTownHall::ARGBuildingTownHall() : ARGBuildingBase()
+ARGBuildingTownHall::ARGBuildingTownHall()
+	: ARGBuildingBase()
 {
 	this->BuildingImportance = EFEntitiesImportance::TownHall;
 }
@@ -31,11 +33,27 @@ TArray<FActionData> ARGBuildingTownHall::GetAvailableActions_Implementation() co
 
 void ARGBuildingTownHall::PerformAction_Implementation(const FName& ActionName)
 {
-	if(ActionName == ACTION_BUILDPEASANT)
+	TArray<FActionData> AvailableActions = GetAvailableActions_Implementation();
+	FActionData* ActionData = AvailableActions.FindByPredicate([&](const FActionData& Action) { return Action.ActionName == ActionName; });
+
+	if (ActionName == ACTION_BUILDPEASANT)
 	{
-		UE_LOG(LogBuildingTownHall, Warning, TEXT("BuildPeasant logic is not implemented yet."));
-		return;
+		if (!UnitPeasantBlueprintClass)
+		{
+			UE_LOG(LogBuildingTownHall, Warning, TEXT("[PerformAction_Implementation] UnitPeasantBlueprintClass is nullptr."));
+			return;
+		}
+
+		if (ActionsUtility::IsEnoughResourcesToBuild(PlayerPawn, ActionData->ActionWoodCost))
+		{
+			AddUnitToSpawnQueue(UnitPeasantBlueprintClass, ActionData->UnitSpawnTime);
+			PlayerPawn->AddPlayerResources(-ActionData->ActionWoodCost);
+		}
+		else
+		{
+			UE_LOG(LogBuildingTownHall, Display, TEXT("There are not enough resources to perform the action %s"), *ActionData->ActionName.ToString());
+		}
 	}
-	
+
 	IActionable::PerformAction_Implementation(ActionName);
 }

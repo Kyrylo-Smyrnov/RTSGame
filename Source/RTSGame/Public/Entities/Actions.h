@@ -1,5 +1,7 @@
 // https://github.com/Kyrylo-Smyrnov/RTSGame
 
+#pragma once
+
 #include "Entities/Actionable.h"
 #include "Player/RGPlayerPawn.h"
 

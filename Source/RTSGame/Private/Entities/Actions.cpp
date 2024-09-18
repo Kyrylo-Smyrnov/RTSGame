@@ -1,3 +1,5 @@
+// https://github.com/Kyrylo-Smyrnov/RTSGame
+
 #include "Entities/Actions.h"
 
 namespace ActionsUtility
@@ -18,8 +20,9 @@ FActionData TownHall_BuildPeasant = FActionData{
 	FText::FromString("Capable of constructing various buildings to expand your base and strengthen your position."),
 	0,
 	0,
+	50,
 	0,
-	0};
+	5};
 } // namespace BuildingActions
 
 namespace UnitActions
@@ -32,12 +35,14 @@ FActionData Base_Attack = FActionData{
 	0,
 	0,
 	0,
+	0,
 	0};
 
 FActionData Base_Hold = FActionData{
 	"HoldAction",
 	LoadObject<UTexture2D>(nullptr, TEXT("/Game/UI/Icons/Entities/Units/T_IconHold")),
 	FText::FromString("Command the selected unit to hold its current position."),
+	0,
 	0,
 	0,
 	0,
@@ -50,12 +55,14 @@ FActionData Base_Move = FActionData{
 	0,
 	0,
 	0,
+	0,
 	0};
 
 FActionData Base_MoveAttack = FActionData{
 	"MoveAttackAction",
 	LoadObject<UTexture2D>(nullptr, TEXT("/Game/UI/Icons/Entities/Units/T_IconMoveAttack")),
 	FText::FromString("Command the selected unit to move towards a target while attacking any enemies encountered along the way."),
+	0,
 	0,
 	0,
 	0,
@@ -69,6 +76,7 @@ FActionData Peasant_BuildTownHall = FActionData{
 	0,
 	0,
 	200,
+	0,
 	0};
 
 } // namespace UnitActions

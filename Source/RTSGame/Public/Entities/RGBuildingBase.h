@@ -2,12 +2,14 @@
 
 #pragma once
 
+#include "Buildings/SpawnQueueEntry.h"
 #include "CoreMinimal.h"
 #include "EntitiesImportance.h"
 #include "GameFramework/Pawn.h"
 #include "RGBuildingBase.generated.h"
 
 class ARGPlayerController;
+class ARGPlayerPawn;
 class UDecalComponent;
 class UStaticMeshComponent;
 
@@ -23,6 +25,8 @@ class RTSGAME_API ARGBuildingBase : public APawn
 	UFUNCTION()
 	void HandleOnClicked(AActor* TouchedActor, FKey ButtonPressed);
 
+	void AddUnitToSpawnQueue(TSubclassOf<AActor> UnitClass, float SpawnTime);
+
 	bool IsSelected() const;
 	int32 GetImportance() const;
 
@@ -33,6 +37,9 @@ class RTSGAME_API ARGBuildingBase : public APawn
   protected:
 	virtual void BeginPlay() override;
 
+	UPROPERTY()
+	ARGPlayerPawn* PlayerPawn;
+	
 	UPROPERTY(EditDefaultsOnly, Category = "Components")
 	UDecalComponent* SelectionCircleDecal;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components")
@@ -41,10 +48,17 @@ class RTSGAME_API ARGBuildingBase : public APawn
 	EFEntitiesImportance BuildingImportance;
 
   private:
+	void SpawnUnitFromQueue(int32 QueueIndex);
+	void SpawnNextUnit();
 	void HandleBuildingConstructing();
 	
 	UPROPERTY()
 	ARGPlayerController* PlayerController;
+
+	FTimerHandle SpawnTimerHandle;
+	TArray<FSpawnQueueEntry> SpawnQueue;
+	float RemainingSpawnTime;
+	bool bIsSpawning;
 
 	UPROPERTY()
 	UMaterialInterface* ValidPlacementMaterial;

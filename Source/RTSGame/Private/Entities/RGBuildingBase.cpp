@@ -10,7 +10,7 @@
 DEFINE_LOG_CATEGORY_STATIC(LogRGBuildingBase, All, All);
 
 ARGBuildingBase::ARGBuildingBase()
-	: bIsSelected(false), bIsConstructing(false)
+	: bIsSelected(false), bIsConstructing(false), bIsSpawning(false), RemainingSpawnTime(0.0f)
 {
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -65,7 +65,6 @@ void ARGBuildingBase::HandleOnClicked(AActor* TouchedActor, FKey ButtonPressed)
 	}
 	else if (ButtonPressed == EKeys::LeftMouseButton && !bIsConstructing)
 	{
-		ARGPlayerPawn* PlayerPawn = Cast<ARGPlayerPawn>(PlayerController->GetPawn());
 		if (!PlayerPawn)
 			return;
 
@@ -99,6 +98,18 @@ void ARGBuildingBase::HandleOnClicked(AActor* TouchedActor, FKey ButtonPressed)
 			PlayerPawn->AddEntitiesToSelected(this);
 		}
 	}
+}
+
+void ARGBuildingBase::AddUnitToSpawnQueue(TSubclassOf<AActor> UnitClass, float SpawnTime)
+{
+	FSpawnQueueEntry QueueEntry;
+	QueueEntry.UnitClass = UnitClass;
+	QueueEntry.SpawnTime = SpawnTime;
+
+	SpawnQueue.Add(QueueEntry);
+
+	if(!bIsSpawning)
+		SpawnNextUnit();
 }
 
 bool ARGBuildingBase::IsSelected() const
@@ -163,7 +174,7 @@ void ARGBuildingBase::BeginPlay()
 	if (!PlayerController)
 		UE_LOG(LogRGBuildingBase, Warning, TEXT("[BeginPlay] PlayerController is nullptr."));
 
-	ARGPlayerPawn* PlayerPawn = Cast<ARGPlayerPawn>(PlayerController->GetPawn());
+	PlayerPawn = Cast<ARGPlayerPawn>(PlayerController->GetPawn());
 	if (!PlayerPawn)
 	{
 		UE_LOG(LogRGBuildingBase, Warning, TEXT("[BeginPlay] PlayerPawn is nullptr."));
@@ -173,6 +184,36 @@ void ARGBuildingBase::BeginPlay()
 	PlayerPawn->AddEntitiesToContolled(this);
 }
 
+void ARGBuildingBase::SpawnNextUnit()
+{
+	if(SpawnQueue.Num() == 0)
+	{
+		bIsSpawning = false;
+		RemainingSpawnTime = 0.0f;
+		return;
+	}
+
+	FSpawnQueueEntry CurrentEntry = SpawnQueue[0];
+
+	bIsSpawning = true;
+	RemainingSpawnTime = CurrentEntry.SpawnTime;
+
+	GetWorld()->GetTimerManager().SetTimer(
+		SpawnTimerHandle,
+		[this, CurrentEntry]() {
+			FVector SpawnLocation = GetActorLocation() + FVector(500, 0, 0);
+			SpawnLocation.Z = 108;
+			GetWorld()->SpawnActor<AActor>(CurrentEntry.UnitClass, SpawnLocation, FRotator::ZeroRotator);
+			
+			SpawnQueue.RemoveAt(0);
+			
+			SpawnNextUnit();
+		},
+		CurrentEntry.SpawnTime,
+		false);
+	
+}
+
 void ARGBuildingBase::HandleBuildingConstructing()
 {
 	FHitResult HitResult;
@@ -180,7 +221,7 @@ void ARGBuildingBase::HandleBuildingConstructing()
 	{
 		StaticMeshComponent->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
 		StaticMeshComponent->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Overlap);
-		
+
 		SetActorLocation(HitResult.Location);
 		SetBuildingPlacementMaterial(CheckForOverlap());
 	}

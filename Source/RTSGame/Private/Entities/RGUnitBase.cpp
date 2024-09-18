@@ -105,22 +105,22 @@ TArray<FActionData> ARGUnitBase::GetAvailableActions_Implementation() const
 
 void ARGUnitBase::PerformAction_Implementation(const FName& ActionName)
 {
-	if(ActionName == "AttackAction")
+	if(ActionName == ACTION_ATTACK)
 	{
 		UE_LOG(LogRGUnitBase, Warning, TEXT("AttackAction logic is not implemented yet."));
 		return;
 	}
-	else if(ActionName == "HoldAction")
+	else if(ActionName == ACTION_HOLDATTACK)
 	{
 		UE_LOG(LogRGUnitBase, Warning, TEXT("HoldAction logic is not implemented yet."));
 		return;
 	}
-	else if(ActionName == "MoveAction")
+	else if(ActionName == ACTION_MOVE)
 	{
 		UE_LOG(LogRGUnitBase, Warning, TEXT("MoveAction logic is not implemented yet."));
 		return;
 	}
-	else if(ActionName == "MoveAttackAction")
+	else if(ActionName == ACTION_MOVEATTACK)
 	{
 		UE_LOG(LogRGUnitBase, Warning, TEXT("MoveAttackAction logic is not implemented yet."));
 		return;

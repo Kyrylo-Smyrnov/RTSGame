@@ -7,6 +7,8 @@
 #include "Entities/RGBuildingBase.h"
 #include "RGBuildingTownHall.generated.h"
 
+class ARGUnitPeasant;
+
 UCLASS()
 class RTSGAME_API ARGBuildingTownHall : public ARGBuildingBase, public IActionable
 {
@@ -24,5 +26,8 @@ class RTSGAME_API ARGBuildingTownHall : public ARGBuildingBase, public IActionab
 	virtual TArray<FActionData> GetAvailableActions_Implementation() const override;
 
   private:
+	UPROPERTY(EditDefaultsOnly, Category = "Actions")
+	TSubclassOf<ARGUnitPeasant> UnitPeasantBlueprintClass;
+
 	const FName ACTION_BUILDPEASANT = "BuildPeasant";
 };

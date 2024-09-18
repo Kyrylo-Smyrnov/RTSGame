@@ -34,4 +34,6 @@ class RTSGAME_API ARGUnitPeasant : public ARGUnitBase
 	TSubclassOf<ARGBuildingTownHall> BuildingTownHallBlueprintClass;
 
 	int32 CarryingWood;
+
+	const FName ACTION_BUILDTOWNHALL = "BuildTownHall";
 };

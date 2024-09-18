@@ -12,6 +12,8 @@ void ARGUnitAIController::BeginPlay()
 {
 	Super::BeginPlay();
 
+	UE_LOG(LogTemp, Warning, TEXT("AIController BeginPlay called"));
+
 	PlayerController = Cast<ARGPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 	if(PlayerController)
 		PlayerController->RightMouseButtonInputPressedUninteractable.AddUObject(this, &ARGUnitAIController::HandleRightMouseButtonInputPressedUninteractable);

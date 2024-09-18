@@ -7,7 +7,8 @@
 
 DEFINE_LOG_CATEGORY_STATIC(LogUnitPeasant, All, All);
 
-ARGUnitPeasant::ARGUnitPeasant() : ARGUnitBase(), CarryingWood(0)
+ARGUnitPeasant::ARGUnitPeasant()
+	: ARGUnitBase(), CarryingWood(0)
 {
 	UnitImportance = EFEntitiesImportance::Peasant;
 }
@@ -40,24 +41,27 @@ void ARGUnitPeasant::PerformAction_Implementation(const FName& ActionName)
 	BuildParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
 	TArray<FActionData> AvailableActions = GetAvailableActions_Implementation();
-	FActionData* ActionData = AvailableActions.FindByPredicate([&](const FActionData& Action)
-			{ return Action.ActionName == ActionName; });
+	FActionData* ActionData = AvailableActions.FindByPredicate([&](const FActionData& Action) { return Action.ActionName == ActionName; });
 
-	if (ActionName == "BuildTownHall")
+	if (ActionName == ACTION_BUILDTOWNHALL)
 	{
-		if(!BuildingTownHallBlueprintClass)
+		if (!BuildingTownHallBlueprintClass)
 		{
 			UE_LOG(LogUnitPeasant, Warning, TEXT("[PerformAction_Implementation] BuildingTownHallBlueprintClass is nullptr."));
 			return;
 		}
-		
-		if(ActionsUtility::IsEnoughResourcesToBuild(PlayerPawn, ActionData->ActionWoodCost))
+
+		if (ActionsUtility::IsEnoughResourcesToBuild(PlayerPawn, ActionData->ActionWoodCost))
 		{
 			ARGBuildingTownHall* SpawnedTownHall = GetWorld()->SpawnActor<ARGBuildingTownHall>(BuildingTownHallBlueprintClass, BuildParameters);
-			if(SpawnedTownHall)
+			if (SpawnedTownHall)
 				SpawnedTownHall->SetBuildingPlacementMaterial(true);
 
 			PlayerPawn->AddPlayerResources(-ActionData->ActionWoodCost);
+		}
+		else
+		{
+			UE_LOG(LogUnitPeasant, Display, TEXT("There are not enough resources to perform the action %s"), *ActionData->ActionName.ToString());
 		}
 
 		return;
@@ -73,12 +77,12 @@ void ARGUnitPeasant::AddCarryingWood(int32 Amount)
 
 void ARGUnitPeasant::PutCarryingResources()
 {
-	if(!PlayerPawn)
+	if (!PlayerPawn)
 	{
 		UE_LOG(LogUnitPeasant, Warning, TEXT("[PutCarryingResources] PlayerPawn is nullptr."));
 		return;
 	}
-	
+
 	PlayerPawn->AddPlayerResources(CarryingWood);
 	CarryingWood = 0;
 }
