@@ -9,7 +9,8 @@
 class ARGPlayerController;
 class URGPlayerCameraComponent;
 
-DECLARE_MULTICAST_DELEGATE_OneParam(FOnSelectedEntitiesChanged, AActor*);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnSelectedEntitiesChanged, TArray<AActor*>);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnMostImportantEntityChanged, AActor*);
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnPlayerResourcesChanged, int32);
 
 UCLASS()
@@ -42,6 +43,7 @@ class RTSGAME_API ARGPlayerPawn : public APawn
 	int32 GetPlayerResources();
 
 	FOnSelectedEntitiesChanged OnSelectedEntitiesChanged;
+	FOnMostImportantEntityChanged OnMostImportantEntityChanged;
 	FOnPlayerResourcesChanged OnPlayerResourcesChanged;
 
   protected:

@@ -108,7 +108,7 @@ void ARGBuildingBase::AddUnitToSpawnQueue(TSubclassOf<AActor> UnitClass, float S
 
 	SpawnQueue.Add(QueueEntry);
 
-	if(!bIsSpawning)
+	if (!bIsSpawning)
 		SpawnNextUnit();
 }
 
@@ -120,6 +120,14 @@ bool ARGBuildingBase::IsSelected() const
 int32 ARGBuildingBase::GetImportance() const
 {
 	return BuildingImportance;
+}
+
+UTexture2D* ARGBuildingBase::GetSelectionIcon() const
+{
+	if (!SelectionIcon)
+		UE_LOG(LogRGBuildingBase, Warning, TEXT("[GetSelectionIcon] SelectionIcon is nullptr."))
+
+	return SelectionIcon;
 }
 
 void ARGBuildingBase::SetSelected(bool bIsBuildingSelected)
@@ -186,7 +194,7 @@ void ARGBuildingBase::BeginPlay()
 
 void ARGBuildingBase::SpawnNextUnit()
 {
-	if(SpawnQueue.Num() == 0)
+	if (SpawnQueue.Num() == 0)
 	{
 		bIsSpawning = false;
 		RemainingSpawnTime = 0.0f;
@@ -204,14 +212,13 @@ void ARGBuildingBase::SpawnNextUnit()
 			FVector SpawnLocation = GetActorLocation() + FVector(500, 0, 0);
 			SpawnLocation.Z = 108;
 			GetWorld()->SpawnActor<AActor>(CurrentEntry.UnitClass, SpawnLocation, FRotator::ZeroRotator);
-			
+
 			SpawnQueue.RemoveAt(0);
-			
+
 			SpawnNextUnit();
 		},
 		CurrentEntry.SpawnTime,
 		false);
-	
 }
 
 void ARGBuildingBase::HandleBuildingConstructing()

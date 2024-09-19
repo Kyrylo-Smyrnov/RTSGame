@@ -28,9 +28,11 @@ class RTSGAME_API ARGBuildingBase : public APawn
 	void AddUnitToSpawnQueue(TSubclassOf<AActor> UnitClass, float SpawnTime);
 
 	bool IsSelected() const;
-	int32 GetImportance() const;
-
 	void SetSelected(bool bIsBuildingSelected);
+
+	int32 GetImportance() const;
+	UTexture2D* GetSelectionIcon() const;
+
 	void SetBuildingPlacementMaterial(const bool IsValidPlacement);
 	void SetBuildingMeshMaterials();
 
@@ -39,11 +41,14 @@ class RTSGAME_API ARGBuildingBase : public APawn
 
 	UPROPERTY()
 	ARGPlayerPawn* PlayerPawn;
-	
+
 	UPROPERTY(EditDefaultsOnly, Category = "Components")
 	UDecalComponent* SelectionCircleDecal;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components")
 	UStaticMeshComponent* StaticMeshComponent;
+
+	UPROPERTY(EditDefaultsOnly, Category = "UI")
+	UTexture2D* SelectionIcon;
 
 	EFEntitiesImportance BuildingImportance;
 
@@ -51,7 +56,7 @@ class RTSGAME_API ARGBuildingBase : public APawn
 	void SpawnUnitFromQueue(int32 QueueIndex);
 	void SpawnNextUnit();
 	void HandleBuildingConstructing();
-	
+
 	UPROPERTY()
 	ARGPlayerController* PlayerController;
 

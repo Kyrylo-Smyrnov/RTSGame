@@ -29,17 +29,21 @@ class RTSGAME_API ARGUnitBase : public ACharacter, public IActionable
 	void SetSelected(bool bIsSelected);
 
 	int32 GetImportance() const;
+	UTexture2D* GetSelectionIcon() const;
 
-	virtual TArray<FActionData> GetAvailableActions_Implementation() const override;
 	virtual void PerformAction_Implementation(const FName& ActionName) override;
 
   protected:
 	virtual void BeginPlay() override;
+	virtual TArray<FActionData> GetAvailableActions_Implementation() const override;
 
 	UPROPERTY()
 	ARGPlayerPawn* PlayerPawn;
 	UPROPERTY(EditDefaultsOnly, Category = "Components")
 	UDecalComponent* SelectionCircleDecal;
+
+	UPROPERTY(EditDefaultsOnly, Category = "UI")
+	UTexture2D* SelectionIcon;
 
 	EFEntitiesImportance UnitImportance;
 

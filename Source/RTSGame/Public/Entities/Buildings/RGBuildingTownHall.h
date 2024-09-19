@@ -22,7 +22,6 @@ class RTSGAME_API ARGBuildingTownHall : public ARGBuildingBase, public IActionab
 
   protected:
 	virtual void BeginPlay() override;
-
 	virtual TArray<FActionData> GetAvailableActions_Implementation() const override;
 
   private:

@@ -38,11 +38,13 @@ class RTSGAME_API ARGPlayerHUD : public AHUD
 	const FLinearColor SELECTION_BOX_OUTLINE_COLOR = FLinearColor(0.0f, 1.0f, 0.0f, 1.0f);
 	const float SELECTION_BOX_OUTLINE_THICKNESS = 1.0f;
 
-	UPROPERTY(EditDefaultsOnly, Category="Widgets")
+	UPROPERTY(EditDefaultsOnly, Category = "Widgets")
 	TSubclassOf<UUserWidget> ActionGridWidgetClass;
-	UPROPERTY(EditDefaultsOnly, Category="Widgets")
+	UPROPERTY(EditDefaultsOnly, Category = "Widgets")
 	TSubclassOf<UUserWidget> ResourceWidgetClass;
-	
+	UPROPERTY(EditDefaultsOnly, Category = "Widgets")
+	TSubclassOf<UUserWidget> SelectionWidgetClass;
+
 	UPROPERTY()
 	TArray<AActor*> SelectedEntities;
 };

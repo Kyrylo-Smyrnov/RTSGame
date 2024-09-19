@@ -6,6 +6,7 @@
 #include "Player/RGPlayerPawn.h"
 #include "Player/UI/RGActionGridWidget.h"
 #include "Player/UI/RGPlayerResourcesWidget.h"
+#include "Player/UI/RGPlayerSelectionWidget.h"
 #include "RGPlayerController.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogRGPlayerHud, All, All);
@@ -14,7 +15,7 @@ void ARGPlayerHUD::DrawHUD()
 {
 	if (bIsSelectionBoxDrawn)
 	{
-		if(PlayerController)
+		if (PlayerController)
 			PlayerController->GetMousePosition(SelectionBoxEndPoint.X, SelectionBoxEndPoint.Y);
 
 		if (FVector2D::Distance(SelectionBoxStartPoint, SelectionBoxEndPoint) > 10.0f)
@@ -49,6 +50,12 @@ void ARGPlayerHUD::BeginPlay()
 		URGPlayerResourcesWidget* ResourcesWidget = CreateWidget<URGPlayerResourcesWidget>(PlayerController, ResourceWidgetClass);
 		if (ResourcesWidget)
 			ResourcesWidget->AddToViewport();
+	}
+	if (SelectionWidgetClass)
+	{
+		URGPlayerSelectionWidget* SelectionWidget = CreateWidget<URGPlayerSelectionWidget>(PlayerController, SelectionWidgetClass);
+		if (SelectionWidget)
+			SelectionWidget->AddToViewport();
 	}
 }
 

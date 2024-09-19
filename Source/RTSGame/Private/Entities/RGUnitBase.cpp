@@ -10,7 +10,8 @@
 
 DEFINE_LOG_CATEGORY_STATIC(LogRGUnitBase, All, All);
 
-ARGUnitBase::ARGUnitBase() : bIsSelected(false)
+ARGUnitBase::ARGUnitBase()
+	: bIsSelected(false)
 {
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -76,12 +77,12 @@ bool ARGUnitBase::IsSelected() const
 
 void ARGUnitBase::SetSelected(bool bIsUnitSelected)
 {
-	if(!SelectionCircleDecal)
+	if (!SelectionCircleDecal)
 	{
 		UE_LOG(LogRGUnitBase, Warning, TEXT("[SetSelected] SelectionCircleDecal is nullptr."));
 		return;
 	}
-	
+
 	bIsSelected = bIsUnitSelected;
 	SelectionCircleDecal->SetVisibility(bIsUnitSelected);
 }
@@ -89,6 +90,14 @@ void ARGUnitBase::SetSelected(bool bIsUnitSelected)
 int32 ARGUnitBase::GetImportance() const
 {
 	return UnitImportance;
+}
+
+UTexture2D* ARGUnitBase::GetSelectionIcon() const
+{
+	if (!SelectionIcon)
+		UE_LOG(LogRGUnitBase, Warning, TEXT("[GetSelectionIcon] SelectionIcon is nullptr."))
+
+	return SelectionIcon;
 }
 
 TArray<FActionData> ARGUnitBase::GetAvailableActions_Implementation() const
@@ -105,27 +114,27 @@ TArray<FActionData> ARGUnitBase::GetAvailableActions_Implementation() const
 
 void ARGUnitBase::PerformAction_Implementation(const FName& ActionName)
 {
-	if(ActionName == ACTION_ATTACK)
+	if (ActionName == ACTION_ATTACK)
 	{
 		UE_LOG(LogRGUnitBase, Warning, TEXT("AttackAction logic is not implemented yet."));
 		return;
 	}
-	else if(ActionName == ACTION_HOLDATTACK)
+	else if (ActionName == ACTION_HOLDATTACK)
 	{
 		UE_LOG(LogRGUnitBase, Warning, TEXT("HoldAction logic is not implemented yet."));
 		return;
 	}
-	else if(ActionName == ACTION_MOVE)
+	else if (ActionName == ACTION_MOVE)
 	{
 		UE_LOG(LogRGUnitBase, Warning, TEXT("MoveAction logic is not implemented yet."));
 		return;
 	}
-	else if(ActionName == ACTION_MOVEATTACK)
+	else if (ActionName == ACTION_MOVEATTACK)
 	{
 		UE_LOG(LogRGUnitBase, Warning, TEXT("MoveAttackAction logic is not implemented yet."));
 		return;
 	}
-	
+
 	IActionable::PerformAction_Implementation(ActionName);
 }
 
@@ -135,14 +144,14 @@ void ARGUnitBase::BeginPlay()
 	OnClicked.AddDynamic(this, &ARGUnitBase::HandleOnClicked);
 
 	PlayerController = Cast<ARGPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
-	if(!PlayerController)
+	if (!PlayerController)
 	{
 		UE_LOG(LogRGUnitBase, Warning, TEXT("[BeginPlay] PlayerController is nullptr."));
 		return;
 	}
-	
+
 	PlayerPawn = Cast<ARGPlayerPawn>(PlayerController->GetPawn());
-	if(!PlayerPawn)
+	if (!PlayerPawn)
 	{
 		UE_LOG(LogRGUnitBase, Warning, TEXT("[BeginPlay] PlayerPawn is nullptr."));
 		return;

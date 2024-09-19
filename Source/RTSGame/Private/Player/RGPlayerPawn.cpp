@@ -86,7 +86,8 @@ void ARGPlayerPawn::AddEntitiesToSelected(AActor* Entity)
 	if (SelectedEntities.Num() > 1)
 		SelectedEntities.Sort(CompareEntityImportance);
 
-	OnSelectedEntitiesChanged.Broadcast(GetMostImportantEntity());
+	OnMostImportantEntityChanged.Broadcast(GetMostImportantEntity());
+	OnSelectedEntitiesChanged.Broadcast(SelectedEntities);
 }
 
 void ARGPlayerPawn::AddEntitiesToSelected(TArray<AActor*> Entities)
@@ -113,7 +114,8 @@ void ARGPlayerPawn::AddEntitiesToSelected(TArray<AActor*> Entities)
 	if (SelectedEntities.Num() > 1)
 		SelectedEntities.Sort(CompareEntityImportance);
 
-	OnSelectedEntitiesChanged.Broadcast(GetMostImportantEntity());
+	OnMostImportantEntityChanged.Broadcast(GetMostImportantEntity());
+	OnSelectedEntitiesChanged.Broadcast(SelectedEntities);
 }
 
 void ARGPlayerPawn::RemoveEntityFromSelected(AActor* Entity)
@@ -134,7 +136,8 @@ void ARGPlayerPawn::RemoveEntityFromSelected(AActor* Entity)
 	if (SelectedEntities.Num() > 1)
 		SelectedEntities.Sort(CompareEntityImportance);
 
-	OnSelectedEntitiesChanged.Broadcast(GetMostImportantEntity());
+	OnMostImportantEntityChanged.Broadcast(GetMostImportantEntity());
+	OnSelectedEntitiesChanged.Broadcast(SelectedEntities);
 }
 
 void ARGPlayerPawn::ClearSelectedEntities()
@@ -152,7 +155,8 @@ void ARGPlayerPawn::ClearSelectedEntities()
 
 	SelectedEntities.Empty();
 
-	OnSelectedEntitiesChanged.Broadcast(GetMostImportantEntity());
+	OnMostImportantEntityChanged.Broadcast(GetMostImportantEntity());
+	OnSelectedEntitiesChanged.Broadcast(SelectedEntities);
 }
 
 bool ARGPlayerPawn::IsEntitySelected(AActor* Entity) const
