@@ -10,7 +10,7 @@
 DEFINE_LOG_CATEGORY_STATIC(LogRGBuildingBase, All, All);
 
 ARGBuildingBase::ARGBuildingBase()
-	: bIsSelected(false), bIsConstructing(false), bIsSpawning(false), RemainingSpawnTime(0.0f)
+	: RemainingSpawnTime(0.0f), bIsSpawning(false), bIsSelected(false), bIsConstructing(false)
 {
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -128,6 +128,11 @@ UTexture2D* ARGBuildingBase::GetSelectionIcon() const
 		UE_LOG(LogRGBuildingBase, Warning, TEXT("[GetSelectionIcon] SelectionIcon is nullptr."))
 
 	return SelectionIcon;
+}
+
+TArray<FSpawnQueueEntry> ARGBuildingBase::GetSpawnQueue() const
+{
+	return SpawnQueue;
 }
 
 void ARGBuildingBase::SetSelected(bool bIsBuildingSelected)

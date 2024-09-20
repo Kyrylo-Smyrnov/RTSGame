@@ -11,7 +11,7 @@
 DEFINE_LOG_CATEGORY_STATIC(LogRGResourceBase, All, All);
 
 ARGResourceBase::ARGResourceBase()
-	: Health(100.0f), bIsDead(false)
+	: bIsDead(false), Health(100.0f)
 {
 	PrimaryActorTick.bCanEverTick = true;
 

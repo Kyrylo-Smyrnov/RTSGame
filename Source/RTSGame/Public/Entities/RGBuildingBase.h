@@ -32,6 +32,7 @@ class RTSGAME_API ARGBuildingBase : public APawn
 
 	int32 GetImportance() const;
 	UTexture2D* GetSelectionIcon() const;
+	TArray<FSpawnQueueEntry> GetSpawnQueue() const;
 
 	void SetBuildingPlacementMaterial(const bool IsValidPlacement);
 	void SetBuildingMeshMaterials();

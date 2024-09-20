@@ -1,43 +1,26 @@
 // https://github.com/Kyrylo-Smyrnov/RTSGame
 
-#include "Player/UI/RGPlayerSelectionWidget.h"
+#include "Player/UI/RGSelectionBarSquad.h"
 #include "Components/GridPanel.h"
 #include "Components/GridSlot.h"
 #include "Components/Image.h"
 #include "Components/SizeBox.h"
 #include "Entities/RGBuildingBase.h"
 #include "Entities/RGUnitBase.h"
-#include "Kismet/GameplayStatics.h"
-#include "Player/RGPlayerPawn.h"
-#include "RGPlayerController.h"
 
-DEFINE_LOG_CATEGORY_STATIC(LogRGPlayerSelectionWidget, All, All);
+DEFINE_LOG_CATEGORY_STATIC(LogURGSelectionBarSquad, All, All);
 
-void URGPlayerSelectionWidget::NativeConstruct()
+void URGSelectionBarSquad::NativeConstruct()
 {
 	Super::NativeConstruct();
-
 	InitializeWidget();
-
-	PlayerController = Cast<ARGPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
-	if (!PlayerController)
-	{
-		UE_LOG(LogRGPlayerSelectionWidget, Warning, TEXT("[NativeConstruct] PlayerController is nullptr."));
-		return;
-	}
-
-	ARGPlayerPawn* PlayerPawn = Cast<ARGPlayerPawn>(PlayerController->GetPawn());
-	if (!PlayerPawn)
-	{
-		UE_LOG(LogRGPlayerSelectionWidget, Warning, TEXT("[NativeConstruct] PlayerPawn is nullptr."));
-		return;
-	}
-
-	PlayerPawn->OnSelectedEntitiesChanged.AddUObject(this, &URGPlayerSelectionWidget::UpdateWidget);
 }
 
-void URGPlayerSelectionWidget::UpdateWidget(TArray<AActor*> SelectedEntities)
+void URGSelectionBarSquad::UpdateWidget(TArray<AActor*> SelectedEntities)
 {
+	if(GetVisibility() == ESlateVisibility::Hidden)
+		return;
+	
 	for (int32 i = 0; i < EntitiesIcons.Num(); ++i)
 	{
 		if (i < SelectedEntities.Num())
@@ -58,18 +41,22 @@ void URGPlayerSelectionWidget::UpdateWidget(TArray<AActor*> SelectedEntities)
 	}
 }
 
-void URGPlayerSelectionWidget::InitializeWidget()
+void URGSelectionBarSquad::InitializeWidget()
 {
 	if (!SelectionGrid)
 	{
-		UE_LOG(LogRGPlayerSelectionWidget, Warning, TEXT("[InitializeWidget] SelectionGrid is nullptr."));
+		UE_LOG(LogURGSelectionBarSquad, Warning, TEXT("[InitializeWidget] SelectionGrid is nullptr."));
 		return;
 	}
 
 	const int32 ROWS = 2;
 	const int32 COLS = 8;
-	const float ICON_MARGIN = 5.0f;
-	const FVector2D ICON_SIZE(75.0f, 75.0f);
+	const float ICON_PADDING = 1.0f;
+	const float ICON_MARGIN = 20.0f;
+	const FVector2D ICON_SIZE(60.0f, 60.0f);
+
+	SelectionGrid->SetRenderTranslation(
+		FVector2D((-ICON_SIZE.X * COLS - ICON_MARGIN) / 2, -ICON_SIZE.Y * ROWS - ICON_MARGIN));
 
 	for (int32 Row = 0; Row < ROWS; ++Row)
 	{
@@ -88,7 +75,7 @@ void URGPlayerSelectionWidget::InitializeWidget()
 			UGridSlot* GridSlot = Cast<UGridSlot>(SelectionGrid->AddChildToGrid(SizeBox, Row, Col));
 
 			if (GridSlot)
-				GridSlot->SetPadding(FMargin(ICON_MARGIN));
+				GridSlot->SetPadding(FMargin(ICON_PADDING));
 		}
 	}
 }

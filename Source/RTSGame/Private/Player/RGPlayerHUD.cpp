@@ -6,7 +6,7 @@
 #include "Player/RGPlayerPawn.h"
 #include "Player/UI/RGActionGridWidget.h"
 #include "Player/UI/RGPlayerResourcesWidget.h"
-#include "Player/UI/RGPlayerSelectionWidget.h"
+#include "Player/UI/RGSelectionBarMain.h"
 #include "RGPlayerController.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogRGPlayerHud, All, All);
@@ -51,11 +51,11 @@ void ARGPlayerHUD::BeginPlay()
 		if (ResourcesWidget)
 			ResourcesWidget->AddToViewport();
 	}
-	if (SelectionWidgetClass)
+	if (SelectionBarMainClass)
 	{
-		URGPlayerSelectionWidget* SelectionWidget = CreateWidget<URGPlayerSelectionWidget>(PlayerController, SelectionWidgetClass);
-		if (SelectionWidget)
-			SelectionWidget->AddToViewport();
+		URGSelectionBarMain* SelectionBarMain = CreateWidget<URGSelectionBarMain>(PlayerController, SelectionBarMainClass);
+		if (SelectionBarMain)
+			SelectionBarMain->AddToViewport();
 	}
 }
 
