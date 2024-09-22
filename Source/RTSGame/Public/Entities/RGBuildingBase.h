@@ -30,15 +30,18 @@ class RTSGAME_API ARGBuildingBase : public APawn
 
 	void AddUnitToSpawnQueue(TSubclassOf<AActor> UnitClass, float SpawnTime);
 
-	bool IsSelected() const;
-	void SetSelected(bool bIsBuildingSelected);
-
 	int32 GetImportance() const;
 	UTexture2D* GetSelectionIcon() const;
 	TArray<FSpawnQueueEntry>& GetSpawnQueue();
+	
+	bool GetIsConstructing() const;
+	bool IsSelected() const; // TODO: Change to GetIsSelected.
 
 	void SetBuildingPlacementMaterial(const bool IsValidPlacement);
 	void SetBuildingMeshMaterials();
+
+	void SetSelected(bool bIsBuildingSelected);
+	void SetTimeToConstruct(float Time);
 
 	FOnSpawnQueueChanged OnSpawnQueueChanged;
 	FOnSpawnProgressChanged OnSpawnProgressChanged;
@@ -52,7 +55,14 @@ class RTSGAME_API ARGBuildingBase : public APawn
 	UPROPERTY(EditDefaultsOnly, Category = "Components")
 	UDecalComponent* SelectionCircleDecal;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components")
-	UStaticMeshComponent* StaticMeshComponent;
+	UStaticMeshComponent* StaticMeshComponentCurrent;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Construction")
+	UStaticMesh* StaticMeshConstructionPhase1;
+	UPROPERTY(EditDefaultsOnly, Category = "Construction")
+	UStaticMesh* StaticMeshConstructionPhase2;
+	UPROPERTY(EditDefaultsOnly, Category = "Construction")
+	UStaticMesh* StaticMeshConstructionPhase3;
 
 	UPROPERTY(EditDefaultsOnly, Category = "UI")
 	UTexture2D* SelectionIcon;
@@ -60,8 +70,11 @@ class RTSGAME_API ARGBuildingBase : public APawn
 	EFEntitiesImportance BuildingImportance;
 
   private:
-	void SpawnUnitFromQueue(int32 QueueIndex);
+	bool CheckForOverlap();
+
 	void SpawnNextUnit();
+
+	void HandleBuildingPlacing();
 	void HandleBuildingConstructing();
 
 	UPROPERTY()
@@ -79,8 +92,9 @@ class RTSGAME_API ARGBuildingBase : public APawn
 	UPROPERTY()
 	TArray<UMaterialInterface*> BuildingMeshMaterials;
 
-	bool CheckForOverlap();
-
 	bool bIsSelected;
+	bool bIsPlacing;
 	bool bIsConstructing;
+
+	float TimeToConstruct;
 };

@@ -26,7 +26,7 @@ struct FActionData
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "Action")
 	int32 ActionCooldown = 0;
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "Action")
-	int32 UnitSpawnTime = 0;
+	int32 UnitSpawnTime = 0; // TODO: Change to ConstructionTime
 
 	FActionData()
 	{

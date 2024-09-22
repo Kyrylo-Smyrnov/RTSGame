@@ -55,7 +55,10 @@ void ARGUnitPeasant::PerformAction_Implementation(const FName& ActionName)
 		{
 			ARGBuildingTownHall* SpawnedTownHall = GetWorld()->SpawnActor<ARGBuildingTownHall>(BuildingTownHallBlueprintClass, BuildParameters);
 			if (SpawnedTownHall)
+			{
+				SpawnedTownHall->SetTimeToConstruct(ActionData->UnitSpawnTime);
 				SpawnedTownHall->SetBuildingPlacementMaterial(true);
+			}
 
 			PlayerPawn->AddPlayerResources(-ActionData->ActionWoodCost);
 		}

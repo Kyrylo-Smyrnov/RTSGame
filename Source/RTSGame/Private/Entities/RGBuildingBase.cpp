@@ -10,16 +10,16 @@
 DEFINE_LOG_CATEGORY_STATIC(LogRGBuildingBase, All, All);
 
 ARGBuildingBase::ARGBuildingBase()
-	: RemainingSpawnTime(0.0f), bIsSpawning(false), bIsSelected(false), bIsConstructing(false)
+	: RemainingSpawnTime(0.0f), bIsSpawning(false), bIsSelected(false), bIsPlacing(false), bIsConstructing(false), TimeToConstruct(0.0f)
 {
 	PrimaryActorTick.bCanEverTick = true;
 
-	StaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>("StaticMeshComponent");
-	StaticMeshComponent->SetCollisionResponseToChannel(ECC_GameTraceChannel1, ECR_Block);
-	StaticMeshComponent->SetCollisionResponseToChannel(ECC_Visibility, ECR_Ignore);
-	StaticMeshComponent->SetGenerateOverlapEvents(true);
-	StaticMeshComponent->bReceivesDecals = false;
-	SetRootComponent(StaticMeshComponent);
+	StaticMeshComponentCurrent = CreateDefaultSubobject<UStaticMeshComponent>("StaticMeshComponent");
+	StaticMeshComponentCurrent->SetCollisionResponseToChannel(ECC_GameTraceChannel1, ECR_Block);
+	StaticMeshComponentCurrent->SetCollisionResponseToChannel(ECC_Visibility, ECR_Ignore);
+	StaticMeshComponentCurrent->SetGenerateOverlapEvents(true);
+	StaticMeshComponentCurrent->bReceivesDecals = false;
+	SetRootComponent(StaticMeshComponentCurrent);
 
 	SelectionCircleDecal = CreateDefaultSubobject<UDecalComponent>("SelectionCircleDecal");
 	SelectionCircleDecal->SetupAttachment(GetRootComponent());
@@ -44,8 +44,8 @@ ARGBuildingBase::ARGBuildingBase()
 void ARGBuildingBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	if (bIsConstructing)
-		HandleBuildingConstructing();
+	if (bIsPlacing)
+		HandleBuildingPlacing();
 }
 
 void ARGBuildingBase::HandleOnClicked(AActor* TouchedActor, FKey ButtonPressed)
@@ -56,14 +56,16 @@ void ARGBuildingBase::HandleOnClicked(AActor* TouchedActor, FKey ButtonPressed)
 		return;
 	}
 
-	if (bIsConstructing && CheckForOverlap())
+	if (bIsPlacing && CheckForOverlap())
 	{
-		StaticMeshComponent->SetCollisionResponseToChannel(ECC_Pawn, ECR_Block);
-		StaticMeshComponent->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Block);
-		bIsConstructing = false;
+		StaticMeshComponentCurrent->SetCollisionResponseToChannel(ECC_Pawn, ECR_Block);
+		StaticMeshComponentCurrent->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Block);
+
+		bIsPlacing = false;
 		SetBuildingMeshMaterials();
+		HandleBuildingConstructing();
 	}
-	else if (ButtonPressed == EKeys::LeftMouseButton && !bIsConstructing)
+	else if (ButtonPressed == EKeys::LeftMouseButton && !bIsPlacing)
 	{
 		if (!PlayerPawn)
 			return;
@@ -136,6 +138,11 @@ TArray<FSpawnQueueEntry>& ARGBuildingBase::GetSpawnQueue()
 	return SpawnQueue;
 }
 
+bool ARGBuildingBase::GetIsConstructing() const
+{
+	return bIsConstructing;
+}
+
 void ARGBuildingBase::SetSelected(bool bIsBuildingSelected)
 {
 	if (!SelectionCircleDecal)
@@ -148,9 +155,14 @@ void ARGBuildingBase::SetSelected(bool bIsBuildingSelected)
 	SelectionCircleDecal->SetVisibility(bIsBuildingSelected);
 }
 
+void ARGBuildingBase::SetTimeToConstruct(float Time)
+{
+	TimeToConstruct = Time;
+}
+
 void ARGBuildingBase::SetBuildingPlacementMaterial(const bool IsValidPlacement)
 {
-	if (!StaticMeshComponent)
+	if (!StaticMeshComponentCurrent)
 	{
 		UE_LOG(LogRGBuildingBase, Warning, TEXT("[SetBuildingPlacementMaterial] StaticMeshComponent is nullptr."));
 		return;
@@ -161,20 +173,20 @@ void ARGBuildingBase::SetBuildingPlacementMaterial(const bool IsValidPlacement)
 		return;
 	}
 
-	bIsConstructing = true;
+	bIsPlacing = true;
 	UMaterialInterface* PlacementMaterial = IsValidPlacement ? ValidPlacementMaterial : InValidPlacementMaterial;
 
-	for (int i = 0; i < StaticMeshComponent->GetMaterials().Num(); ++i)
-		StaticMeshComponent->SetMaterial(i, PlacementMaterial);
+	for (int i = 0; i < StaticMeshComponentCurrent->GetMaterials().Num(); ++i)
+		StaticMeshComponentCurrent->SetMaterial(i, PlacementMaterial);
 }
 
 void ARGBuildingBase::SetBuildingMeshMaterials()
 {
-	if (!StaticMeshComponent)
+	if (!StaticMeshComponentCurrent)
 		UE_LOG(LogRGBuildingBase, Warning, TEXT("[SetBuildingMeshMaterials] StaticMeshComponent is nullptr."));
 
 	for (int i = 0; i < BuildingMeshMaterials.Num(); ++i)
-		StaticMeshComponent->SetMaterial(i, BuildingMeshMaterials[i]);
+		StaticMeshComponentCurrent->SetMaterial(i, BuildingMeshMaterials[i]);
 }
 
 void ARGBuildingBase::BeginPlay()
@@ -182,7 +194,7 @@ void ARGBuildingBase::BeginPlay()
 	Super::BeginPlay();
 
 	OnClicked.AddDynamic(this, &ARGBuildingBase::HandleOnClicked);
-	BuildingMeshMaterials = StaticMeshComponent->GetMaterials();
+	BuildingMeshMaterials = StaticMeshComponentCurrent->GetMaterials();
 
 	PlayerController = Cast<ARGPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 	if (!PlayerController)
@@ -233,23 +245,49 @@ void ARGBuildingBase::SpawnNextUnit()
 		} }, 0.1, true);
 }
 
-void ARGBuildingBase::HandleBuildingConstructing()
+void ARGBuildingBase::HandleBuildingPlacing()
 {
 	FHitResult HitResult;
 	if (PlayerController && PlayerController->GetHitResultUnderCursorByChannel(UEngineTypes::ConvertToTraceType(ECC_Visibility), true, HitResult))
 	{
-		StaticMeshComponent->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
-		StaticMeshComponent->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Overlap);
+		StaticMeshComponentCurrent->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+		StaticMeshComponentCurrent->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Overlap);
 
 		SetActorLocation(HitResult.Location);
 		SetBuildingPlacementMaterial(CheckForOverlap());
 	}
 }
 
+void ARGBuildingBase::HandleBuildingConstructing()
+{
+	if (TimeToConstruct == 0.0f || !StaticMeshConstructionPhase1 ||
+		!StaticMeshConstructionPhase2 || !StaticMeshConstructionPhase3)
+	{
+		UE_LOG(LogRGBuildingBase, Warning, TEXT("[HandleBuildingConstructing] Invalid input to perform constructing."));
+		return;
+	}
+
+	bIsConstructing = true;
+	StaticMeshComponentCurrent->SetStaticMesh(StaticMeshConstructionPhase1);
+
+	float TimeToChangePhase = TimeToConstruct / 2.0f;
+	FTimerHandle Phase2TimerHandle;
+
+	// TODO: TurnOff ActionButtons during construction.
+	// TODO: Show construction progress in SelectionBarQueue.
+	GetWorld()->GetTimerManager().SetTimer(Phase2TimerHandle, [this, TimeToChangePhase] {
+		StaticMeshComponentCurrent->SetStaticMesh(StaticMeshConstructionPhase2);
+		FTimerHandle Phase3TimerHandle;
+		GetWorld()->GetTimerManager().SetTimer(Phase3TimerHandle,[this, TimeToChangePhase] {
+			StaticMeshComponentCurrent->SetStaticMesh(StaticMeshConstructionPhase3);
+			bIsConstructing = false;
+		}, TimeToChangePhase, false); }, TimeToChangePhase, false);
+}
+
 bool ARGBuildingBase::CheckForOverlap()
 {
 	TArray<AActor*> OverlappingActors;
-	StaticMeshComponent->GetOverlappingActors(OverlappingActors);
+	StaticMeshComponentCurrent->GetOverlappingActors(OverlappingActors);
 
 	for (AActor* Actor : OverlappingActors)
 	{

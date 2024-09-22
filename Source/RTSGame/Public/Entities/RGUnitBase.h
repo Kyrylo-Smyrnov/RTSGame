@@ -23,11 +23,11 @@ class RTSGAME_API ARGUnitBase : public ACharacter, public IActionable
 
 	UFUNCTION()
 	void HandleOnClicked(AActor* TouchedActor, FKey ButtonPressed);
-
-	UFUNCTION(BlueprintCallable)
-	bool IsSelected() const;
+	
 	void SetSelected(bool bIsSelected);
 
+	//UFUNCTION(BlueprintCallable)
+	bool IsSelected() const; // TODO: Change to GetIsSelected.
 	int32 GetImportance() const;
 	UTexture2D* GetSelectionIcon() const;
 

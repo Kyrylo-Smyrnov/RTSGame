@@ -33,6 +33,9 @@ TArray<FActionData> ARGBuildingTownHall::GetAvailableActions_Implementation() co
 
 void ARGBuildingTownHall::PerformAction_Implementation(const FName& ActionName)
 {
+	if(GetIsConstructing())
+		return;
+	
 	TArray<FActionData> AvailableActions = GetAvailableActions_Implementation();
 	FActionData* ActionData = AvailableActions.FindByPredicate([&](const FActionData& Action) { return Action.ActionName == ActionName; });
 
