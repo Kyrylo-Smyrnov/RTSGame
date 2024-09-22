@@ -13,6 +13,9 @@ class ARGPlayerPawn;
 class UDecalComponent;
 class UStaticMeshComponent;
 
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnSpawnQueueChanged, TArray<FSpawnQueueEntry>& SpawnQueue);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnSpawnProgressChanged, float Progress);
+
 UCLASS()
 class RTSGAME_API ARGBuildingBase : public APawn
 {
@@ -32,10 +35,13 @@ class RTSGAME_API ARGBuildingBase : public APawn
 
 	int32 GetImportance() const;
 	UTexture2D* GetSelectionIcon() const;
-	TArray<FSpawnQueueEntry> GetSpawnQueue() const;
+	TArray<FSpawnQueueEntry>& GetSpawnQueue();
 
 	void SetBuildingPlacementMaterial(const bool IsValidPlacement);
 	void SetBuildingMeshMaterials();
+
+	FOnSpawnQueueChanged OnSpawnQueueChanged;
+	FOnSpawnProgressChanged OnSpawnProgressChanged;
 
   protected:
 	virtual void BeginPlay() override;

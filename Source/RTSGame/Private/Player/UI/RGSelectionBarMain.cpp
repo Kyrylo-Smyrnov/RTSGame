@@ -33,20 +33,49 @@ void URGSelectionBarMain::NativeConstruct()
 
 void URGSelectionBarMain::UpdateWidget(TArray<AActor*> SelectedEntities)
 {
+	if (SelectedBuilding)
+		SelectedBuilding->OnSpawnQueueChanged.RemoveAll(this);
+
 	if (SelectedEntities.Num() == 1)
 	{
 		if (ARGBuildingBase* CastedBuilding = Cast<ARGBuildingBase>(SelectedEntities[0]))
+		{
+			SelectedBuilding = CastedBuilding;
+			SelectedBuilding->OnSpawnQueueChanged.AddUObject(this, &URGSelectionBarMain::HandleSpawnQueueChange);
+
 			if (CastedBuilding->GetSpawnQueue().Num() != 0)
 			{
+				CurrentState = SelectionBarQueueState;
 				SelectionBarSquad->SetVisibility(ESlateVisibility::Hidden);
 				SelectionBarQueue->SetVisibility(ESlateVisibility::Visible);
-				SelectionBarQueue->UpdateWidget(CastedBuilding);
+				SelectionBarQueue->UpdateWidget(SelectedBuilding);
 			}
+		}
 	}
 	else
 	{
+		CurrentState = SelectionBarSquadState;
 		SelectionBarQueue->SetVisibility(ESlateVisibility::Hidden);
 		SelectionBarSquad->SetVisibility(ESlateVisibility::Visible);
 		SelectionBarSquad->UpdateWidget(SelectedEntities);
+	}
+}
+
+void URGSelectionBarMain::HandleSpawnQueueChange(TArray<FSpawnQueueEntry>& SpawnQueue)
+{
+	if (SpawnQueue.Num() == 0)
+	{
+		if (CurrentState == SelectionBarQueueState)
+		{
+			CurrentState = SelectionBarStatState;
+			SelectionBarQueue->SetVisibility(ESlateVisibility::Hidden);
+		}
+	}
+	else if (CurrentState != SelectionBarQueueState)
+	{
+		CurrentState = SelectionBarQueueState;
+		SelectionBarSquad->SetVisibility(ESlateVisibility::Hidden);
+		SelectionBarQueue->SetVisibility(ESlateVisibility::Visible);
+		SelectionBarQueue->UpdateWidget(SelectedBuilding);
 	}
 }

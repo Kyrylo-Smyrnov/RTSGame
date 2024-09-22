@@ -6,6 +6,7 @@
 #include "CoreMinimal.h"
 #include "RGSelectionBarQueue.generated.h"
 
+struct FSpawnQueueEntry;
 class ARGBuildingBase;
 class UImage;
 class UProgressBar;
@@ -31,4 +32,9 @@ class RTSGAME_API URGSelectionBarQueue : public UUserWidget
 
   private:
 	void InitializeWidget();
+	void HandleSpawnQueueChange(TArray<FSpawnQueueEntry>& SpawnQueue);
+	void HandleSpawnProgressChange(float Progress);
+
+	UPROPERTY()
+	ARGBuildingBase* CurrentBuilding;
 };

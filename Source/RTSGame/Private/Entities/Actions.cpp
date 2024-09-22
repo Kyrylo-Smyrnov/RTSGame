@@ -20,7 +20,7 @@ FActionData TownHall_BuildPeasant = FActionData{
 	FText::FromString("Capable of constructing various buildings to expand your base and strengthen your position."),
 	0,
 	0,
-	50,
+	0,
 	0,
 	5};
 } // namespace BuildingActions

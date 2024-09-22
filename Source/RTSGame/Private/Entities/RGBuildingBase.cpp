@@ -107,6 +107,7 @@ void ARGBuildingBase::AddUnitToSpawnQueue(TSubclassOf<AActor> UnitClass, float S
 	QueueEntry.SpawnTime = SpawnTime;
 
 	SpawnQueue.Add(QueueEntry);
+	OnSpawnQueueChanged.Broadcast(SpawnQueue);
 
 	if (!bIsSpawning)
 		SpawnNextUnit();
@@ -130,7 +131,7 @@ UTexture2D* ARGBuildingBase::GetSelectionIcon() const
 	return SelectionIcon;
 }
 
-TArray<FSpawnQueueEntry> ARGBuildingBase::GetSpawnQueue() const
+TArray<FSpawnQueueEntry>& ARGBuildingBase::GetSpawnQueue()
 {
 	return SpawnQueue;
 }
@@ -211,19 +212,25 @@ void ARGBuildingBase::SpawnNextUnit()
 	bIsSpawning = true;
 	RemainingSpawnTime = CurrentEntry.SpawnTime;
 
-	GetWorld()->GetTimerManager().SetTimer(
-		SpawnTimerHandle,
-		[this, CurrentEntry]() {
-			FVector SpawnLocation = GetActorLocation() + FVector(500, 0, 0);
-			SpawnLocation.Z = 108;
-			GetWorld()->SpawnActor<AActor>(CurrentEntry.UnitClass, SpawnLocation, FRotator::ZeroRotator);
+	GetWorld()->GetTimerManager().SetTimer(SpawnTimerHandle, [this, CurrentEntry]() {
+		if (SpawnQueue.Num() > 0)
+		{
+			RemainingSpawnTime -= 0.1;
+			float Progress = 1.0f - (RemainingSpawnTime / CurrentEntry.SpawnTime);
+			OnSpawnProgressChanged.Broadcast(Progress);
 
-			SpawnQueue.RemoveAt(0);
+			if (RemainingSpawnTime <= 0)
+			{
+				FVector SpawnLocation = GetActorLocation() + FVector(500, 0, 0);
+				SpawnLocation.Z = 108;
+				GetWorld()->SpawnActor<AActor>(CurrentEntry.UnitClass, SpawnLocation, FRotator::ZeroRotator);
 
-			SpawnNextUnit();
-		},
-		CurrentEntry.SpawnTime,
-		false);
+				SpawnQueue.RemoveAt(0);
+				OnSpawnQueueChanged.Broadcast(SpawnQueue);
+
+				SpawnNextUnit();
+			}
+		} }, 0.1, true);
 }
 
 void ARGBuildingBase::HandleBuildingConstructing()

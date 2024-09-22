@@ -6,9 +6,19 @@
 #include "CoreMinimal.h"
 #include "RGSelectionBarMain.generated.h"
 
+class ARGBuildingBase;
+struct FSpawnQueueEntry;
 class ARGPlayerController;
 class URGSelectionBarSquad;
 class URGSelectionBarQueue;
+
+UENUM()
+enum ECurrentWidgetState
+{
+	SelectionBarSquadState,
+	SelectionBarQueueState,
+	SelectionBarStatState
+};
 
 UCLASS()
 class RTSGAME_API URGSelectionBarMain : public UUserWidget
@@ -26,6 +36,12 @@ class RTSGAME_API URGSelectionBarMain : public UUserWidget
 	class URGSelectionBarQueue* SelectionBarQueue;
 
   private:
+	void HandleSpawnQueueChange(TArray<FSpawnQueueEntry>& SpawnQueue);
+
+	
 	UPROPERTY()
 	ARGPlayerController* PlayerController;
+	ARGBuildingBase* SelectedBuilding;
+
+	ECurrentWidgetState CurrentState;
 };
