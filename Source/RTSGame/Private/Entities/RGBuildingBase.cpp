@@ -6,6 +6,8 @@
 #include "Kismet/GameplayStatics.h"
 #include "Player/RGPlayerPawn.h"
 #include "RGPlayerController.h"
+#include "Player/RGPlayerHUD.h"
+#include "Player/UI/RGActionGridWidget.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogRGBuildingBase, All, All);
 
@@ -268,20 +270,44 @@ void ARGBuildingBase::HandleBuildingConstructing()
 	}
 
 	bIsConstructing = true;
+	float ConstructionStartTime = GetWorld()->GetTimeSeconds();
+	
 	StaticMeshComponentCurrent->SetStaticMesh(StaticMeshConstructionPhase1);
 
 	float TimeToChangePhase = TimeToConstruct / 2.0f;
-	FTimerHandle Phase2TimerHandle;
 
 	// TODO: TurnOff ActionButtons during construction.
-	// TODO: Show construction progress in SelectionBarQueue.
-	GetWorld()->GetTimerManager().SetTimer(Phase2TimerHandle, [this, TimeToChangePhase] {
-		StaticMeshComponentCurrent->SetStaticMesh(StaticMeshConstructionPhase2);
-		FTimerHandle Phase3TimerHandle;
-		GetWorld()->GetTimerManager().SetTimer(Phase3TimerHandle,[this, TimeToChangePhase] {
+	FTimerHandle ConstructionTimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(ConstructionTimerHandle, [this, TimeToChangePhase, &ConstructionTimerHandle, ConstructionStartTime]()
+	{
+		float ElapsedTime = GetWorld()->GetTimeSeconds() - ConstructionStartTime;
+		float ConstructionProgress = ElapsedTime / TimeToConstruct;
+		
+		OnConstructionProgressChanged.Broadcast(ConstructionProgress);
+		
+		if (ElapsedTime >= TimeToChangePhase && ElapsedTime < TimeToConstruct)
+		{
+			StaticMeshComponentCurrent->SetStaticMesh(StaticMeshConstructionPhase2);
+		}
+		else if (ElapsedTime >= TimeToConstruct)
+		{
 			StaticMeshComponentCurrent->SetStaticMesh(StaticMeshConstructionPhase3);
+			
+			GetWorld()->GetTimerManager().ClearTimer(ConstructionTimerHandle);
 			bIsConstructing = false;
-		}, TimeToChangePhase, false); }, TimeToChangePhase, false);
+			
+			OnConstructionProgressChanged.Broadcast(0.0f);
+			OnSpawnQueueChanged.Broadcast(SpawnQueue);
+
+			if(Cast<ARGBuildingBase>(PlayerPawn->GetMostImportantEntity()) == this)
+			{
+				if(ARGPlayerHUD* PlayerHUD = Cast<ARGPlayerHUD>(PlayerController->GetHUD()))
+				{
+					PlayerHUD->GetActionGridWidget()->UpdateWidget(PlayerPawn->GetMostImportantEntity());
+				}
+			}
+		}
+	}, 0.1f, true);
 }
 
 bool ARGBuildingBase::CheckForOverlap()

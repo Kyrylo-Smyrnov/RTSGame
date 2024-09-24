@@ -23,6 +23,11 @@ void ARGPlayerHUD::DrawHUD()
 	}
 }
 
+URGActionGridWidget* ARGPlayerHUD::GetActionGridWidget() const
+{
+	return ActionGridWidget;
+}
+
 void ARGPlayerHUD::BeginPlay()
 {
 	Super::BeginPlay();
@@ -41,7 +46,7 @@ void ARGPlayerHUD::BeginPlay()
 
 	if (ActionGridWidgetClass)
 	{
-		URGActionGridWidget* ActionGridWidget = CreateWidget<URGActionGridWidget>(PlayerController, ActionGridWidgetClass);
+		ActionGridWidget = CreateWidget<URGActionGridWidget>(PlayerController, ActionGridWidgetClass);
 		if (ActionGridWidget)
 			ActionGridWidget->AddToViewport();
 	}

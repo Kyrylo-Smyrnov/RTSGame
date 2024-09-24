@@ -30,6 +30,7 @@ class RTSGAME_API ARGPlayerPawn : public APawn
 	AActor* GetMostImportantEntity() const;
 	UFUNCTION(BlueprintCallable)
 	TArray<AActor*> GetSelectedEntities() const;
+	
 
 	void AddEntitiesToContolled(AActor* Entity);
 	void RemoveEntityFromControlled(AActor* Entity);

@@ -18,6 +18,8 @@ class RTSGAME_API ARGPlayerHUD : public AHUD
   public:
 	virtual void DrawHUD() override;
 
+	URGActionGridWidget* GetActionGridWidget() const;
+
   protected:
 	virtual void BeginPlay() override;
 
@@ -40,8 +42,12 @@ class RTSGAME_API ARGPlayerHUD : public AHUD
 
 	UPROPERTY(EditDefaultsOnly, Category = "Widgets")
 	TSubclassOf<UUserWidget> ActionGridWidgetClass;
+	UPROPERTY()
+	URGActionGridWidget* ActionGridWidget;
+	
 	UPROPERTY(EditDefaultsOnly, Category = "Widgets")
 	TSubclassOf<UUserWidget> ResourceWidgetClass;
+	
 	UPROPERTY(EditDefaultsOnly, Category = "Widgets")
 	TSubclassOf<UUserWidget> SelectionBarMainClass;
 

@@ -24,15 +24,23 @@ void URGSelectionBarQueue::UpdateWidget(ARGBuildingBase* Building)
 	{
 		CurrentBuilding->OnSpawnQueueChanged.RemoveAll(this);
 		CurrentBuilding->OnSpawnProgressChanged.RemoveAll(this);
+		CurrentBuilding->OnConstructionProgressChanged.RemoveAll(this);
 	}
-
-	Building->OnSpawnQueueChanged.AddUObject(this, &URGSelectionBarQueue::HandleSpawnQueueChange);
-	Building->OnSpawnProgressChanged.AddUObject(this, &URGSelectionBarQueue::HandleSpawnProgressChange);
 
 	CurrentBuilding = Building;
 
-	HandleSpawnQueueChange(Building->GetSpawnQueue());
-	SpawnProgressBar->SetVisibility(ESlateVisibility::Visible);
+	CurrentBuilding->OnSpawnQueueChanged.AddUObject(this, &URGSelectionBarQueue::HandleSpawnQueueChange);
+	CurrentBuilding->OnSpawnProgressChanged.AddUObject(this, &URGSelectionBarQueue::HandleSpawnProgressChange);
+
+	if (CurrentBuilding->GetIsConstructing())
+	{
+		CurrentBuilding->OnConstructionProgressChanged.AddUObject(this, &URGSelectionBarQueue::HandleSpawnProgressChange);
+		HandleBuildingConstruction();
+	}
+	else
+	{
+		HandleSpawnQueueChange(CurrentBuilding->GetSpawnQueue());
+	}
 }
 
 void URGSelectionBarQueue::InitializeWidget()
@@ -114,6 +122,8 @@ void URGSelectionBarQueue::HandleSpawnQueueChange(TArray<FSpawnQueueEntry>& Spaw
 		return;
 	}
 
+	SpawnProgressBar->SetVisibility(ESlateVisibility::Visible);
+	
 	ARGUnitBase* CurrentUnit = Cast<ARGUnitBase>(SpawnQueue[0].UnitClass.GetDefaultObject());
 	if (CurrentUnit)
 	{
@@ -140,6 +150,17 @@ void URGSelectionBarQueue::HandleSpawnQueueChange(TArray<FSpawnQueueEntry>& Spaw
 			}
 		}
 	}
+}
+
+void URGSelectionBarQueue::HandleBuildingConstruction()
+{
+	SpawnProgressBar->SetVisibility(ESlateVisibility::Visible);
+	
+	CurrentUnitIcon->SetBrushFromTexture(CurrentBuilding->GetSelectionIcon());
+	CurrentUnitIcon->SetVisibility(ESlateVisibility::Visible);
+
+	for(UImage* Icon : UnitsInQueueIcons)
+		Icon->SetVisibility(ESlateVisibility::Hidden);
 }
 
 void URGSelectionBarQueue::HandleSpawnProgressChange(float Progress)

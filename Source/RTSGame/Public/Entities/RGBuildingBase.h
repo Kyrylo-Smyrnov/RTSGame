@@ -15,6 +15,7 @@ class UStaticMeshComponent;
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnSpawnQueueChanged, TArray<FSpawnQueueEntry>& SpawnQueue);
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnSpawnProgressChanged, float Progress);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnConstructionProgressChanged, float Progress);
 
 UCLASS()
 class RTSGAME_API ARGBuildingBase : public APawn
@@ -45,6 +46,7 @@ class RTSGAME_API ARGBuildingBase : public APawn
 
 	FOnSpawnQueueChanged OnSpawnQueueChanged;
 	FOnSpawnProgressChanged OnSpawnProgressChanged;
+	FOnConstructionProgressChanged OnConstructionProgressChanged;
 
   protected:
 	virtual void BeginPlay() override;

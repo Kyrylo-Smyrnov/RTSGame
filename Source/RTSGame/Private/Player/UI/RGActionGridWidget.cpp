@@ -79,6 +79,17 @@ void URGActionGridWidget::UpdateWidget(AActor* MostImportantEntity)
 			Index++;
 		}
 	}
+
+	if (ARGBuildingBase* CastedBuilding = Cast<ARGBuildingBase>(MostImportantEntity))
+	{
+		if(CastedBuilding->GetIsConstructing())
+		{
+			for(auto& Action : ActionButtons)
+			{
+				Action.Key->SetIsEnabled(false);
+			}
+		}
+	}
 }
 
 void URGActionGridWidget::InitializeWidget()

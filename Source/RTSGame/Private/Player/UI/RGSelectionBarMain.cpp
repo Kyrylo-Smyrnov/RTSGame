@@ -43,7 +43,7 @@ void URGSelectionBarMain::UpdateWidget(TArray<AActor*> SelectedEntities)
 			SelectedBuilding = CastedBuilding;
 			SelectedBuilding->OnSpawnQueueChanged.AddUObject(this, &URGSelectionBarMain::HandleSpawnQueueChange);
 
-			if (CastedBuilding->GetSpawnQueue().Num() != 0)
+			if (CastedBuilding->GetSpawnQueue().Num() != 0 || CastedBuilding->GetIsConstructing())
 			{
 				CurrentState = SelectionBarQueueState;
 				SelectionBarSquad->SetVisibility(ESlateVisibility::Hidden);

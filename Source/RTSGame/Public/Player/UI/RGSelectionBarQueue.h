@@ -33,6 +33,7 @@ class RTSGAME_API URGSelectionBarQueue : public UUserWidget
   private:
 	void InitializeWidget();
 	void HandleSpawnQueueChange(TArray<FSpawnQueueEntry>& SpawnQueue);
+	void HandleBuildingConstruction();
 	void HandleSpawnProgressChange(float Progress);
 
 	UPROPERTY()
