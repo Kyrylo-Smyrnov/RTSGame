@@ -7,6 +7,8 @@
 #include "Kismet/GameplayStatics.h"
 #include "Player/RGPlayerPawn.h"
 #include "RGPlayerController.h"
+#include "BehaviorTree/BlackboardComponent.h"
+#include "Entities/Units/AI/RGUnitAIController.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogRGUnitBase, All, All);
 
@@ -30,14 +32,14 @@ void ARGUnitBase::Tick(float DeltaTime)
 
 void ARGUnitBase::HandleOnClicked(AActor* TouchedActor, FKey ButtonPressed)
 {
-	if (PlayerController && ButtonPressed == EKeys::LeftMouseButton)
+	if (!PlayerController || !PlayerPawn)
 	{
-		if (!PlayerPawn)
-		{
-			UE_LOG(LogRGUnitBase, Warning, TEXT("[HandleOnClicked] PlayerPawn is nullptr."))
-			return;
-		}
+		UE_LOG(LogRGUnitBase, Warning, TEXT("[HandleOnClicked] PlayerController or PlayerPawn is nullptr."))
+		return;
+	}
 
+	if (ButtonPressed == EKeys::LeftMouseButton)
+	{
 		bool bIsShiftDown = PlayerController->IsInputKeyDown(EKeys::LeftShift);
 		bool bIsCtrlDown = PlayerController->IsInputKeyDown(EKeys::LeftControl);
 
@@ -66,6 +68,19 @@ void ARGUnitBase::HandleOnClicked(AActor* TouchedActor, FKey ButtonPressed)
 			// Deselect all other entities and leave this one selected
 			PlayerPawn->ClearSelectedEntities();
 			PlayerPawn->AddEntitiesToSelected(this);
+		}
+	}
+	else if (ButtonPressed == EKeys::RightMouseButton && PlayerPawn->GetSelectedEntities().Num() > 0)
+	{
+		TArray<AActor*> SelectedEntities = PlayerPawn->GetSelectedEntities();
+		
+		for(int32 i = 0; i < SelectedEntities.Num(); ++i)
+		{
+			if(ARGUnitBase* CastedUnit = Cast<ARGUnitBase>(SelectedEntities[i]))
+			{
+				UBlackboardComponent* Blackboard = Cast<ARGUnitAIController>(CastedUnit->GetController())->GetBlackboardComponent();
+				Blackboard->SetValueAsVector("TargetLocationToMove", GetActorLocation());
+			}
 		}
 	}
 }

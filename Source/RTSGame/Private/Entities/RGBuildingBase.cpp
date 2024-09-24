@@ -1,13 +1,16 @@
 // https://github.com/Kyrylo-Smyrnov/RTSGame
 
 #include "Entities/RGBuildingBase.h"
+#include "BehaviorTree/BlackboardComponent.h"
 #include "Components/DecalComponent.h"
 #include "Components/StaticMeshComponent.h"
+#include "Entities/RGUnitBase.h"
+#include "Entities/Units/AI/RGUnitAIController.h"
 #include "Kismet/GameplayStatics.h"
-#include "Player/RGPlayerPawn.h"
-#include "RGPlayerController.h"
 #include "Player/RGPlayerHUD.h"
+#include "Player/RGPlayerPawn.h"
 #include "Player/UI/RGActionGridWidget.h"
+#include "RGPlayerController.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogRGBuildingBase, All, All);
 
@@ -52,9 +55,9 @@ void ARGBuildingBase::Tick(float DeltaTime)
 
 void ARGBuildingBase::HandleOnClicked(AActor* TouchedActor, FKey ButtonPressed)
 {
-	if (!PlayerController)
+	if (!PlayerController || !PlayerPawn)
 	{
-		UE_LOG(LogRGBuildingBase, Warning, TEXT("[HandleOnClicked] PlayerController is nullptr."));
+		UE_LOG(LogRGBuildingBase, Warning, TEXT("[HandleOnClicked] PlayerController or PlayerPawn is nullptr."));
 		return;
 	}
 
@@ -67,11 +70,8 @@ void ARGBuildingBase::HandleOnClicked(AActor* TouchedActor, FKey ButtonPressed)
 		SetBuildingMeshMaterials();
 		HandleBuildingConstructing();
 	}
-	else if (ButtonPressed == EKeys::LeftMouseButton && !bIsPlacing)
+	else if (ButtonPressed == EKeys::LeftMouseButton)
 	{
-		if (!PlayerPawn)
-			return;
-
 		bool bIsShiftDown = PlayerController->IsInputKeyDown(EKeys::LeftShift);
 		bool bIsCtrlDown = PlayerController->IsInputKeyDown(EKeys::LeftControl);
 
@@ -100,6 +100,19 @@ void ARGBuildingBase::HandleOnClicked(AActor* TouchedActor, FKey ButtonPressed)
 			// Deselect all other entities and leave this one selected
 			PlayerPawn->ClearSelectedEntities();
 			PlayerPawn->AddEntitiesToSelected(this);
+		}
+	}
+	else if (ButtonPressed == EKeys::RightMouseButton && PlayerPawn->GetSelectedEntities().Num() > 0)
+	{
+		TArray<AActor*> SelectedEntities = PlayerPawn->GetSelectedEntities();
+
+		for (int32 i = 0; i < SelectedEntities.Num(); ++i)
+		{
+			if (ARGUnitBase* CastedUnit = Cast<ARGUnitBase>(SelectedEntities[i]))
+			{
+				UBlackboardComponent* Blackboard = Cast<ARGUnitAIController>(CastedUnit->GetController())->GetBlackboardComponent();
+				Blackboard->SetValueAsVector("TargetLocationToMove", GetActorLocation());
+			}
 		}
 	}
 }
@@ -271,14 +284,13 @@ void ARGBuildingBase::HandleBuildingConstructing()
 
 	bIsConstructing = true;
 	float ConstructionStartTime = GetWorld()->GetTimeSeconds();
-	
+
 	StaticMeshComponentCurrent->SetStaticMesh(StaticMeshConstructionPhase1);
 
 	float TimeToChangePhase = TimeToConstruct / 2.0f;
-	
+
 	FTimerHandle ConstructionTimerHandle;
-	GetWorld()->GetTimerManager().SetTimer(ConstructionTimerHandle, [this, TimeToChangePhase, &ConstructionTimerHandle, ConstructionStartTime]()
-	{
+	GetWorld()->GetTimerManager().SetTimer(ConstructionTimerHandle, [this, TimeToChangePhase, &ConstructionTimerHandle, ConstructionStartTime]() {
 		float ElapsedTime = GetWorld()->GetTimeSeconds() - ConstructionStartTime;
 		float ConstructionProgress = ElapsedTime / TimeToConstruct;
 		
@@ -305,8 +317,7 @@ void ARGBuildingBase::HandleBuildingConstructing()
 					PlayerHUD->GetActionGridWidget()->UpdateWidget(PlayerPawn->GetMostImportantEntity());
 				}
 			}
-		}
-	}, 0.1f, true);
+		} }, 0.1f, true);
 }
 
 bool ARGBuildingBase::CheckForOverlap()
