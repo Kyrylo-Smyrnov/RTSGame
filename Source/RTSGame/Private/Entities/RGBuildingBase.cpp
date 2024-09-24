@@ -275,8 +275,7 @@ void ARGBuildingBase::HandleBuildingConstructing()
 	StaticMeshComponentCurrent->SetStaticMesh(StaticMeshConstructionPhase1);
 
 	float TimeToChangePhase = TimeToConstruct / 2.0f;
-
-	// TODO: TurnOff ActionButtons during construction.
+	
 	FTimerHandle ConstructionTimerHandle;
 	GetWorld()->GetTimerManager().SetTimer(ConstructionTimerHandle, [this, TimeToChangePhase, &ConstructionTimerHandle, ConstructionStartTime]()
 	{
