@@ -1,12 +1,15 @@
 // https://github.com/Kyrylo-Smyrnov/RTSGame
 
 #include "Entities/RGBuildingBase.h"
+
+#include "DrawDebugHelpers.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "Components/DecalComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "Entities/RGUnitBase.h"
 #include "Entities/Units/AI/RGUnitAIController.h"
 #include "Kismet/GameplayStatics.h"
+#include "NavigationSystem.h"
 #include "Player/RGPlayerHUD.h"
 #include "Player/RGPlayerPawn.h"
 #include "Player/UI/RGActionGridWidget.h"
@@ -105,13 +108,24 @@ void ARGBuildingBase::HandleOnClicked(AActor* TouchedActor, FKey ButtonPressed)
 	else if (ButtonPressed == EKeys::RightMouseButton && PlayerPawn->GetSelectedEntities().Num() > 0)
 	{
 		TArray<AActor*> SelectedEntities = PlayerPawn->GetSelectedEntities();
-
 		for (int32 i = 0; i < SelectedEntities.Num(); ++i)
 		{
 			if (ARGUnitBase* CastedUnit = Cast<ARGUnitBase>(SelectedEntities[i]))
 			{
-				UBlackboardComponent* Blackboard = Cast<ARGUnitAIController>(CastedUnit->GetController())->GetBlackboardComponent();
-				Blackboard->SetValueAsVector("TargetLocationToMove", GetActorLocation());
+				FVector Origin, BoxExtent, ActorSize;
+				GetActorBounds(true, Origin, BoxExtent);
+				ActorSize = BoxExtent * 2;
+				float SearchRadius = FMath::Max3(ActorSize.X, ActorSize.Y, 0.0f);
+				
+				FNavLocation ClosestPointOnNavMesh;
+				
+				bool bFoundLocation = PlayerController->GetNavSystem()->GetRandomPointInNavigableRadius(
+					GetActorLocation(), SearchRadius, ClosestPointOnNavMesh);
+				if(bFoundLocation)
+				{
+					UBlackboardComponent* Blackboard = Cast<ARGUnitAIController>(CastedUnit->GetController())->GetBlackboardComponent();
+					Blackboard->SetValueAsVector("TargetLocationToMove", ClosestPointOnNavMesh.Location);	
+				}
 			}
 		}
 	}

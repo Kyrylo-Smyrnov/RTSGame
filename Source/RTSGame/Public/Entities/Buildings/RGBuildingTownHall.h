@@ -18,6 +18,7 @@ class RTSGAME_API ARGBuildingTownHall : public ARGBuildingBase, public IActionab
 	ARGBuildingTownHall();
 	virtual void Tick(float DeltaSeconds) override;
 	virtual void PerformAction_Implementation(const FName& ActionName) override;
+	virtual void HandleOnClicked(AActor* TouchedActor, FKey ButtonPressed) override;
 
   protected:
 	virtual void BeginPlay() override;

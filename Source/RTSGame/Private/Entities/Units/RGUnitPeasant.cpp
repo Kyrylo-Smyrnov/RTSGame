@@ -89,3 +89,8 @@ void ARGUnitPeasant::PutCarryingResources()
 	PlayerPawn->AddPlayerResources(CarryingWood);
 	CarryingWood = 0;
 }
+
+bool ARGUnitPeasant::GetIsCarryingResources() const
+{
+	return CarryingWood != 0;
+}

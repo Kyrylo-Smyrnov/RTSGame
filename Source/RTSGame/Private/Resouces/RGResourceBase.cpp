@@ -4,7 +4,9 @@
 #include "AIController.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "Entities/RGUnitBase.h"
+#include "Entities/Units/AI/RGUnitAIController.h"
 #include "Kismet/GameplayStatics.h"
+#include "NavigationSystem.h"
 #include "Player/RGPlayerPawn.h"
 #include "RGPlayerController.h"
 
@@ -29,9 +31,9 @@ void ARGResourceBase::Tick(float DeltaTime)
 
 void ARGResourceBase::HandleOnClicked(AActor* TouchedActor, FKey ButtonPressed)
 {
-	if (!PlayerPawn)
+	if (!PlayerController || !PlayerPawn)
 	{
-		UE_LOG(LogRGResourceBase, Warning, TEXT("[HandleOnClicked] PlayerPawn is nullptr."))
+		UE_LOG(LogRGResourceBase, Warning, TEXT("[HandleOnClicked] PlayerController or PlayerPawn is nullptr."))
 		return;
 	}
 
@@ -58,8 +60,8 @@ void ARGResourceBase::HandleOnClicked(AActor* TouchedActor, FKey ButtonPressed)
 
 				// 1 - Attack
 				BlackboardComponent->SetValueAsEnum(BLACKBOARD_KEY_UNITSTATE, 1);
-				BlackboardComponent->SetValueAsVector(BLACKBOARD_KEY_TARGETLOCATIONTOMOVE, GetActorLocation());
 				BlackboardComponent->SetValueAsObject(BLACKBOARD_KEY_TARGETACTORTOATTACK, this);
+				BlackboardComponent->SetValueAsVector(BLACKBOARD_KEY_TARGETLOCATIONTOMOVE, GetActorLocation());
 			}
 		}
 	}

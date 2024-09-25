@@ -27,7 +27,7 @@ class RTSGAME_API ARGBuildingBase : public APawn
 	virtual void Tick(float DeltaTime) override;
 
 	UFUNCTION()
-	void HandleOnClicked(AActor* TouchedActor, FKey ButtonPressed);
+	virtual void HandleOnClicked(AActor* TouchedActor, FKey ButtonPressed);
 
 	void AddUnitToSpawnQueue(TSubclassOf<AActor> UnitClass, float SpawnTime);
 
