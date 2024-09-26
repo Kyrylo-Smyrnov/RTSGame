@@ -24,8 +24,6 @@ class RTSGAME_API ARGUnitPeasant : public ARGUnitBase
 	UFUNCTION(BlueprintCallable, Category = "Resources")
 	void PutCarryingResources();
 
-	bool GetIsCarryingResources() const;
-
   protected:
 	virtual void BeginPlay() override;
 

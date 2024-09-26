@@ -6,8 +6,6 @@
 #include "GameFramework/PlayerController.h"
 #include "RGPlayerController.generated.h"
 
-class UNavigationSystemV1;
-
 DECLARE_MULTICAST_DELEGATE_OneParam(FMouseWheelInput, float);
 DECLARE_MULTICAST_DELEGATE_OneParam(FLeftMouseButtonInputPressed, FVector2D);
 DECLARE_MULTICAST_DELEGATE(FLeftMouseButtonInputPressedUninteractable);
@@ -29,8 +27,6 @@ class RTSGAME_API ARGPlayerController : public APlayerController
 	FLeftMouseButtonInputReleased LeftMouseButtonInputReleased;
 	FRightMouseButtonInputPressedUninteractable RightMouseButtonInputPressedUninteractable;
 
-	UNavigationSystemV1* GetNavSystem();
-
   protected:
 	virtual void BeginPlay() override;
 
@@ -39,6 +35,4 @@ class RTSGAME_API ARGPlayerController : public APlayerController
 	void OnLeftMouseButtonInputPressed();
 	void OnLeftMouseButtonInputReleased();
 	void OnRightMouseButtonInputPressed();
-
-	UNavigationSystemV1* NavSystem;
 };

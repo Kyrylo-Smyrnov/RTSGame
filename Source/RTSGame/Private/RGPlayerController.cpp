@@ -1,7 +1,6 @@
 // https://github.com/Kyrylo-Smyrnov/RTSGame
 
 #include "RGPlayerController.h"
-#include "NavigationSystem.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogRGPlayerController, All, All);
 
@@ -11,10 +10,6 @@ ARGPlayerController::ARGPlayerController()
 	ClickEventKeys.AddUnique(EKeys::LeftMouseButton);
 	ClickEventKeys.AddUnique(EKeys::RightMouseButton);
 	DefaultClickTraceChannel = ECC_GameTraceChannel1;
-
-	NavSystem = FNavigationSystem::GetCurrent<UNavigationSystemV1>(GetWorld());
-	if(!NavSystem)
-		UE_LOG(LogRGPlayerController, Warning, TEXT("[Constructor] NavSystem is nullptr."))
 }
 
 void ARGPlayerController::SetupInputComponent()
@@ -32,11 +27,6 @@ void ARGPlayerController::SetupInputComponent()
 	InputComponent->BindAction("LeftMouseButtonInput", IE_Pressed, this, &ARGPlayerController::OnLeftMouseButtonInputPressed);
 	InputComponent->BindAction("LeftMouseButtonInput", IE_Released, this, &ARGPlayerController::OnLeftMouseButtonInputReleased);
 	InputComponent->BindAction("RightMouseButtonInput", IE_Pressed, this, &ARGPlayerController::OnRightMouseButtonInputPressed);
-}
-
-UNavigationSystemV1* ARGPlayerController::GetNavSystem()
-{
-	return NavSystem;
 }
 
 void ARGPlayerController::BeginPlay()
