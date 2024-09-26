@@ -16,8 +16,9 @@ class RTSGAME_API ARGUnitPeasant : public ARGUnitBase
   public:
 	ARGUnitPeasant();
 	virtual void Tick(float DeltaSeconds) override;
-
 	virtual void PerformAction_Implementation(const FName& ActionName) override;
+
+	bool GetIsCarryingResources() const;
 
 	UFUNCTION(BlueprintCallable, Category = "Resources")
 	void AddCarryingWood(int32 Amount);

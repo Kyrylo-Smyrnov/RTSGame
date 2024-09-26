@@ -110,8 +110,23 @@ void ARGBuildingBase::HandleOnClicked(AActor* TouchedActor, FKey ButtonPressed)
 		{
 			if (ARGUnitBase* CastedUnit = Cast<ARGUnitBase>(SelectedEntities[i]))
 			{
-				UBlackboardComponent* Blackboard = Cast<ARGUnitAIController>(CastedUnit->GetController())->GetBlackboardComponent();
-				Blackboard->SetValueAsVector("TargetLocationToMove", GetActorLocation());
+				FVector Origin;
+				FVector BoxExtent;
+				FVector ActorSize;
+				
+				GetActorBounds(true, Origin, BoxExtent);
+				ActorSize = BoxExtent * 2;
+				float SearchRadius = FMath::Max3(ActorSize.X, ActorSize.Y, 0.0f);
+				
+				FNavLocation ClosestPointOnNavMesh;
+				
+				bool bFoundLocation = PlayerController->GetNavigationSystem()->GetRandomPointInNavigableRadius(
+					GetActorLocation(), SearchRadius, ClosestPointOnNavMesh);
+				if(bFoundLocation)
+				{
+					UBlackboardComponent* Blackboard = Cast<ARGUnitAIController>(CastedUnit->GetController())->GetBlackboardComponent();
+					Blackboard->SetValueAsVector("TargetLocationToMove", ClosestPointOnNavMesh.Location);	
+				}
 			}
 		}
 	}

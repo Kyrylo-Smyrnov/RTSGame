@@ -73,6 +73,11 @@ void ARGUnitPeasant::PerformAction_Implementation(const FName& ActionName)
 	IActionable::PerformAction_Implementation(ActionName);
 }
 
+bool ARGUnitPeasant::GetIsCarryingResources() const
+{
+	return CarryingWood != 0;
+}
+
 void ARGUnitPeasant::AddCarryingWood(int32 Amount)
 {
 	CarryingWood += Amount;

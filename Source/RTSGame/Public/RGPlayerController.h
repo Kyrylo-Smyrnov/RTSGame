@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
+#include "NavigationSystem.h"
 #include "RGPlayerController.generated.h"
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FMouseWheelInput, float);
@@ -27,6 +28,8 @@ class RTSGAME_API ARGPlayerController : public APlayerController
 	FLeftMouseButtonInputReleased LeftMouseButtonInputReleased;
 	FRightMouseButtonInputPressedUninteractable RightMouseButtonInputPressedUninteractable;
 
+	UNavigationSystemV1* GetNavigationSystem() const;
+
   protected:
 	virtual void BeginPlay() override;
 
@@ -35,4 +38,7 @@ class RTSGAME_API ARGPlayerController : public APlayerController
 	void OnLeftMouseButtonInputPressed();
 	void OnLeftMouseButtonInputReleased();
 	void OnRightMouseButtonInputPressed();
+
+	UPROPERTY()
+	UNavigationSystemV1* NavigationSystem;
 };

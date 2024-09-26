@@ -10,6 +10,10 @@ ARGPlayerController::ARGPlayerController()
 	ClickEventKeys.AddUnique(EKeys::LeftMouseButton);
 	ClickEventKeys.AddUnique(EKeys::RightMouseButton);
 	DefaultClickTraceChannel = ECC_GameTraceChannel1;
+
+	NavigationSystem = FNavigationSystem::GetCurrent<UNavigationSystemV1>(GetWorld());
+	if(!NavigationSystem)
+		UE_LOG(LogRGPlayerController, Warning, TEXT("[Constructor] NavigationSystem is nullptr."))
 }
 
 void ARGPlayerController::SetupInputComponent()
@@ -27,6 +31,11 @@ void ARGPlayerController::SetupInputComponent()
 	InputComponent->BindAction("LeftMouseButtonInput", IE_Pressed, this, &ARGPlayerController::OnLeftMouseButtonInputPressed);
 	InputComponent->BindAction("LeftMouseButtonInput", IE_Released, this, &ARGPlayerController::OnLeftMouseButtonInputReleased);
 	InputComponent->BindAction("RightMouseButtonInput", IE_Pressed, this, &ARGPlayerController::OnRightMouseButtonInputPressed);
+}
+
+UNavigationSystemV1* ARGPlayerController::GetNavigationSystem() const
+{
+	return NavigationSystem;
 }
 
 void ARGPlayerController::BeginPlay()

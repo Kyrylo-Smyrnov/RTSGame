@@ -1,7 +1,9 @@
 // https://github.com/Kyrylo-Smyrnov/RTSGame
 
 #include "Entities/Buildings/RGBuildingTownHall.h"
+#include "BehaviorTree/BlackboardComponent.h"
 #include "Entities/Actions.h"
+#include "Entities/Units/AI/RGUnitAIController.h"
 #include "Entities/Units/RGUnitPeasant.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogBuildingTownHall, All, All);
@@ -33,9 +35,9 @@ TArray<FActionData> ARGBuildingTownHall::GetAvailableActions_Implementation() co
 
 void ARGBuildingTownHall::PerformAction_Implementation(const FName& ActionName)
 {
-	if(GetIsConstructing())
+	if (GetIsConstructing())
 		return;
-	
+
 	TArray<FActionData> AvailableActions = GetAvailableActions_Implementation();
 	FActionData* ActionData = AvailableActions.FindByPredicate([&](const FActionData& Action) { return Action.ActionName == ActionName; });
 
@@ -59,4 +61,21 @@ void ARGBuildingTownHall::PerformAction_Implementation(const FName& ActionName)
 	}
 
 	IActionable::PerformAction_Implementation(ActionName);
+}
+
+void ARGBuildingTownHall::HandleOnClicked(AActor* TouchedActor, FKey ButtonPressed)
+{
+	Super::HandleOnClicked(TouchedActor, ButtonPressed);
+	TArray<AActor*> SelectedEntities = PlayerPawn->GetSelectedEntities();
+	for (int i = 0; i < SelectedEntities.Num(); ++i)
+	{
+		if (ARGUnitPeasant* CastedPeasant = Cast<ARGUnitPeasant>(SelectedEntities[i]))
+		{
+			if (CastedPeasant->GetIsCarryingResources())
+			{
+				UBlackboardComponent* Blackboard = Cast<ARGUnitAIController>(CastedPeasant->GetController())->GetBlackboardComponent();
+				Blackboard->SetValueAsEnum("UnitState", 2);
+			}
+		}
+	}
 }
