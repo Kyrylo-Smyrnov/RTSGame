@@ -8,6 +8,7 @@
 #include "GameFramework/Pawn.h"
 #include "RGBuildingBase.generated.h"
 
+class ARGBuildingBanner;
 class ARGPlayerController;
 class ARGPlayerPawn;
 class UDecalComponent;
@@ -34,7 +35,7 @@ class RTSGAME_API ARGBuildingBase : public APawn
 	int32 GetImportance() const;
 	UTexture2D* GetSelectionIcon() const;
 	TArray<FSpawnQueueEntry>& GetSpawnQueue();
-	
+
 	bool GetIsConstructing() const;
 	bool IsSelected() const; // TODO: Change to GetIsSelected.
 
@@ -59,6 +60,11 @@ class RTSGAME_API ARGBuildingBase : public APawn
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components")
 	UStaticMeshComponent* StaticMeshComponentCurrent;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Objects")
+	TSubclassOf<ARGBuildingBanner> BuildingBannerClass;
+	UPROPERTY()
+	ARGBuildingBanner* BuildingBanner;
+
 	UPROPERTY(EditDefaultsOnly, Category = "Construction")
 	UStaticMesh* StaticMeshConstructionPhase1;
 	UPROPERTY(EditDefaultsOnly, Category = "Construction")
@@ -78,9 +84,12 @@ class RTSGAME_API ARGBuildingBase : public APawn
 
 	void HandleBuildingPlacing();
 	void HandleBuildingConstructing();
+	void HandleRightMouseButtonInputPressedUninteractable();
 
 	UPROPERTY()
 	ARGPlayerController* PlayerController;
+
+	FVector LastBannerLocation;
 
 	FTimerHandle SpawnTimerHandle;
 	TArray<FSpawnQueueEntry> SpawnQueue;
