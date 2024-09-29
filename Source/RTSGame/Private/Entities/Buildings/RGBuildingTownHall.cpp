@@ -2,7 +2,7 @@
 
 #include "Entities/Buildings/RGBuildingTownHall.h"
 #include "BehaviorTree/BlackboardComponent.h"
-#include "Entities/Actions.h"
+#include "Entities/Actions/Actions.h"
 #include "Entities/Units/AI/RGUnitAIController.h"
 #include "Entities/Units/RGUnitPeasant.h"
 

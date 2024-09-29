@@ -1,12 +1,12 @@
 // https://github.com/Kyrylo-Smyrnov/RTSGame
 
 #include "Player/UI/RGSelectionBarMain.h"
-#include "Entities/RGBuildingBase.h"
+#include "Entities/Buildings/RGBuildingBase.h"
 #include "Kismet/GameplayStatics.h"
+#include "Player/RGPlayerController.h"
 #include "Player/RGPlayerPawn.h"
 #include "Player/UI/RGSelectionBarQueue.h"
 #include "Player/UI/RGSelectionBarSquad.h"
-#include "RGPlayerController.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogRGSelectionBarMain, All, All);
 

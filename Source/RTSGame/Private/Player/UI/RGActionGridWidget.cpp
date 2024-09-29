@@ -6,12 +6,12 @@
 #include "Components/GridSlot.h"
 #include "Components/Image.h"
 #include "Components/SizeBox.h"
-#include "Entities/Actionable.h"
+#include "Entities/Actions/Actionable.h"
 #include "Entities/Buildings/RGBuildingTownHall.h"
 #include "Entities/Units/RGUnitPeasant.h"
 #include "Kismet/GameplayStatics.h"
+#include "Player/RGPlayerController.h"
 #include "Player/RGPlayerPawn.h"
-#include "RGPlayerController.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogRGActionGridWidget, All, All);
 
@@ -82,9 +82,9 @@ void URGActionGridWidget::UpdateWidget(AActor* MostImportantEntity)
 
 	if (ARGBuildingBase* CastedBuilding = Cast<ARGBuildingBase>(MostImportantEntity))
 	{
-		if(CastedBuilding->GetIsConstructing())
+		if (CastedBuilding->GetIsConstructing())
 		{
-			for(auto& Action : ActionButtons)
+			for (auto& Action : ActionButtons)
 			{
 				Action.Key->SetIsEnabled(false);
 			}

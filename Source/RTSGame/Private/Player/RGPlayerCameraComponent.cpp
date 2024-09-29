@@ -4,7 +4,7 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Kismet/GameplayStatics.h"
-#include "RGPlayerController.h"
+#include "Player/RGPlayerController.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogRGPlayerCameraComponent, All, All);
 

@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "Entities/Actionable.h"
+#include "Entities/Actions/Actionable.h"
 #include "Player/RGPlayerPawn.h"
 
 namespace ActionsUtility
@@ -23,4 +23,4 @@ extern FActionData Base_Move;
 extern FActionData Base_MoveAttack;
 
 extern FActionData Peasant_BuildTownHall;
-} // UnitActions
+} // namespace UnitActions

@@ -5,8 +5,8 @@
 #include "Components/GridSlot.h"
 #include "Components/Image.h"
 #include "Components/SizeBox.h"
-#include "Entities/RGBuildingBase.h"
-#include "Entities/RGUnitBase.h"
+#include "Entities/Buildings/RGBuildingBase.h"
+#include "Entities/Units/RGUnitBase.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogURGSelectionBarSquad, All, All);
 
@@ -18,9 +18,9 @@ void URGSelectionBarSquad::NativeConstruct()
 
 void URGSelectionBarSquad::UpdateWidget(TArray<AActor*> SelectedEntities)
 {
-	if(GetVisibility() == ESlateVisibility::Hidden)
+	if (GetVisibility() == ESlateVisibility::Hidden)
 		return;
-	
+
 	for (int32 i = 0; i < EntitiesIcons.Num(); ++i)
 	{
 		if (i < SelectedEntities.Num())

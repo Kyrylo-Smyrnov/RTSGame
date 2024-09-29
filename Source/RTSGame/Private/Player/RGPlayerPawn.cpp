@@ -1,10 +1,10 @@
 // https://github.com/Kyrylo-Smyrnov/RTSGame
 
 #include "Player/RGPlayerPawn.h"
-#include "Entities/RGBuildingBase.h"
-#include "Entities/RGUnitBase.h"
+#include "Entities/Buildings/RGBuildingBase.h"
+#include "Entities/Units/RGUnitBase.h"
 #include "Player/RGPlayerCameraComponent.h"
-#include "RGPlayerController.h"
+#include "Player/RGPlayerController.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogRGPlayerPawn, All, All);
 

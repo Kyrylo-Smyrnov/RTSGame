@@ -1,7 +1,7 @@
 // https://github.com/Kyrylo-Smyrnov/RTSGame
 
 #include "Entities/Units/RGUnitPeasant.h"
-#include "Entities/Actions.h"
+#include "Entities/Actions/Actions.h"
 #include "Entities/Buildings/RGBuildingTownHall.h"
 #include "Player/RGPlayerPawn.h"
 

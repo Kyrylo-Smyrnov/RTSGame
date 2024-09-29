@@ -1,12 +1,12 @@
 // https://github.com/Kyrylo-Smyrnov/RTSGame
 
-#include "Resouces/RGResourceBase.h"
+#include "Entities/Resouces/RGResourceBase.h"
 #include "AIController.h"
 #include "BehaviorTree/BlackboardComponent.h"
-#include "Entities/RGUnitBase.h"
+#include "Entities/Units/RGUnitBase.h"
 #include "Kismet/GameplayStatics.h"
 #include "Player/RGPlayerPawn.h"
-#include "RGPlayerController.h"
+#include "Player/RGPlayerController.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogRGResourceBase, All, All);
 

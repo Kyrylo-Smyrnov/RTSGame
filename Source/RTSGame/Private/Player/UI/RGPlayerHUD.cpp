@@ -1,13 +1,13 @@
 // https://github.com/Kyrylo-Smyrnov/RTSGame
 
-#include "Player/RGPlayerHUD.h"
+#include "Player/UI/RGPlayerHUD.h"
 #include "Blueprint/UserWidget.h"
 #include "Kismet/GameplayStatics.h"
+#include "Player/RGPlayerController.h"
 #include "Player/RGPlayerPawn.h"
 #include "Player/UI/RGActionGridWidget.h"
 #include "Player/UI/RGPlayerResourcesWidget.h"
 #include "Player/UI/RGSelectionBarMain.h"
-#include "RGPlayerController.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogRGPlayerHud, All, All);
 

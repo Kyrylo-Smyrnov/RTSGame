@@ -3,8 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Entities/Actionable.h"
-#include "Entities/RGBuildingBase.h"
+#include "Entities/Actions/Actionable.h"
+#include "Entities/Buildings/RGBuildingBase.h"
 #include "RGBuildingTownHall.generated.h"
 
 class ARGUnitPeasant;

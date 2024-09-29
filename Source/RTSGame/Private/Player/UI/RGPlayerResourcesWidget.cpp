@@ -7,8 +7,8 @@
 #include "Components/SizeBox.h"
 #include "Components/TextBlock.h"
 #include "Kismet/GameplayStatics.h"
+#include "Player/RGPlayerController.h"
 #include "Player/RGPlayerPawn.h"
-#include "RGPlayerController.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogRGPlayerResourcesWidget, All, All);
 

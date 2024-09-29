@@ -2,9 +2,9 @@
 
 #include "Entities/Units/AI/RGUnitAIController.h"
 #include "BehaviorTree/BlackboardComponent.h"
-#include "Entities/RGUnitBase.h"
+#include "Entities/Units/RGUnitBase.h"
 #include "Kismet/GameplayStatics.h"
-#include "RGPlayerController.h"
+#include "Player/RGPlayerController.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogRGUnitAIController, All, All);
 
@@ -13,7 +13,7 @@ void ARGUnitAIController::BeginPlay()
 	Super::BeginPlay();
 
 	PlayerController = Cast<ARGPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
-	if(PlayerController)
+	if (PlayerController)
 		PlayerController->RightMouseButtonInputPressedUninteractable.AddUObject(this, &ARGUnitAIController::HandleRightMouseButtonInputPressedUninteractable);
 	else
 		UE_LOG(LogRGUnitAIController, Warning, TEXT("[BeginPlay] PlayerController is nullptr."));
@@ -22,12 +22,12 @@ void ARGUnitAIController::BeginPlay()
 void ARGUnitAIController::HandleRightMouseButtonInputPressedUninteractable()
 {
 	ARGUnitBase* Unit = Cast<ARGUnitBase>(GetPawn());
-	if(!Unit)
+	if (!Unit)
 	{
 		UE_LOG(LogRGUnitAIController, Warning, TEXT("[HandleRightMouseButtonInputPressedUninteractable] Unit is nullptr."));
 		return;
 	}
-		
+
 	if (Unit->IsSelected())
 	{
 		UBlackboardComponent* BlackboardComponent = GetBlackboardComponent();

@@ -2,9 +2,9 @@
 
 #pragma once
 
-#include "Actionable.h"
 #include "CoreMinimal.h"
-#include "EntitiesImportance.h"
+#include "Entities/Actions/Actionable.h"
+#include "Entities/EntitiesImportance.h"
 #include "GameFramework/Character.h"
 #include "RGUnitBase.generated.h"
 
@@ -23,10 +23,10 @@ class RTSGAME_API ARGUnitBase : public ACharacter, public IActionable
 
 	UFUNCTION()
 	void HandleOnClicked(AActor* TouchedActor, FKey ButtonPressed);
-	
+
 	void SetSelected(bool bIsSelected);
 
-	//UFUNCTION(BlueprintCallable)
+	// UFUNCTION(BlueprintCallable)
 	bool IsSelected() const; // TODO: Change to GetIsSelected.
 	int32 GetImportance() const;
 	UTexture2D* GetSelectionIcon() const;

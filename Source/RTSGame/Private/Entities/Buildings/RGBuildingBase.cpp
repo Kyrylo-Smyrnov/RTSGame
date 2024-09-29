@@ -1,17 +1,17 @@
 // https://github.com/Kyrylo-Smyrnov/RTSGame
 
-#include "Entities/RGBuildingBase.h"
+#include "Entities/Buildings/RGBuildingBase.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "Components/DecalComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "Entities/Buildings/RGBuildingBanner.h"
-#include "Entities/RGUnitBase.h"
 #include "Entities/Units/AI/RGUnitAIController.h"
+#include "Entities/Units/RGUnitBase.h"
 #include "Kismet/GameplayStatics.h"
-#include "Player/RGPlayerHUD.h"
+#include "Player/RGPlayerController.h"
 #include "Player/RGPlayerPawn.h"
 #include "Player/UI/RGActionGridWidget.h"
-#include "RGPlayerController.h"
+#include "Player/UI/RGPlayerHUD.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogRGBuildingBase, All, All);
 
@@ -256,7 +256,7 @@ void ARGBuildingBase::BeginPlay()
 
 	PlayerPawn->AddEntitiesToContolled(this);
 
-	if(!bIsPlacing)
+	if (!bIsPlacing)
 		LastBannerLocation = GetActorLocation() + FVector(0.0f, 500.0f, 0.0f);
 }
 

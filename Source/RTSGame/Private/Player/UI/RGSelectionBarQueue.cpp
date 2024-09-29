@@ -7,8 +7,8 @@
 #include "Components/ProgressBar.h"
 #include "Components/SizeBox.h"
 #include "Components/VerticalBox.h"
-#include "Entities/RGBuildingBase.h"
-#include "Entities/RGUnitBase.h"
+#include "Entities/Buildings/RGBuildingBase.h"
+#include "Entities/Units/RGUnitBase.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogRGSelectionBarQueue, All, All);
 
@@ -123,7 +123,7 @@ void URGSelectionBarQueue::HandleSpawnQueueChange(TArray<FSpawnQueueEntry>& Spaw
 	}
 
 	SpawnProgressBar->SetVisibility(ESlateVisibility::Visible);
-	
+
 	ARGUnitBase* CurrentUnit = Cast<ARGUnitBase>(SpawnQueue[0].UnitClass.GetDefaultObject());
 	if (CurrentUnit)
 	{
@@ -155,11 +155,11 @@ void URGSelectionBarQueue::HandleSpawnQueueChange(TArray<FSpawnQueueEntry>& Spaw
 void URGSelectionBarQueue::HandleBuildingConstruction()
 {
 	SpawnProgressBar->SetVisibility(ESlateVisibility::Visible);
-	
+
 	CurrentUnitIcon->SetBrushFromTexture(CurrentBuilding->GetSelectionIcon());
 	CurrentUnitIcon->SetVisibility(ESlateVisibility::Visible);
 
-	for(UImage* Icon : UnitsInQueueIcons)
+	for (UImage* Icon : UnitsInQueueIcons)
 		Icon->SetVisibility(ESlateVisibility::Hidden);
 }
 

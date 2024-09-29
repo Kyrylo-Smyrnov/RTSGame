@@ -1,6 +1,6 @@
 // https://github.com/Kyrylo-Smyrnov/RTSGame
 
-#include "RGPlayerController.h"
+#include "Player/RGPlayerController.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogRGPlayerController, All, All);
 
@@ -12,7 +12,7 @@ ARGPlayerController::ARGPlayerController()
 	DefaultClickTraceChannel = ECC_GameTraceChannel1;
 
 	NavigationSystem = FNavigationSystem::GetCurrent<UNavigationSystemV1>(GetWorld());
-	if(!NavigationSystem)
+	if (!NavigationSystem)
 		UE_LOG(LogRGPlayerController, Warning, TEXT("[Constructor] NavigationSystem is nullptr."))
 }
 

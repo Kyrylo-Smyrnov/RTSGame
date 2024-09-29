@@ -2,9 +2,9 @@
 
 #pragma once
 
-#include "Buildings/SpawnQueueEntry.h"
 #include "CoreMinimal.h"
-#include "EntitiesImportance.h"
+#include "Entities/Buildings/SpawnQueueEntry.h"
+#include "Entities/EntitiesImportance.h"
 #include "GameFramework/Pawn.h"
 #include "RGBuildingBase.generated.h"
 

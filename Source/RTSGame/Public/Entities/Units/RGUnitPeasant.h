@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Entities/RGUnitBase.h"
+#include "Entities/Units/RGUnitBase.h"
 #include "RGUnitPeasant.generated.h"
 
 class ARGBuildingTownHall;

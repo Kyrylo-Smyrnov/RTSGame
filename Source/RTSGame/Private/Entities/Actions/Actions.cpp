@@ -1,6 +1,6 @@
 // https://github.com/Kyrylo-Smyrnov/RTSGame
 
-#include "Entities/Actions.h"
+#include "Entities/Actions/Actions.h"
 
 namespace ActionsUtility
 {

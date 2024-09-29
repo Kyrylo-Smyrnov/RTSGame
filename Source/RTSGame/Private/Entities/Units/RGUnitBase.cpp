@@ -1,14 +1,14 @@
 // https://github.com/Kyrylo-Smyrnov/RTSGame
 
-#include "Entities/RGUnitBase.h"
+#include "Entities/Units/RGUnitBase.h"
+#include "BehaviorTree/BlackboardComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/DecalComponent.h"
-#include "Entities/Actions.h"
-#include "Kismet/GameplayStatics.h"
-#include "Player/RGPlayerPawn.h"
-#include "RGPlayerController.h"
-#include "BehaviorTree/BlackboardComponent.h"
+#include "Entities/Actions/Actions.h"
 #include "Entities/Units/AI/RGUnitAIController.h"
+#include "Kismet/GameplayStatics.h"
+#include "Player/RGPlayerController.h"
+#include "Player/RGPlayerPawn.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogRGUnitBase, All, All);
 
@@ -73,10 +73,10 @@ void ARGUnitBase::HandleOnClicked(AActor* TouchedActor, FKey ButtonPressed)
 	else if (ButtonPressed == EKeys::RightMouseButton && PlayerPawn->GetSelectedEntities().Num() > 0)
 	{
 		TArray<AActor*> SelectedEntities = PlayerPawn->GetSelectedEntities();
-		
-		for(int32 i = 0; i < SelectedEntities.Num(); ++i)
+
+		for (int32 i = 0; i < SelectedEntities.Num(); ++i)
 		{
-			if(ARGUnitBase* CastedUnit = Cast<ARGUnitBase>(SelectedEntities[i]))
+			if (ARGUnitBase* CastedUnit = Cast<ARGUnitBase>(SelectedEntities[i]))
 			{
 				UBlackboardComponent* Blackboard = Cast<ARGUnitAIController>(CastedUnit->GetController())->GetBlackboardComponent();
 				Blackboard->SetValueAsVector("TargetLocationToMove", GetActorLocation());
