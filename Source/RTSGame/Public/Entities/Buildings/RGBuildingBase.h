@@ -2,9 +2,11 @@
 
 #pragma once
 
+#include "BehaviorTree/BlackboardComponent.h"
 #include "CoreMinimal.h"
 #include "Entities/Buildings/SpawnQueueEntry.h"
 #include "Entities/EntitiesImportance.h"
+#include "Entities/Units/AI/RGUnitAIController.h"
 #include "GameFramework/Pawn.h"
 #include "RGBuildingBase.generated.h"
 
@@ -25,25 +27,20 @@ class RTSGAME_API ARGBuildingBase : public APawn
 
   public:
 	ARGBuildingBase();
-	virtual void Tick(float DeltaTime) override;
-
-	UFUNCTION()
-	virtual void HandleOnClicked(AActor* TouchedActor, FKey ButtonPressed);
 
 	void AddUnitToSpawnQueue(TSubclassOf<AActor> UnitClass, float SpawnTime);
 
+	bool GetIsSelected() const;
+	bool GetIsConstructing() const;
 	int32 GetImportance() const;
 	UTexture2D* GetSelectionIcon() const;
 	TArray<FSpawnQueueEntry>& GetSpawnQueue();
 
-	bool GetIsConstructing() const;
-	bool IsSelected() const; // TODO: Change to GetIsSelected.
+	void SetSelected(bool bIsBuildingSelected);
+	void SetTimeToConstruct(float Time);
 
 	void SetBuildingPlacementMaterial(const bool IsValidPlacement);
 	void SetBuildingMeshMaterials();
-
-	void SetSelected(bool bIsBuildingSelected);
-	void SetTimeToConstruct(float Time);
 
 	FOnSpawnQueueChanged OnSpawnQueueChanged;
 	FOnSpawnProgressChanged OnSpawnProgressChanged;
@@ -51,6 +48,10 @@ class RTSGAME_API ARGBuildingBase : public APawn
 
   protected:
 	virtual void BeginPlay() override;
+	virtual void Tick(float DeltaTime) override;
+
+	UFUNCTION()
+	virtual void HandleOnClicked(AActor* TouchedActor, FKey ButtonPressed);
 
 	UPROPERTY()
 	ARGPlayerPawn* PlayerPawn;
@@ -78,7 +79,7 @@ class RTSGAME_API ARGBuildingBase : public APawn
 	EFEntitiesImportance BuildingImportance;
 
   private:
-	bool CheckForOverlap();
+	bool CheckForOverlap() const;
 
 	void SpawnNextUnit();
 
@@ -88,8 +89,6 @@ class RTSGAME_API ARGBuildingBase : public APawn
 
 	UPROPERTY()
 	ARGPlayerController* PlayerController;
-
-	FVector LastBannerLocation;
 
 	FTimerHandle SpawnTimerHandle;
 	TArray<FSpawnQueueEntry> SpawnQueue;
@@ -102,6 +101,8 @@ class RTSGAME_API ARGBuildingBase : public APawn
 	UMaterialInterface* InValidPlacementMaterial;
 	UPROPERTY()
 	TArray<UMaterialInterface*> BuildingMeshMaterials;
+
+	FVector LastBannerLocation;
 
 	bool bIsSelected;
 	bool bIsPlacing;

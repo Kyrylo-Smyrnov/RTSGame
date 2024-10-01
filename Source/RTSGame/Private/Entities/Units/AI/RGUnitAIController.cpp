@@ -28,7 +28,7 @@ void ARGUnitAIController::HandleRightMouseButtonInputPressedUninteractable()
 		return;
 	}
 
-	if (Unit->IsSelected())
+	if (Unit->GetIsSelected())
 	{
 		UBlackboardComponent* BlackboardComponent = GetBlackboardComponent();
 

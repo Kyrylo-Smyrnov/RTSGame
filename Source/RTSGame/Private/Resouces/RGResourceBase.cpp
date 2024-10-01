@@ -1,6 +1,6 @@
 // https://github.com/Kyrylo-Smyrnov/RTSGame
 
-#include "Entities/Resouces/RGResourceBase.h"
+#include "Resouces/RGResourceBase.h"
 #include "AIController.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "Entities/Units/RGUnitBase.h"

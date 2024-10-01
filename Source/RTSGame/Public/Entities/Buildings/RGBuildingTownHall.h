@@ -16,16 +16,18 @@ class RTSGAME_API ARGBuildingTownHall : public ARGBuildingBase, public IActionab
 
   public:
 	ARGBuildingTownHall();
-	virtual void Tick(float DeltaSeconds) override;
 	virtual void PerformAction_Implementation(const FName& ActionName) override;
-	virtual void HandleOnClicked(AActor* TouchedActor, FKey ButtonPressed) override;
 
   protected:
 	virtual void BeginPlay() override;
+	virtual void Tick(float DeltaSeconds) override;
+	
 	virtual TArray<FActionData> GetAvailableActions_Implementation() const override;
+	
+	virtual void HandleOnClicked(AActor* TouchedActor, FKey ButtonPressed) override;
 
   private:
-	UPROPERTY(EditDefaultsOnly, Category = "Actions")
+	UPROPERTY(EditDefaultsOnly, Category = "Objects")
 	TSubclassOf<ARGUnitPeasant> UnitPeasantBlueprintClass;
 
 	const FName ACTION_BUILDPEASANT = "BuildPeasant";

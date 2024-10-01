@@ -1,11 +1,9 @@
 // https://github.com/Kyrylo-Smyrnov/RTSGame
 
 #include "Entities/Buildings/RGBuildingBase.h"
-#include "BehaviorTree/BlackboardComponent.h"
 #include "Components/DecalComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "Entities/Buildings/RGBuildingBanner.h"
-#include "Entities/Units/AI/RGUnitAIController.h"
 #include "Entities/Units/RGUnitBase.h"
 #include "Kismet/GameplayStatics.h"
 #include "Player/RGPlayerController.h"
@@ -45,6 +43,132 @@ ARGBuildingBase::ARGBuildingBase()
 		InValidPlacementMaterial = InValidPlacementMaterialFinder.Object;
 	else
 		UE_LOG(LogRGBuildingBase, Warning, TEXT("[Constructor] ValidPlacementMaterial not found."));
+}
+
+void ARGBuildingBase::AddUnitToSpawnQueue(TSubclassOf<AActor> UnitClass, float SpawnTime)
+{
+	FSpawnQueueEntry QueueEntry;
+	QueueEntry.UnitClass = UnitClass;
+	QueueEntry.SpawnTime = SpawnTime;
+
+	SpawnQueue.Add(QueueEntry);
+	OnSpawnQueueChanged.Broadcast(SpawnQueue);
+
+	if (!bIsSpawning)
+		SpawnNextUnit();
+}
+
+bool ARGBuildingBase::GetIsSelected() const
+{
+	return bIsSelected;
+}
+
+bool ARGBuildingBase::GetIsConstructing() const
+{
+	return bIsConstructing;
+}
+
+int32 ARGBuildingBase::GetImportance() const
+{
+	return BuildingImportance;
+}
+
+UTexture2D* ARGBuildingBase::GetSelectionIcon() const
+{
+	if (!SelectionIcon)
+		UE_LOG(LogRGBuildingBase, Warning, TEXT("[GetSelectionIcon] SelectionIcon is nullptr."))
+
+	return SelectionIcon;
+}
+
+TArray<FSpawnQueueEntry>& ARGBuildingBase::GetSpawnQueue()
+{
+	return SpawnQueue;
+}
+
+void ARGBuildingBase::SetSelected(bool bIsBuildingSelected)
+{
+	if (!SelectionCircleDecal)
+	{
+		UE_LOG(LogRGBuildingBase, Warning, TEXT("[SetSelected] SelectionCircleDecal is nullptr."));
+		return;
+	}
+
+	bIsSelected = bIsBuildingSelected;
+	SelectionCircleDecal->SetVisibility(bIsBuildingSelected);
+
+	if (bIsBuildingSelected && PlayerPawn->GetMostImportantEntity() == this)
+	{
+		if (!BuildingBanner)
+		{
+			BuildingBanner = GetWorld()->SpawnActor<ARGBuildingBanner>(BuildingBannerClass, LastBannerLocation, FRotator::ZeroRotator);
+		}
+	}
+	else
+	{
+		BuildingBanner->Destroy();
+		BuildingBanner = nullptr;
+	}
+}
+
+void ARGBuildingBase::SetTimeToConstruct(float Time)
+{
+	TimeToConstruct = Time;
+}
+
+void ARGBuildingBase::SetBuildingPlacementMaterial(const bool IsValidPlacement)
+{
+	if (!StaticMeshComponentCurrent)
+	{
+		UE_LOG(LogRGBuildingBase, Warning, TEXT("[SetBuildingPlacementMaterial] StaticMeshComponent is nullptr."));
+		return;
+	}
+	if (!ValidPlacementMaterial || !InValidPlacementMaterial)
+	{
+		UE_LOG(LogRGBuildingBase, Warning, TEXT("[SetBuildingPlacementMaterial] Placement materials aren't set."));
+		return;
+	}
+
+	bIsPlacing = true;
+	UMaterialInterface* PlacementMaterial = IsValidPlacement ? ValidPlacementMaterial : InValidPlacementMaterial;
+
+	for (int i = 0; i < StaticMeshComponentCurrent->GetMaterials().Num(); ++i)
+		StaticMeshComponentCurrent->SetMaterial(i, PlacementMaterial);
+}
+
+void ARGBuildingBase::SetBuildingMeshMaterials()
+{
+	if (!StaticMeshComponentCurrent)
+		UE_LOG(LogRGBuildingBase, Warning, TEXT("[SetBuildingMeshMaterials] StaticMeshComponent is nullptr."));
+
+	for (int i = 0; i < BuildingMeshMaterials.Num(); ++i)
+		StaticMeshComponentCurrent->SetMaterial(i, BuildingMeshMaterials[i]);
+}
+
+void ARGBuildingBase::BeginPlay()
+{
+	Super::BeginPlay();
+
+	OnClicked.AddDynamic(this, &ARGBuildingBase::HandleOnClicked);
+	BuildingMeshMaterials = StaticMeshComponentCurrent->GetMaterials();
+
+	PlayerController = Cast<ARGPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	if (!PlayerController)
+		UE_LOG(LogRGBuildingBase, Warning, TEXT("[BeginPlay] PlayerController is nullptr."));
+
+	PlayerController->RightMouseButtonInputPressedUninteractable.AddUObject(this, &ARGBuildingBase::HandleRightMouseButtonInputPressedUninteractable);
+
+	PlayerPawn = Cast<ARGPlayerPawn>(PlayerController->GetPawn());
+	if (!PlayerPawn)
+	{
+		UE_LOG(LogRGBuildingBase, Warning, TEXT("[BeginPlay] PlayerPawn is nullptr."));
+		return;
+	}
+
+	PlayerPawn->AddEntitiesToContolled(this);
+
+	if (!bIsPlacing)
+		LastBannerLocation = GetActorLocation() + FVector(0.0f, 500.0f, 0.0f);
 }
 
 void ARGBuildingBase::Tick(float DeltaTime)
@@ -134,130 +258,21 @@ void ARGBuildingBase::HandleOnClicked(AActor* TouchedActor, FKey ButtonPressed)
 	}
 }
 
-void ARGBuildingBase::AddUnitToSpawnQueue(TSubclassOf<AActor> UnitClass, float SpawnTime)
+bool ARGBuildingBase::CheckForOverlap() const
 {
-	FSpawnQueueEntry QueueEntry;
-	QueueEntry.UnitClass = UnitClass;
-	QueueEntry.SpawnTime = SpawnTime;
+	TArray<AActor*> OverlappingActors;
+	StaticMeshComponentCurrent->GetOverlappingActors(OverlappingActors);
 
-	SpawnQueue.Add(QueueEntry);
-	OnSpawnQueueChanged.Broadcast(SpawnQueue);
-
-	if (!bIsSpawning)
-		SpawnNextUnit();
-}
-
-bool ARGBuildingBase::IsSelected() const
-{
-	return bIsSelected;
-}
-
-int32 ARGBuildingBase::GetImportance() const
-{
-	return BuildingImportance;
-}
-
-UTexture2D* ARGBuildingBase::GetSelectionIcon() const
-{
-	if (!SelectionIcon)
-		UE_LOG(LogRGBuildingBase, Warning, TEXT("[GetSelectionIcon] SelectionIcon is nullptr."))
-
-	return SelectionIcon;
-}
-
-TArray<FSpawnQueueEntry>& ARGBuildingBase::GetSpawnQueue()
-{
-	return SpawnQueue;
-}
-
-bool ARGBuildingBase::GetIsConstructing() const
-{
-	return bIsConstructing;
-}
-
-void ARGBuildingBase::SetSelected(bool bIsBuildingSelected)
-{
-	if (!SelectionCircleDecal)
+	for (AActor* Actor : OverlappingActors)
 	{
-		UE_LOG(LogRGBuildingBase, Warning, TEXT("[SetSelected] SelectionCircleDecal is nullptr."));
-		return;
-	}
-
-	bIsSelected = bIsBuildingSelected;
-	SelectionCircleDecal->SetVisibility(bIsBuildingSelected);
-
-	if (bIsBuildingSelected && PlayerPawn->GetMostImportantEntity() == this)
-	{
-		if (!BuildingBanner)
+		if (Actor->GetRootComponent()->GetCollisionObjectType() == ECC_Pawn ||
+			Actor->GetRootComponent()->GetCollisionObjectType() == ECC_WorldDynamic)
 		{
-			BuildingBanner = GetWorld()->SpawnActor<ARGBuildingBanner>(BuildingBannerClass, LastBannerLocation, FRotator::ZeroRotator);
+			return false;
 		}
 	}
-	else
-	{
-		BuildingBanner->Destroy();
-		BuildingBanner = nullptr;
-	}
-}
 
-void ARGBuildingBase::SetTimeToConstruct(float Time)
-{
-	TimeToConstruct = Time;
-}
-
-void ARGBuildingBase::SetBuildingPlacementMaterial(const bool IsValidPlacement)
-{
-	if (!StaticMeshComponentCurrent)
-	{
-		UE_LOG(LogRGBuildingBase, Warning, TEXT("[SetBuildingPlacementMaterial] StaticMeshComponent is nullptr."));
-		return;
-	}
-	if (!ValidPlacementMaterial || !InValidPlacementMaterial)
-	{
-		UE_LOG(LogRGBuildingBase, Warning, TEXT("[SetBuildingPlacementMaterial] Placement materials aren't set."));
-		return;
-	}
-
-	bIsPlacing = true;
-	UMaterialInterface* PlacementMaterial = IsValidPlacement ? ValidPlacementMaterial : InValidPlacementMaterial;
-
-	for (int i = 0; i < StaticMeshComponentCurrent->GetMaterials().Num(); ++i)
-		StaticMeshComponentCurrent->SetMaterial(i, PlacementMaterial);
-}
-
-void ARGBuildingBase::SetBuildingMeshMaterials()
-{
-	if (!StaticMeshComponentCurrent)
-		UE_LOG(LogRGBuildingBase, Warning, TEXT("[SetBuildingMeshMaterials] StaticMeshComponent is nullptr."));
-
-	for (int i = 0; i < BuildingMeshMaterials.Num(); ++i)
-		StaticMeshComponentCurrent->SetMaterial(i, BuildingMeshMaterials[i]);
-}
-
-void ARGBuildingBase::BeginPlay()
-{
-	Super::BeginPlay();
-
-	OnClicked.AddDynamic(this, &ARGBuildingBase::HandleOnClicked);
-	BuildingMeshMaterials = StaticMeshComponentCurrent->GetMaterials();
-
-	PlayerController = Cast<ARGPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
-	if (!PlayerController)
-		UE_LOG(LogRGBuildingBase, Warning, TEXT("[BeginPlay] PlayerController is nullptr."));
-
-	PlayerController->RightMouseButtonInputPressedUninteractable.AddUObject(this, &ARGBuildingBase::HandleRightMouseButtonInputPressedUninteractable);
-
-	PlayerPawn = Cast<ARGPlayerPawn>(PlayerController->GetPawn());
-	if (!PlayerPawn)
-	{
-		UE_LOG(LogRGBuildingBase, Warning, TEXT("[BeginPlay] PlayerPawn is nullptr."));
-		return;
-	}
-
-	PlayerPawn->AddEntitiesToContolled(this);
-
-	if (!bIsPlacing)
-		LastBannerLocation = GetActorLocation() + FVector(0.0f, 500.0f, 0.0f);
+	return true;
 }
 
 void ARGBuildingBase::SpawnNextUnit()
@@ -381,21 +396,4 @@ void ARGBuildingBase::HandleRightMouseButtonInputPressedUninteractable()
 		BuildingBanner = GetWorld()->SpawnActor<ARGBuildingBanner>(BuildingBannerClass, HitResult.Location, FRotator::ZeroRotator);
 		LastBannerLocation = HitResult.Location;
 	}
-}
-
-bool ARGBuildingBase::CheckForOverlap()
-{
-	TArray<AActor*> OverlappingActors;
-	StaticMeshComponentCurrent->GetOverlappingActors(OverlappingActors);
-
-	for (AActor* Actor : OverlappingActors)
-	{
-		if (Actor->GetRootComponent()->GetCollisionObjectType() == ECC_Pawn ||
-			Actor->GetRootComponent()->GetCollisionObjectType() == ECC_WorldDynamic)
-		{
-			return false;
-		}
-	}
-
-	return true;
 }

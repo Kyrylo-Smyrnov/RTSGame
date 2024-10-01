@@ -4,11 +4,9 @@
 #include "BehaviorTree/BlackboardComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/DecalComponent.h"
-#include "Entities/Actions/Actions.h"
 #include "Entities/Units/AI/RGUnitAIController.h"
 #include "Kismet/GameplayStatics.h"
 #include "Player/RGPlayerController.h"
-#include "Player/RGPlayerPawn.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogRGUnitBase, All, All);
 
@@ -23,6 +21,84 @@ ARGUnitBase::ARGUnitBase()
 	SelectionCircleDecal = CreateDefaultSubobject<UDecalComponent>("SelectionCircleDecal");
 	SelectionCircleDecal->SetupAttachment(GetRootComponent());
 	SelectionCircleDecal->SetVisibility(false);
+}
+
+void ARGUnitBase::PerformAction_Implementation(const FName& ActionName)
+{
+	if (ActionName == ACTION_ATTACK)
+	{
+		UE_LOG(LogRGUnitBase, Warning, TEXT("AttackAction logic is not implemented yet."));
+		return;
+	}
+	else if (ActionName == ACTION_HOLDATTACK)
+	{
+		UE_LOG(LogRGUnitBase, Warning, TEXT("HoldAction logic is not implemented yet."));
+		return;
+	}
+	else if (ActionName == ACTION_MOVE)
+	{
+		UE_LOG(LogRGUnitBase, Warning, TEXT("MoveAction logic is not implemented yet."));
+		return;
+	}
+	else if (ActionName == ACTION_MOVEATTACK)
+	{
+		UE_LOG(LogRGUnitBase, Warning, TEXT("MoveAttackAction logic is not implemented yet."));
+		return;
+	}
+
+	IActionable::PerformAction_Implementation(ActionName);
+}
+
+bool ARGUnitBase::GetIsSelected() const
+{
+	return bIsSelected;
+}
+
+void ARGUnitBase::SetSelected(bool bIsUnitSelected)
+{
+	if (!SelectionCircleDecal)
+	{
+		UE_LOG(LogRGUnitBase, Warning, TEXT("[SetSelected] SelectionCircleDecal is nullptr."));
+		return;
+	}
+
+	bIsSelected = bIsUnitSelected;
+	SelectionCircleDecal->SetVisibility(bIsUnitSelected);
+}
+
+int32 ARGUnitBase::GetImportance() const
+{
+	return UnitImportance;
+}
+
+UTexture2D* ARGUnitBase::GetSelectionIcon() const
+{
+	if (!SelectionIcon)
+		UE_LOG(LogRGUnitBase, Warning, TEXT("[GetSelectionIcon] SelectionIcon is nullptr."))
+
+	return SelectionIcon;
+}
+
+void ARGUnitBase::BeginPlay()
+{
+	Super::BeginPlay();
+	OnClicked.AddDynamic(this, &ARGUnitBase::HandleOnClicked);
+
+	PlayerController = Cast<ARGPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	if (!PlayerController)
+	{
+		UE_LOG(LogRGUnitBase, Warning, TEXT("[BeginPlay] PlayerController is nullptr."));
+		return;
+	}
+
+	PlayerPawn = Cast<ARGPlayerPawn>(PlayerController->GetPawn());
+	if (!PlayerPawn)
+	{
+		UE_LOG(LogRGUnitBase, Warning, TEXT("[BeginPlay] PlayerPawn is nullptr."));
+		return;
+	}
+
+	PlayerPawn->AddEntitiesToContolled(this);
 }
 
 void ARGUnitBase::Tick(float DeltaTime)
@@ -85,36 +161,6 @@ void ARGUnitBase::HandleOnClicked(AActor* TouchedActor, FKey ButtonPressed)
 	}
 }
 
-bool ARGUnitBase::IsSelected() const
-{
-	return bIsSelected;
-}
-
-void ARGUnitBase::SetSelected(bool bIsUnitSelected)
-{
-	if (!SelectionCircleDecal)
-	{
-		UE_LOG(LogRGUnitBase, Warning, TEXT("[SetSelected] SelectionCircleDecal is nullptr."));
-		return;
-	}
-
-	bIsSelected = bIsUnitSelected;
-	SelectionCircleDecal->SetVisibility(bIsUnitSelected);
-}
-
-int32 ARGUnitBase::GetImportance() const
-{
-	return UnitImportance;
-}
-
-UTexture2D* ARGUnitBase::GetSelectionIcon() const
-{
-	if (!SelectionIcon)
-		UE_LOG(LogRGUnitBase, Warning, TEXT("[GetSelectionIcon] SelectionIcon is nullptr."))
-
-	return SelectionIcon;
-}
-
 TArray<FActionData> ARGUnitBase::GetAvailableActions_Implementation() const
 {
 	TArray<FActionData> BaseUnitActions;
@@ -125,52 +171,4 @@ TArray<FActionData> ARGUnitBase::GetAvailableActions_Implementation() const
 	BaseUnitActions.Add(UnitActions::Base_MoveAttack);
 
 	return BaseUnitActions;
-}
-
-void ARGUnitBase::PerformAction_Implementation(const FName& ActionName)
-{
-	if (ActionName == ACTION_ATTACK)
-	{
-		UE_LOG(LogRGUnitBase, Warning, TEXT("AttackAction logic is not implemented yet."));
-		return;
-	}
-	else if (ActionName == ACTION_HOLDATTACK)
-	{
-		UE_LOG(LogRGUnitBase, Warning, TEXT("HoldAction logic is not implemented yet."));
-		return;
-	}
-	else if (ActionName == ACTION_MOVE)
-	{
-		UE_LOG(LogRGUnitBase, Warning, TEXT("MoveAction logic is not implemented yet."));
-		return;
-	}
-	else if (ActionName == ACTION_MOVEATTACK)
-	{
-		UE_LOG(LogRGUnitBase, Warning, TEXT("MoveAttackAction logic is not implemented yet."));
-		return;
-	}
-
-	IActionable::PerformAction_Implementation(ActionName);
-}
-
-void ARGUnitBase::BeginPlay()
-{
-	Super::BeginPlay();
-	OnClicked.AddDynamic(this, &ARGUnitBase::HandleOnClicked);
-
-	PlayerController = Cast<ARGPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
-	if (!PlayerController)
-	{
-		UE_LOG(LogRGUnitBase, Warning, TEXT("[BeginPlay] PlayerController is nullptr."));
-		return;
-	}
-
-	PlayerPawn = Cast<ARGPlayerPawn>(PlayerController->GetPawn());
-	if (!PlayerPawn)
-	{
-		UE_LOG(LogRGUnitBase, Warning, TEXT("[BeginPlay] PlayerPawn is nullptr."));
-		return;
-	}
-
-	PlayerPawn->AddEntitiesToContolled(this);
 }

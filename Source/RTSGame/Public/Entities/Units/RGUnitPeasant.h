@@ -15,23 +15,23 @@ class RTSGAME_API ARGUnitPeasant : public ARGUnitBase
 
   public:
 	ARGUnitPeasant();
-	virtual void Tick(float DeltaSeconds) override;
 	virtual void PerformAction_Implementation(const FName& ActionName) override;
-
-	bool GetIsCarryingResources() const;
 
 	UFUNCTION(BlueprintCallable, Category = "Resources")
 	void AddCarryingWood(int32 Amount);
 	UFUNCTION(BlueprintCallable, Category = "Resources")
 	void PutCarryingResources();
 
+	bool GetIsCarryingResources() const;
+
   protected:
 	virtual void BeginPlay() override;
+	virtual void Tick(float DeltaSeconds) override;
 
 	virtual TArray<FActionData> GetAvailableActions_Implementation() const override;
 
   private:
-	UPROPERTY(EditDefaultsOnly, Category = "Actions")
+	UPROPERTY(EditDefaultsOnly, Category = "Objects")
 	TSubclassOf<ARGBuildingTownHall> BuildingTownHallBlueprintClass;
 
 	int32 CarryingWood;

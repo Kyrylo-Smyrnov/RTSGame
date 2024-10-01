@@ -8,7 +8,6 @@ ARGBuildingBanner::ARGBuildingBanner()
 
 	SkeletalMeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>("SkeletalMeshComponent");
 	SkeletalMeshComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	SkeletalMeshComponent->SetWorldRotation(FRotator(0.0f, 90.0f, 0.0f));
 	SkeletalMeshComponent->bReceivesDecals = false;
 	SetRootComponent(SkeletalMeshComponent);
 }

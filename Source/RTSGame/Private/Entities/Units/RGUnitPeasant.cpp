@@ -1,9 +1,7 @@
 // https://github.com/Kyrylo-Smyrnov/RTSGame
 
 #include "Entities/Units/RGUnitPeasant.h"
-#include "Entities/Actions/Actions.h"
 #include "Entities/Buildings/RGBuildingTownHall.h"
-#include "Player/RGPlayerPawn.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogUnitPeasant, All, All);
 
@@ -11,26 +9,6 @@ ARGUnitPeasant::ARGUnitPeasant()
 	: ARGUnitBase(), CarryingWood(0)
 {
 	UnitImportance = EFEntitiesImportance::Peasant;
-}
-
-void ARGUnitPeasant::Tick(float DeltaSeconds)
-{
-	Super::Tick(DeltaSeconds);
-}
-
-void ARGUnitPeasant::BeginPlay()
-{
-	Super::BeginPlay();
-}
-
-TArray<FActionData> ARGUnitPeasant::GetAvailableActions_Implementation() const
-{
-	TArray<FActionData> PeasantActions;
-
-	PeasantActions.Append(Super::GetAvailableActions_Implementation());
-	PeasantActions.Add(UnitActions::Peasant_BuildTownHall);
-
-	return PeasantActions;
 }
 
 void ARGUnitPeasant::PerformAction_Implementation(const FName& ActionName)
@@ -73,11 +51,6 @@ void ARGUnitPeasant::PerformAction_Implementation(const FName& ActionName)
 	IActionable::PerformAction_Implementation(ActionName);
 }
 
-bool ARGUnitPeasant::GetIsCarryingResources() const
-{
-	return CarryingWood != 0;
-}
-
 void ARGUnitPeasant::AddCarryingWood(int32 Amount)
 {
 	CarryingWood += Amount;
@@ -93,4 +66,29 @@ void ARGUnitPeasant::PutCarryingResources()
 
 	PlayerPawn->AddPlayerResources(CarryingWood);
 	CarryingWood = 0;
+}
+
+bool ARGUnitPeasant::GetIsCarryingResources() const
+{
+	return CarryingWood != 0;
+}
+
+void ARGUnitPeasant::BeginPlay()
+{
+	Super::BeginPlay();
+}
+
+void ARGUnitPeasant::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+}
+
+TArray<FActionData> ARGUnitPeasant::GetAvailableActions_Implementation() const
+{
+	TArray<FActionData> PeasantActions;
+
+	PeasantActions.Append(Super::GetAvailableActions_Implementation());
+	PeasantActions.Add(UnitActions::Peasant_BuildTownHall);
+
+	return PeasantActions;
 }
