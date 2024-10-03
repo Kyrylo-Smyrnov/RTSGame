@@ -1,12 +1,13 @@
 // https://github.com/Kyrylo-Smyrnov/RTSGame
 
-#include "Resouces/RGResourceBase.h"
+#include "Entities/Resouces/RGResourceBase.h"
 #include "AIController.h"
 #include "BehaviorTree/BlackboardComponent.h"
+#include "Entities/BBKeys.h"
 #include "Entities/Units/RGUnitBase.h"
 #include "Kismet/GameplayStatics.h"
-#include "Player/RGPlayerPawn.h"
 #include "Player/RGPlayerController.h"
+#include "Player/RGPlayerPawn.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogRGResourceBase, All, All);
 
@@ -57,9 +58,9 @@ void ARGResourceBase::HandleOnClicked(AActor* TouchedActor, FKey ButtonPressed)
 				}
 
 				// 1 - Attack
-				BlackboardComponent->SetValueAsEnum(BLACKBOARD_KEY_UNITSTATE, 1);
-				BlackboardComponent->SetValueAsVector(BLACKBOARD_KEY_TARGETLOCATIONTOMOVE, GetActorLocation());
-				BlackboardComponent->SetValueAsObject(BLACKBOARD_KEY_TARGETACTORTOATTACK, this);
+				BlackboardComponent->SetValueAsEnum(BBKeys::UNIT_AI_BBKEY_UNITSTATE, 1);
+				BlackboardComponent->SetValueAsVector(BBKeys::UNIT_AI_BBKEY_TARGETLOCATIONTOMOVE, GetActorLocation());
+				BlackboardComponent->SetValueAsObject(BBKeys::UNIT_AI_BBKEY_TARGETACTORTOATTACK, this);
 			}
 		}
 	}

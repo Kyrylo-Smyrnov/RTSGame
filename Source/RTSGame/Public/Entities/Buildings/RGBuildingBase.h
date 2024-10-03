@@ -4,6 +4,7 @@
 
 #include "BehaviorTree/BlackboardComponent.h"
 #include "CoreMinimal.h"
+#include "Entities/BBKeys.h"
 #include "Entities/Buildings/SpawnQueueEntry.h"
 #include "Entities/EntitiesImportance.h"
 #include "Entities/Units/AI/RGUnitAIController.h"

@@ -40,8 +40,4 @@ class RTSGAME_API ARGResourceBase : public AActor
 	ARGPlayerController* PlayerController;
 	UPROPERTY()
 	ARGPlayerPawn* PlayerPawn;
-
-	const FName BLACKBOARD_KEY_UNITSTATE = "UnitState";
-	const FName BLACKBOARD_KEY_TARGETLOCATIONTOMOVE = "TargetLocationToMove";
-	const FName BLACKBOARD_KEY_TARGETACTORTOATTACK = "TargetActorToAttack";
 };

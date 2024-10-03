@@ -20,7 +20,4 @@ class RTSGAME_API ARGUnitAIController : public AAIController
   private:
 	UPROPERTY()
 	ARGPlayerController* PlayerController;
-
-	const FName BLACKBOARD_KEY_UNITSTATE = "UnitState";
-	const FName BLACKBOARD_KEY_TARGETLOCATIONTOMOVE = "TargetLocationToMove";
 };

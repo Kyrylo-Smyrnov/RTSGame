@@ -186,15 +186,18 @@ void ARGBuildingBase::HandleOnClicked(AActor* TouchedActor, FKey ButtonPressed)
 		return;
 	}
 
-	if (bIsPlacing && CheckForOverlap())
+	if (bIsPlacing)
 	{
-		StaticMeshComponentCurrent->SetCollisionResponseToChannel(ECC_Pawn, ECR_Block);
-		StaticMeshComponentCurrent->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Block);
+		if(CheckForOverlap())
+		{
+			StaticMeshComponentCurrent->SetCollisionResponseToChannel(ECC_Pawn, ECR_Block);
+			StaticMeshComponentCurrent->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Block);
 
-		bIsPlacing = false;
-		LastBannerLocation = GetActorLocation() + FVector(0.0f, 500.0f, 0.0f);
-		SetBuildingMeshMaterials();
-		HandleBuildingConstructing();
+			bIsPlacing = false;
+			LastBannerLocation = GetActorLocation() + FVector(0.0f, 500.0f, 0.0f);
+			SetBuildingMeshMaterials();
+			HandleBuildingConstructing();
+		}
 	}
 	else if (ButtonPressed == EKeys::LeftMouseButton)
 	{
@@ -251,7 +254,7 @@ void ARGBuildingBase::HandleOnClicked(AActor* TouchedActor, FKey ButtonPressed)
 				if (bFoundLocation)
 				{
 					UBlackboardComponent* Blackboard = Cast<ARGUnitAIController>(CastedUnit->GetController())->GetBlackboardComponent();
-					Blackboard->SetValueAsVector("TargetLocationToMove", ClosestPointOnNavMesh.Location);
+					Blackboard->SetValueAsVector(BBKeys::UNIT_AI_BBKEY_TARGETLOCATIONTOMOVE, ClosestPointOnNavMesh.Location);
 				}
 			}
 		}
@@ -303,7 +306,7 @@ void ARGBuildingBase::SpawnNextUnit()
 				ARGUnitBase* SpawnedUnit = GetWorld()->SpawnActor<ARGUnitBase>(CurrentEntry.UnitClass, SpawnLocation, FRotator::ZeroRotator);
 
 				UBlackboardComponent* BlackboardComponent = Cast<ARGUnitAIController>(SpawnedUnit->GetController())->GetBlackboardComponent();
-				BlackboardComponent->SetValueAsVector("TargetLocationToMove", LastBannerLocation);
+				BlackboardComponent->SetValueAsVector(BBKeys::UNIT_AI_BBKEY_TARGETLOCATIONTOMOVE, LastBannerLocation);
 
 				SpawnQueue.RemoveAt(0);
 				OnSpawnQueueChanged.Broadcast(SpawnQueue);

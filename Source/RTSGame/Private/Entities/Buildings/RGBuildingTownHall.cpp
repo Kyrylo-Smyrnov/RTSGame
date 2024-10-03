@@ -72,7 +72,7 @@ void ARGBuildingTownHall::HandleOnClicked(AActor* TouchedActor, FKey ButtonPress
 			if (CastedPeasant->GetIsCarryingResources())
 			{
 				UBlackboardComponent* Blackboard = Cast<ARGUnitAIController>(CastedPeasant->GetController())->GetBlackboardComponent();
-				Blackboard->SetValueAsEnum("UnitState", 2);
+				Blackboard->SetValueAsEnum(BBKeys::UNIT_AI_BBKEY_UNITSTATE, 2);
 			}
 		}
 	}
