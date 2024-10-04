@@ -145,6 +145,23 @@ void ARGBuildingBase::SetBuildingMeshMaterials()
 		StaticMeshComponentCurrent->SetMaterial(i, BuildingMeshMaterials[i]);
 }
 
+void ARGBuildingBase::SetBannerLocation(FVector NewLocation)
+{
+	if (BuildingBanner)
+	{
+		BuildingBanner->Destroy();
+		BuildingBanner = nullptr;
+	}
+
+	BuildingBanner = GetWorld()->SpawnActor<ARGBuildingBanner>(BuildingBannerClass, NewLocation, FRotator::ZeroRotator);
+	LastBannerLocation = NewLocation;
+}
+
+void ARGBuildingBase::SetActorToAttackForSpawnedUnit(AActor* NewActorToAttack)
+{
+	ActorToAttackForSpawnedUnits = NewActorToAttack;
+}
+
 void ARGBuildingBase::BeginPlay()
 {
 	Super::BeginPlay();
@@ -156,7 +173,7 @@ void ARGBuildingBase::BeginPlay()
 	if (!PlayerController)
 		UE_LOG(LogRGBuildingBase, Warning, TEXT("[BeginPlay] PlayerController is nullptr."));
 
-	PlayerController->RightMouseButtonInputPressedUninteractable.AddUObject(this, &ARGBuildingBase::HandleRightMouseButtonInputPressedUninteractable);
+	PlayerController->RightMouseButtonInputPressed.AddUObject(this, &ARGBuildingBase::HandleRightMouseButtonInputPressed);
 
 	PlayerPawn = Cast<ARGPlayerPawn>(PlayerController->GetPawn());
 	if (!PlayerPawn)
@@ -188,7 +205,7 @@ void ARGBuildingBase::HandleOnClicked(AActor* TouchedActor, FKey ButtonPressed)
 
 	if (bIsPlacing)
 	{
-		if(CheckForOverlap())
+		if (CheckForOverlap())
 		{
 			StaticMeshComponentCurrent->SetCollisionResponseToChannel(ECC_Pawn, ECR_Block);
 			StaticMeshComponentCurrent->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Block);
@@ -307,6 +324,13 @@ void ARGBuildingBase::SpawnNextUnit()
 
 				UBlackboardComponent* BlackboardComponent = Cast<ARGUnitAIController>(SpawnedUnit->GetController())->GetBlackboardComponent();
 				BlackboardComponent->SetValueAsVector(BBKeys::UNIT_AI_BBKEY_TARGETLOCATIONTOMOVE, LastBannerLocation);
+				if(ActorToAttackForSpawnedUnits)
+				{
+					BlackboardComponent->SetValueAsObject(BBKeys::UNIT_AI_BBKEY_TARGETACTORTOATTACK, ActorToAttackForSpawnedUnits);
+					BlackboardComponent->SetValueAsEnum(BBKeys::UNIT_AI_BBKEY_UNITSTATE, 1);
+				}
+				else
+					BlackboardComponent->SetValueAsEnum(BBKeys::UNIT_AI_BBKEY_UNITSTATE, 0);
 
 				SpawnQueue.RemoveAt(0);
 				OnSpawnQueueChanged.Broadcast(SpawnQueue);
@@ -376,7 +400,7 @@ void ARGBuildingBase::HandleBuildingConstructing()
 		} }, 0.1f, true);
 }
 
-void ARGBuildingBase::HandleRightMouseButtonInputPressedUninteractable()
+void ARGBuildingBase::HandleRightMouseButtonInputPressed()
 {
 	if (PlayerPawn->GetMostImportantEntity() != this)
 		return;
@@ -387,16 +411,11 @@ void ARGBuildingBase::HandleRightMouseButtonInputPressedUninteractable()
 		return;
 	}
 
-	if (BuildingBanner)
-	{
-		BuildingBanner->Destroy();
-		BuildingBanner = nullptr;
-	}
-
 	FHitResult HitResult;
-	if (PlayerController->GetHitResultUnderCursorByChannel(UEngineTypes::ConvertToTraceType(ECC_Visibility), true, HitResult))
+	if (!PlayerController->GetHitResultUnderCursor(ECC_GameTraceChannel1, true, HitResult) &&
+		PlayerController->GetHitResultUnderCursorByChannel(UEngineTypes::ConvertToTraceType(ECC_Visibility), true, HitResult))
 	{
-		BuildingBanner = GetWorld()->SpawnActor<ARGBuildingBanner>(BuildingBannerClass, HitResult.Location, FRotator::ZeroRotator);
-		LastBannerLocation = HitResult.Location;
+		SetBannerLocation(HitResult.Location);
+		SetActorToAttackForSpawnedUnit(nullptr);
 	}
 }

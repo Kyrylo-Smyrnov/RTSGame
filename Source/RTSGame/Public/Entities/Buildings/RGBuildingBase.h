@@ -43,6 +43,9 @@ class RTSGAME_API ARGBuildingBase : public APawn
 	void SetBuildingPlacementMaterial(const bool IsValidPlacement);
 	void SetBuildingMeshMaterials();
 
+	void SetBannerLocation(FVector NewLocation);
+	void SetActorToAttackForSpawnedUnit(AActor* NewActorToAttack);
+
 	FOnSpawnQueueChanged OnSpawnQueueChanged;
 	FOnSpawnProgressChanged OnSpawnProgressChanged;
 	FOnConstructionProgressChanged OnConstructionProgressChanged;
@@ -86,11 +89,13 @@ class RTSGAME_API ARGBuildingBase : public APawn
 
 	void HandleBuildingPlacing();
 	void HandleBuildingConstructing();
-	void HandleRightMouseButtonInputPressedUninteractable();
+	void HandleRightMouseButtonInputPressed();
 
 	UPROPERTY()
 	ARGPlayerController* PlayerController;
 
+	UPROPERTY()
+	AActor* ActorToAttackForSpawnedUnits;
 	FTimerHandle SpawnTimerHandle;
 	TArray<FSpawnQueueEntry> SpawnQueue;
 	float RemainingSpawnTime;

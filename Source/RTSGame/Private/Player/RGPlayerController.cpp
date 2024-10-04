@@ -76,7 +76,6 @@ void ARGPlayerController::OnLeftMouseButtonInputReleased()
 
 void ARGPlayerController::OnRightMouseButtonInputPressed()
 {
-	FHitResult HitResult;
-	if (!GetHitResultUnderCursor(ECC_GameTraceChannel1, true, HitResult) && RightMouseButtonInputPressedUninteractable.IsBound())
-		RightMouseButtonInputPressedUninteractable.Broadcast();
+	if(RightMouseButtonInputPressed.IsBound())
+		RightMouseButtonInputPressed.Broadcast();
 }

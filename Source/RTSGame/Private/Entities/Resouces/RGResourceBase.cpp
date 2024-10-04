@@ -4,6 +4,7 @@
 #include "AIController.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "Entities/BBKeys.h"
+#include "Entities/Buildings/RGBuildingBase.h"
 #include "Entities/Units/RGUnitBase.h"
 #include "Kismet/GameplayStatics.h"
 #include "Player/RGPlayerController.h"
@@ -38,6 +39,11 @@ void ARGResourceBase::HandleOnClicked(AActor* TouchedActor, FKey ButtonPressed)
 
 	if (ButtonPressed == EKeys::RightMouseButton)
 	{
+		if(ARGBuildingBase* CastedBuilding = Cast<ARGBuildingBase>(PlayerPawn->GetMostImportantEntity()))
+		{
+			CastedBuilding->SetBannerLocation(GetActorLocation() + FVector(0.0f, 0.0f, 100.0f));
+			CastedBuilding->SetActorToAttackForSpawnedUnit(this);
+		}
 		for (AActor* SelectedEntity : PlayerPawn->GetSelectedEntities())
 		{
 			ARGUnitBase* Unit = Cast<ARGUnitBase>(SelectedEntity);

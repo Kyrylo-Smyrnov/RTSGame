@@ -15,27 +15,29 @@ void ARGUnitAIController::BeginPlay()
 
 	PlayerController = Cast<ARGPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 	if (PlayerController)
-		PlayerController->RightMouseButtonInputPressedUninteractable.AddUObject(this, &ARGUnitAIController::HandleRightMouseButtonInputPressedUninteractable);
+		PlayerController->RightMouseButtonInputPressed.AddUObject(this, &ARGUnitAIController::HandleRightMouseButtonInputPressed);
 	else
 		UE_LOG(LogRGUnitAIController, Warning, TEXT("[BeginPlay] PlayerController is nullptr."));
 }
 
-void ARGUnitAIController::HandleRightMouseButtonInputPressedUninteractable()
+void ARGUnitAIController::HandleRightMouseButtonInputPressed()
 {
 	ARGUnitBase* Unit = Cast<ARGUnitBase>(GetPawn());
 	if (!Unit)
 	{
-		UE_LOG(LogRGUnitAIController, Warning, TEXT("[HandleRightMouseButtonInputPressedUninteractable] Unit is nullptr."));
+		UE_LOG(LogRGUnitAIController, Warning, TEXT("[HandleRightMouseButtonInputPressed] Unit is nullptr."));
 		return;
 	}
+	else if(!Unit->GetIsSelected())
+		return;
 
-	if (Unit->GetIsSelected())
+	FHitResult HitResult;
+	if(!PlayerController->GetHitResultUnderCursor(ECC_GameTraceChannel1, true, HitResult))
 	{
 		UBlackboardComponent* BlackboardComponent = GetBlackboardComponent();
 
 		BlackboardComponent->SetValueAsEnum(BBKeys::UNIT_AI_BBKEY_UNITSTATE, 0);
-
-		FHitResult HitResult;
+		
 		if (PlayerController->GetHitResultUnderCursorByChannel(UEngineTypes::ConvertToTraceType(ECC_Visibility), true, HitResult))
 			BlackboardComponent->SetValueAsVector(BBKeys::UNIT_AI_BBKEY_TARGETLOCATIONTOMOVE, HitResult.Location);
 	}

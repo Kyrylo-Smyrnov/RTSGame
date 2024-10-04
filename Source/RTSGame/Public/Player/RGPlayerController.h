@@ -11,7 +11,8 @@ DECLARE_MULTICAST_DELEGATE_OneParam(FMouseWheelInput, float);
 DECLARE_MULTICAST_DELEGATE_OneParam(FLeftMouseButtonInputPressed, FVector2D);
 DECLARE_MULTICAST_DELEGATE(FLeftMouseButtonInputPressedUninteractable);
 DECLARE_MULTICAST_DELEGATE(FLeftMouseButtonInputReleased);
-DECLARE_MULTICAST_DELEGATE(FRightMouseButtonInputPressedUninteractable);
+
+DECLARE_MULTICAST_DELEGATE(FRightMouseButtonInputPressed);
 
 UCLASS()
 class RTSGAME_API ARGPlayerController : public APlayerController
@@ -26,7 +27,7 @@ class RTSGAME_API ARGPlayerController : public APlayerController
 	FLeftMouseButtonInputPressed LeftMouseButtonInputPressed;
 	FLeftMouseButtonInputPressedUninteractable LeftMouseButtonInputPressedUninteractable;
 	FLeftMouseButtonInputReleased LeftMouseButtonInputReleased;
-	FRightMouseButtonInputPressedUninteractable RightMouseButtonInputPressedUninteractable;
+	FRightMouseButtonInputPressed RightMouseButtonInputPressed;
 
 	UNavigationSystemV1* GetNavigationSystem() const;
 

@@ -15,7 +15,7 @@ class RTSGAME_API ARGUnitAIController : public AAIController
 
   protected:
 	virtual void BeginPlay() override;
-	void HandleRightMouseButtonInputPressedUninteractable();
+	void HandleRightMouseButtonInputPressed();
 
   private:
 	UPROPERTY()
