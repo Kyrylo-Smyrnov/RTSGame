@@ -29,6 +29,8 @@ class RTSGAME_API ARGResourceBase : public AActor
 
 	UPROPERTY(EditDefaultsOnly, Category = "Components")
 	UStaticMeshComponent* StaticMeshComponent;
+	UPROPERTY(EditDefaultsOnly, Category = "Components")
+	UDecalComponent* DecalComponent;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Health")
 	bool bIsDead;
@@ -36,6 +38,11 @@ class RTSGAME_API ARGResourceBase : public AActor
 	int32 Health;
 
   private:
+	void BlinkDecal();
+	
+	FTimerHandle BlinkTimerHandle;
+	bool bIsDecalVisible = false;
+	
 	UPROPERTY()
 	ARGPlayerController* PlayerController;
 	UPROPERTY()
