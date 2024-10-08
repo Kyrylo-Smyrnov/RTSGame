@@ -3,8 +3,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Entities/Actions/Actionable.h"
-#include "Entities/Actions/Actions.h"
 #include "Entities/EntitiesImportance.h"
 #include "GameFramework/Character.h"
 #include "Player/RGPlayerPawn.h"
@@ -14,14 +12,12 @@ class ARGPlayerController;
 class UDecalComponent;
 
 UCLASS()
-class RTSGAME_API ARGUnitBase : public ACharacter, public IActionable
+class RTSGAME_API ARGUnitBase : public ACharacter
 {
 	GENERATED_BODY()
 
   public:
 	ARGUnitBase();
-
-	virtual void PerformAction_Implementation(const FName& ActionName) override;
 
 	bool GetIsSelected() const;
 	int32 GetImportance() const;
@@ -35,8 +31,6 @@ class RTSGAME_API ARGUnitBase : public ACharacter, public IActionable
 
 	UFUNCTION()
 	void HandleOnClicked(AActor* TouchedActor, FKey ButtonPressed);
-
-	virtual TArray<FActionData> GetAvailableActions_Implementation() const override;
 
 	UPROPERTY()
 	ARGPlayerPawn* PlayerPawn;

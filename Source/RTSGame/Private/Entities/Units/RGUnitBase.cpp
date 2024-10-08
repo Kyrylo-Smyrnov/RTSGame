@@ -24,32 +24,6 @@ ARGUnitBase::ARGUnitBase()
 	SelectionCircleDecal->SetVisibility(false);
 }
 
-void ARGUnitBase::PerformAction_Implementation(const FName& ActionName)
-{
-	if (ActionName == ACTION_ATTACK)
-	{
-		UE_LOG(LogRGUnitBase, Warning, TEXT("AttackAction logic is not implemented yet."));
-		return;
-	}
-	else if (ActionName == ACTION_HOLDATTACK)
-	{
-		UE_LOG(LogRGUnitBase, Warning, TEXT("HoldAction logic is not implemented yet."));
-		return;
-	}
-	else if (ActionName == ACTION_MOVE)
-	{
-		UE_LOG(LogRGUnitBase, Warning, TEXT("MoveAction logic is not implemented yet."));
-		return;
-	}
-	else if (ActionName == ACTION_MOVEATTACK)
-	{
-		UE_LOG(LogRGUnitBase, Warning, TEXT("MoveAttackAction logic is not implemented yet."));
-		return;
-	}
-
-	IActionable::PerformAction_Implementation(ActionName);
-}
-
 bool ARGUnitBase::GetIsSelected() const
 {
 	return bIsSelected;
@@ -160,16 +134,4 @@ void ARGUnitBase::HandleOnClicked(AActor* TouchedActor, FKey ButtonPressed)
 			}
 		}
 	}
-}
-
-TArray<FActionData> ARGUnitBase::GetAvailableActions_Implementation() const
-{
-	TArray<FActionData> BaseUnitActions;
-
-	BaseUnitActions.Add(UnitActions::Base_Attack);
-	BaseUnitActions.Add(UnitActions::Base_Hold);
-	BaseUnitActions.Add(UnitActions::Base_Move);
-	BaseUnitActions.Add(UnitActions::Base_MoveAttack);
-
-	return BaseUnitActions;
 }

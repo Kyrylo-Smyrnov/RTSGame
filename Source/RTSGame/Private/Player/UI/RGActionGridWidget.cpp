@@ -6,7 +6,6 @@
 #include "Components/GridSlot.h"
 #include "Components/Image.h"
 #include "Components/SizeBox.h"
-#include "Entities/Actions/Actionable.h"
 #include "Entities/Buildings/RGBuildingTownHall.h"
 #include "Entities/Units/RGUnitPeasant.h"
 #include "Kismet/GameplayStatics.h"
@@ -53,33 +52,6 @@ void URGActionGridWidget::UpdateWidget(AActor* MostImportantEntity)
 			Index++;
 		}
 	}
-	else if (IActionable* ActionableEntity = Cast<IActionable>(MostImportantEntity))
-	{
-		TArray<FActionData> AvailableActions = ActionableEntity->GetAvailableActions_Implementation();
-
-		int32 Index = 0;
-		for (auto& Action : ActionButtons)
-		{
-			if (Index < ActionButtons.Num() && Index < AvailableActions.Num())
-			{
-				Action.Key->SetToolTipText(AvailableActions[Index].ActionTooltip);
-				Action.Key->SetIsEnabled(true);
-				Action.Value = AvailableActions[Index].ActionName;
-				ActionIcons[Index]->SetBrushFromTexture(AvailableActions[Index].ActionIcon, false);
-				ActionIcons[Index]->SetVisibility(ESlateVisibility::Visible);
-			}
-			else
-			{
-				Action.Key->SetToolTipText(FText::FromString(""));
-				Action.Key->SetIsEnabled(false);
-				Action.Value = "";
-				ActionIcons[Index]->SetVisibility(ESlateVisibility::Hidden);
-			}
-
-			Index++;
-		}
-	}
-
 	if (ARGBuildingBase* CastedBuilding = Cast<ARGBuildingBase>(MostImportantEntity))
 	{
 		if (CastedBuilding->GetIsConstructing())
@@ -158,10 +130,7 @@ void URGActionGridWidget::HandleButtonClick()
 	{
 		if (ActionButton.Key->IsHovered() && ActionButton.Key->GetIsEnabled())
 		{
-			if (ARGUnitPeasant* CastedPeasant = Cast<ARGUnitPeasant>(MostImportanEntity))
-				CastedPeasant->PerformAction_Implementation(ActionButton.Value);
-			else if (ARGBuildingTownHall* CastedTownHall = Cast<ARGBuildingTownHall>(MostImportanEntity))
-				CastedTownHall->PerformAction_Implementation(ActionButton.Value);
+			
 		}
 	}
 }
