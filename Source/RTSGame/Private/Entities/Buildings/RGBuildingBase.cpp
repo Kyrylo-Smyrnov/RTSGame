@@ -86,6 +86,11 @@ TArray<FSpawnQueueEntry>& ARGBuildingBase::GetSpawnQueue()
 	return SpawnQueue;
 }
 
+TArray<IRGAction*>& ARGBuildingBase::GetAvailableActions()
+{
+	return AvailableActions;
+}
+
 void ARGBuildingBase::SetSelected(bool bIsBuildingSelected)
 {
 	if (!SelectionCircleDecal)
@@ -186,6 +191,8 @@ void ARGBuildingBase::BeginPlay()
 
 	if (!bIsPlacing)
 		LastBannerLocation = GetActorLocation() + FVector(0.0f, 500.0f, 0.0f);
+
+	InitializeActions();
 }
 
 void ARGBuildingBase::Tick(float DeltaTime)
@@ -194,6 +201,8 @@ void ARGBuildingBase::Tick(float DeltaTime)
 	if (bIsPlacing)
 		HandleBuildingPlacing();
 }
+
+void ARGBuildingBase::InitializeActions() { }
 
 void ARGBuildingBase::HandleOnClicked(AActor* TouchedActor, FKey ButtonPressed)
 {

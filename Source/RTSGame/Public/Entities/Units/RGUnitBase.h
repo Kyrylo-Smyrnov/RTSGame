@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Entities/Actions/RGAction.h"
 #include "Entities/EntitiesImportance.h"
 #include "GameFramework/Character.h"
 #include "Player/RGPlayerPawn.h"
@@ -22,15 +23,17 @@ class RTSGAME_API ARGUnitBase : public ACharacter
 	bool GetIsSelected() const;
 	int32 GetImportance() const;
 	UTexture2D* GetSelectionIcon() const;
+	TArray<IRGAction*>& GetAvailableActions();
 
 	void SetSelected(bool bIsSelected);
 
   protected:
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
-
+	
 	UFUNCTION()
 	void HandleOnClicked(AActor* TouchedActor, FKey ButtonPressed);
+	virtual void InitializeActions();
 
 	UPROPERTY()
 	ARGPlayerPawn* PlayerPawn;
@@ -41,6 +44,8 @@ class RTSGAME_API ARGUnitBase : public ACharacter
 	UPROPERTY(EditDefaultsOnly, Category = "UI")
 	UTexture2D* SelectionIcon;
 
+	TArray<IRGAction*> AvailableActions;
+	
 	EFEntitiesImportance UnitImportance;
 
   private:
@@ -48,9 +53,4 @@ class RTSGAME_API ARGUnitBase : public ACharacter
 	ARGPlayerController* PlayerController;
 
 	bool bIsSelected;
-
-	const FName ACTION_ATTACK = "AttackAction";
-	const FName ACTION_HOLDATTACK = "HoldAction";
-	const FName ACTION_MOVE = "MoveAction";
-	const FName ACTION_MOVEATTACK = "MoveAttackAction";
 };

@@ -46,8 +46,38 @@ void URGActionGridWidget::UpdateWidget(AActor* MostImportantEntity)
 		{
 			Action.Key->SetToolTipText(FText::FromString(""));
 			Action.Key->SetIsEnabled(false);
-			Action.Value = "";
+			Action.Value = nullptr;
 			ActionIcons[Index]->SetVisibility(ESlateVisibility::Hidden);
+
+			Index++;
+		}
+	}
+	else
+	{
+		TArray<IRGAction*> AvailableActions;
+		if(ARGUnitBase* CastedUnit = Cast<ARGUnitBase>(MostImportantEntity))
+			AvailableActions = CastedUnit->GetAvailableActions();
+		else if(ARGBuildingBase* CastedBuilding = Cast<ARGBuildingBase>(MostImportantEntity))
+			AvailableActions = CastedBuilding->GetAvailableActions();
+		
+		int32 Index = 0;
+		for (auto& Action : ActionButtons)
+		{
+			if (Index < ActionButtons.Num() && Index < AvailableActions.Num())
+			{
+				Action.Key->SetToolTipText(AvailableActions[Index]->GetActionData().ActionTooltip);
+				Action.Key->SetIsEnabled(true);
+				Action.Value = AvailableActions[Index];
+				ActionIcons[Index]->SetBrushFromTexture(AvailableActions[Index]->GetActionData().ActionIcon, false);
+				ActionIcons[Index]->SetVisibility(ESlateVisibility::Visible);
+			}
+			else
+			{
+				Action.Key->SetToolTipText(FText::FromString(""));
+				Action.Key->SetIsEnabled(false);
+				Action.Value = nullptr;
+				ActionIcons[Index]->SetVisibility(ESlateVisibility::Hidden);
+			}
 
 			Index++;
 		}
@@ -95,7 +125,7 @@ void URGActionGridWidget::InitializeWidget()
 			ActionButton->SetIsEnabled(false);
 			ActionButton->AddChild(ActionIcon);
 			ActionButton->OnClicked.AddDynamic(this, &URGActionGridWidget::HandleButtonClick);
-			ActionButtons.Add(ActionButton, "");
+			ActionButtons.Add(ActionButton, nullptr);
 
 			USizeBox* SizeBox = NewObject<USizeBox>(this);
 			SizeBox->SetWidthOverride(BUTTON_SIZE.X);
@@ -130,7 +160,11 @@ void URGActionGridWidget::HandleButtonClick()
 	{
 		if (ActionButton.Key->IsHovered() && ActionButton.Key->GetIsEnabled())
 		{
-			
+			if (ActionButton.Value)
+			{
+				ActionButton.Value->Execute_Implementation();
+				return;
+			}
 		}
 	}
 }

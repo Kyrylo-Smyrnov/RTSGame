@@ -21,10 +21,9 @@ class RTSGAME_API ARGBuildingTownHall : public ARGBuildingBase
 	virtual void Tick(float DeltaSeconds) override;
 	
 	virtual void HandleOnClicked(AActor* TouchedActor, FKey ButtonPressed) override;
+	virtual void InitializeActions() override;
 
   private:
 	UPROPERTY(EditDefaultsOnly, Category = "Objects")
 	TSubclassOf<ARGUnitPeasant> UnitPeasantBlueprintClass;
-
-	const FName ACTION_BUILDPEASANT = "BuildPeasant";
 };

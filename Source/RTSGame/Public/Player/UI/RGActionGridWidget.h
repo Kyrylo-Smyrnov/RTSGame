@@ -4,6 +4,7 @@
 
 #include "Blueprint/UserWidget.h"
 #include "CoreMinimal.h"
+#include "Entities/Actions/RGAction.h"
 #include "RGActionGridWidget.generated.h"
 
 class ARGPlayerController;
@@ -24,10 +25,7 @@ class RTSGAME_API URGActionGridWidget : public UUserWidget
 	UPROPERTY(meta = (BindWidget))
 	UGridPanel* ActionGrid;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI");
-	TMap<UButton*, FName> ActionButtons;
-	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI")
+	TMap<UButton*, IRGAction*> ActionButtons;
 	TArray<UImage*> ActionIcons;
 
   private:

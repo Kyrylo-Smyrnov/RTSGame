@@ -54,6 +54,11 @@ UTexture2D* ARGUnitBase::GetSelectionIcon() const
 	return SelectionIcon;
 }
 
+TArray<IRGAction*>& ARGUnitBase::GetAvailableActions()
+{
+	return AvailableActions;
+}
+
 void ARGUnitBase::BeginPlay()
 {
 	Super::BeginPlay();
@@ -74,6 +79,7 @@ void ARGUnitBase::BeginPlay()
 	}
 
 	PlayerPawn->AddEntitiesToContolled(this);
+	InitializeActions();
 }
 
 void ARGUnitBase::Tick(float DeltaTime)
@@ -134,4 +140,8 @@ void ARGUnitBase::HandleOnClicked(AActor* TouchedActor, FKey ButtonPressed)
 			}
 		}
 	}
+}
+
+void ARGUnitBase::InitializeActions()
+{
 }

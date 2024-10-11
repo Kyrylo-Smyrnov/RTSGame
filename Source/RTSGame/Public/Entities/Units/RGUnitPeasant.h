@@ -26,6 +26,7 @@ class RTSGAME_API ARGUnitPeasant : public ARGUnitBase
   protected:
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaSeconds) override;
+	void InitializeActions() override;
 
   private:
 	UPROPERTY(EditDefaultsOnly, Category = "Objects")
