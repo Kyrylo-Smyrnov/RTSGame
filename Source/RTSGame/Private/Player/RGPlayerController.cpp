@@ -5,15 +5,12 @@
 DEFINE_LOG_CATEGORY_STATIC(LogRGPlayerController, All, All);
 
 ARGPlayerController::ARGPlayerController()
+	: NavigationSystem(nullptr)
 {
 	bEnableClickEvents = true;
 	ClickEventKeys.AddUnique(EKeys::LeftMouseButton);
 	ClickEventKeys.AddUnique(EKeys::RightMouseButton);
 	DefaultClickTraceChannel = ECC_GameTraceChannel1;
-
-	NavigationSystem = FNavigationSystem::GetCurrent<UNavigationSystemV1>(GetWorld());
-	if (!NavigationSystem)
-		UE_LOG(LogRGPlayerController, Warning, TEXT("[Constructor] NavigationSystem is nullptr."))
 }
 
 void ARGPlayerController::SetupInputComponent()
@@ -48,6 +45,10 @@ void ARGPlayerController::BeginPlay()
 	InputMode.SetHideCursorDuringCapture(false);
 	InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::LockAlways);
 	SetInputMode(InputMode);
+
+	NavigationSystem = FNavigationSystem::GetCurrent<UNavigationSystemV1>(GetWorld());
+	if (!NavigationSystem)
+		UE_LOG(LogRGPlayerController, Warning, TEXT("[Constructor] NavigationSystem is nullptr."))
 }
 
 void ARGPlayerController::OnMouseWheelInput(float Amount)
@@ -76,6 +77,6 @@ void ARGPlayerController::OnLeftMouseButtonInputReleased()
 
 void ARGPlayerController::OnRightMouseButtonInputPressed()
 {
-	if(RightMouseButtonInputPressed.IsBound())
+	if (RightMouseButtonInputPressed.IsBound())
 		RightMouseButtonInputPressed.Broadcast();
 }
