@@ -5,6 +5,7 @@
 #include "Components/CapsuleComponent.h"
 #include "Components/DecalComponent.h"
 #include "Entities/BBKeys.h"
+#include "Entities/Actions/RGMoveToAction.h"
 #include "Entities/Units/AI/RGUnitAIController.h"
 #include "Kismet/GameplayStatics.h"
 #include "Player/RGPlayerController.h"
@@ -144,4 +145,10 @@ void ARGUnitBase::HandleOnClicked(AActor* TouchedActor, FKey ButtonPressed)
 
 void ARGUnitBase::InitializeActions()
 {
+	URGMoveToAction* MoveToAction = NewObject<URGMoveToAction>();
+	FRGActionData MoveToData = UnitActions::Base_Move;
+	MoveToAction->InitializeAction(this);
+	MoveToAction->SetActionData(MoveToData);
+	
+	AvailableActions.Add(MoveToAction);
 }

@@ -11,10 +11,6 @@ extern FRGActionData TownHall_BuildPeasant;
 
 namespace UnitActions
 {
-extern FRGActionData Base_Attack;
-extern FRGActionData Base_Hold;
 extern FRGActionData Base_Move;
-extern FRGActionData Base_MoveAttack;
-
 extern FRGActionData Peasant_BuildTownHall;
 } // namespace UnitActions

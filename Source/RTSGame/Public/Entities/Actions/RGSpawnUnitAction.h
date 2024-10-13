@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include "RGAction.h"
 #include "CoreMinimal.h"
+#include "RGAction.h"
 #include "RGSpawnUnitAction.generated.h"
 
 class ARGPlayerPawn;
@@ -16,8 +16,8 @@ class RTSGAME_API URGSpawnUnitAction : public UObject, public IRGAction
 
   public:
 	URGSpawnUnitAction();
+	
 	void InitializeAction(TSubclassOf<ACharacter> InUnitClass, ARGBuildingBase* InTargetBuilding, ARGPlayerPawn* PlayerPawn);
-
 	virtual void Execute_Implementation() override;
 
   private:

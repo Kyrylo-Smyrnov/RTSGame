@@ -17,6 +17,16 @@ FRGActionData TownHall_BuildPeasant = FRGActionData{
 
 namespace UnitActions
 {
+FRGActionData Base_Move = FRGActionData{
+	"MoveTo",
+	nullptr,
+	FText::FromString(""),
+	0,
+	0,
+	0,
+	0,
+	0
+};
 // Peasant
 FRGActionData Peasant_BuildTownHall = FRGActionData{
 	"BuildTownHall",
@@ -27,5 +37,4 @@ FRGActionData Peasant_BuildTownHall = FRGActionData{
 	0,
 	0,
 	10};
-
 } // namespace UnitActions

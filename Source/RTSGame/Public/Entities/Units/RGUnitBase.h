@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Entities/Actions/RGAction.h"
+#include "Entities/Actions/RGActionsList.h"
 #include "Entities/EntitiesImportance.h"
 #include "GameFramework/Character.h"
 #include "Player/RGPlayerPawn.h"
@@ -30,7 +31,7 @@ class RTSGAME_API ARGUnitBase : public ACharacter
   protected:
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
-	
+
 	UFUNCTION()
 	void HandleOnClicked(AActor* TouchedActor, FKey ButtonPressed);
 	virtual void InitializeActions();
@@ -45,7 +46,7 @@ class RTSGAME_API ARGUnitBase : public ACharacter
 	UTexture2D* SelectionIcon;
 
 	TArray<IRGAction*> AvailableActions;
-	
+
 	EFEntitiesImportance UnitImportance;
 
   private:

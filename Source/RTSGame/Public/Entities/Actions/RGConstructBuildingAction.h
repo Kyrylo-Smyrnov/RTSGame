@@ -14,8 +14,8 @@ class RTSGAME_API URGConstructBuildingAction : public UObject, public IRGAction
 	GENERATED_BODY()
   public:
 	URGConstructBuildingAction();
+	
 	void InitializeAction(TSubclassOf<AActor> InBuildingClass, ARGPlayerPawn* InPlayerPawn);
-
 	virtual void Execute_Implementation() override;
 
   private:
