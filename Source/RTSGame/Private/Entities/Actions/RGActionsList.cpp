@@ -12,7 +12,8 @@ FRGActionData TownHall_BuildPeasant = FRGActionData{
 	0,
 	0,
 	0,
-	5};
+	5,
+	EActionTargetType::None};
 } // namespace BuildingActions
 
 namespace UnitActions
@@ -25,8 +26,8 @@ FRGActionData Base_Move = FRGActionData{
 	0,
 	0,
 	0,
-	0
-};
+	0,
+	EActionTargetType::Location};
 // Peasant
 FRGActionData Peasant_BuildTownHall = FRGActionData{
 	"BuildTownHall",
@@ -36,5 +37,7 @@ FRGActionData Peasant_BuildTownHall = FRGActionData{
 	0,
 	0,
 	0,
-	10};
+	10,
+	EActionTargetType::None
+};
 } // namespace UnitActions

@@ -4,8 +4,8 @@
 #include "BehaviorTree/BlackboardComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/DecalComponent.h"
-#include "Entities/BBKeys.h"
 #include "Entities/Actions/RGMoveToAction.h"
+#include "Entities/BBKeys.h"
 #include "Entities/Units/AI/RGUnitAIController.h"
 #include "Kismet/GameplayStatics.h"
 #include "Player/RGPlayerController.h"
@@ -58,6 +58,11 @@ UTexture2D* ARGUnitBase::GetSelectionIcon() const
 TArray<IRGAction*>& ARGUnitBase::GetAvailableActions()
 {
 	return AvailableActions;
+}
+
+URGMoveToAction* ARGUnitBase::GetMoveToAction() const
+{
+	return MoveAction;
 }
 
 void ARGUnitBase::BeginPlay()
@@ -149,6 +154,7 @@ void ARGUnitBase::InitializeActions()
 	FRGActionData MoveToData = UnitActions::Base_Move;
 	MoveToAction->InitializeAction(this);
 	MoveToAction->SetActionData(MoveToData);
-	
+	MoveAction = MoveToAction;
+
 	AvailableActions.Add(MoveToAction);
 }

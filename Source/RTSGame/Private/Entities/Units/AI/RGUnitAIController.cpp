@@ -2,6 +2,7 @@
 
 #include "Entities/Units/AI/RGUnitAIController.h"
 #include "BehaviorTree/BlackboardComponent.h"
+#include "Entities/Actions/RGMoveToAction.h"
 #include "Entities/BBKeys.h"
 #include "Entities/Units/RGUnitBase.h"
 #include "Kismet/GameplayStatics.h"
@@ -28,17 +29,17 @@ void ARGUnitAIController::HandleRightMouseButtonInputPressed()
 		UE_LOG(LogRGUnitAIController, Warning, TEXT("[HandleRightMouseButtonInputPressed] Unit is nullptr."));
 		return;
 	}
-	else if(!Unit->GetIsSelected())
+	else if (!Unit->GetIsSelected())
 		return;
 
 	FHitResult HitResult;
-	if(!PlayerController->GetHitResultUnderCursor(ECC_GameTraceChannel1, true, HitResult))
+	if (PlayerController->GetHitResultUnderCursor(ECC_Visibility, true, HitResult))
 	{
-		UBlackboardComponent* BlackboardComponent = GetBlackboardComponent();
-
-		BlackboardComponent->SetValueAsEnum(BBKeys::UNIT_AI_BBKEY_UNITSTATE, 0);
-		
-		if (PlayerController->GetHitResultUnderCursorByChannel(UEngineTypes::ConvertToTraceType(ECC_Visibility), true, HitResult))
-			BlackboardComponent->SetValueAsVector(BBKeys::UNIT_AI_BBKEY_TARGETLOCATIONTOMOVE, HitResult.Location);
+		URGMoveToAction* MoveAction = Unit->GetMoveToAction();
+		if (MoveAction)
+		{
+			MoveAction->SetDestination(HitResult.Location);
+			MoveAction->Execute_Implementation();
+		}
 	}
 }

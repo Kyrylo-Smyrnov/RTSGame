@@ -1,6 +1,8 @@
 // https://github.com/Kyrylo-Smyrnov/RTSGame
 
 #include "Player/RGPlayerPawn.h"
+
+#include "Entities/Actions/RGMoveToAction.h"
 #include "Entities/Buildings/RGBuildingBase.h"
 #include "Entities/Units/RGUnitBase.h"
 #include "Player/RGPlayerCameraComponent.h"
@@ -30,7 +32,18 @@ void ARGPlayerPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 
 void ARGPlayerPawn::HandleLeftMouseButtonInputPressedUninteractable()
 {
-	ClearSelectedEntities();
+	if (bIsAwaitingTarget)
+	{
+		FHitResult HitResult;
+		if (PlayerController->GetHitResultUnderCursorByChannel(UEngineTypes::ConvertToTraceType(ECC_Visibility), true, HitResult))
+		{
+			ExecuteActionWithTarget(HitResult.Location);	
+		}
+	}
+	else
+	{
+		ClearSelectedEntities();
+	}
 }
 
 AActor* ARGPlayerPawn::GetMostImportantEntity() const
@@ -170,9 +183,15 @@ void ARGPlayerPawn::AddPlayerResources(int32 Amount)
 	OnPlayerResourcesChanged.Broadcast(PlayerWoodResource);
 }
 
-int32 ARGPlayerPawn::GetPlayerResources()
+int32 ARGPlayerPawn::GetPlayerResources() const
 {
 	return PlayerWoodResource;
+}
+
+void ARGPlayerPawn::SetAwaitingAction(IRGAction* Action)
+{
+	bIsAwaitingTarget = true;
+	AwaitingAction = Action;
 }
 
 void ARGPlayerPawn::BeginPlay()
@@ -203,4 +222,19 @@ bool ARGPlayerPawn::CompareEntityImportance(const AActor& A, const AActor& B)
 		return BuildingA->GetImportance() < UnitB->GetImportance();
 
 	return false;
+}
+
+void ARGPlayerPawn::ExecuteActionWithTarget(FVector TargetLocation)
+{
+	if (AwaitingAction)
+	{
+		if (URGMoveToAction* MoveToAction = Cast<URGMoveToAction>(AwaitingAction))
+		{
+			MoveToAction->SetDestination(TargetLocation);
+		}
+
+		AwaitingAction->Execute_Implementation();
+		bIsAwaitingTarget = false;
+		AwaitingAction = nullptr;
+	}
 }

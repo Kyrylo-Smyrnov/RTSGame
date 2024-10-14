@@ -3,6 +3,7 @@
 #include "Entities/Buildings/RGBuildingBase.h"
 #include "Components/DecalComponent.h"
 #include "Components/StaticMeshComponent.h"
+#include "Entities/Actions/RGMoveToAction.h"
 #include "Entities/Buildings/RGBuildingBanner.h"
 #include "Entities/Units/RGUnitBase.h"
 #include "Kismet/GameplayStatics.h"
@@ -331,15 +332,9 @@ void ARGBuildingBase::SpawnNextUnit()
 				SpawnLocation.Z = 108;
 				ARGUnitBase* SpawnedUnit = GetWorld()->SpawnActor<ARGUnitBase>(CurrentEntry.UnitClass, SpawnLocation, FRotator::ZeroRotator);
 
-				UBlackboardComponent* BlackboardComponent = Cast<ARGUnitAIController>(SpawnedUnit->GetController())->GetBlackboardComponent();
-				BlackboardComponent->SetValueAsVector(BBKeys::UNIT_AI_BBKEY_TARGETLOCATIONTOMOVE, LastBannerLocation);
-				if(ActorToAttackForSpawnedUnits)
-				{
-					BlackboardComponent->SetValueAsObject(BBKeys::UNIT_AI_BBKEY_TARGETACTORTOATTACK, ActorToAttackForSpawnedUnits);
-					BlackboardComponent->SetValueAsEnum(BBKeys::UNIT_AI_BBKEY_UNITSTATE, 1);
-				}
-				else
-					BlackboardComponent->SetValueAsEnum(BBKeys::UNIT_AI_BBKEY_UNITSTATE, 0);
+				URGMoveToAction* MoveToAction = SpawnedUnit->GetMoveToAction();
+				MoveToAction->SetDestination(LastBannerLocation);
+				MoveToAction->Execute_Implementation();
 
 				SpawnQueue.RemoveAt(0);
 				OnSpawnQueueChanged.Broadcast(SpawnQueue);

@@ -10,6 +10,7 @@
 #include "Player/RGPlayerPawn.h"
 #include "RGUnitBase.generated.h"
 
+class URGMoveToAction;
 class ARGPlayerController;
 class UDecalComponent;
 
@@ -25,6 +26,7 @@ class RTSGAME_API ARGUnitBase : public ACharacter
 	int32 GetImportance() const;
 	UTexture2D* GetSelectionIcon() const;
 	TArray<IRGAction*>& GetAvailableActions();
+	URGMoveToAction* GetMoveToAction() const;
 
 	void SetSelected(bool bIsSelected);
 
@@ -52,6 +54,8 @@ class RTSGAME_API ARGUnitBase : public ACharacter
   private:
 	UPROPERTY()
 	ARGPlayerController* PlayerController;
+	UPROPERTY()
+	URGMoveToAction* MoveAction;
 
 	bool bIsSelected;
 };

@@ -1,8 +1,8 @@
 // https://github.com/Kyrylo-Smyrnov/RTSGame
 
 #include "Entities/Actions/RGMoveToAction.h"
-#include "Entities/Units/RGUnitBase.h"
 #include "Entities/Units/AI/RGUnitAIController.h"
+#include "Entities/Units/RGUnitBase.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogRGMoveToAction, All, All)
 
@@ -19,18 +19,18 @@ void URGMoveToAction::InitializeAction(ARGUnitBase* InControlledUnit)
 
 void URGMoveToAction::Execute_Implementation()
 {
-	if(!ControlledUnit || !AIController)
+	if (!ControlledUnit || !AIController)
 	{
 		UE_LOG(LogRGMoveToAction, Warning, TEXT("[Execute] It is necessary to initialize the action before execution."));
 		return;
 	}
 
-	if(Destination == FVector::ZeroVector)
+	if (Destination == FVector::ZeroVector)
 	{
 		UE_LOG(LogRGMoveToAction, Warning, TEXT("[Execute] It is necessary to set up the destination before execution."));
 		return;
 	}
-	
+
 	AIController->MoveToLocation(Destination, 50.0f, true);
 }
 

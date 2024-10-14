@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Entities/Actions/RGAction.h"
 #include "GameFramework/Pawn.h"
 #include "RGPlayerPawn.generated.h"
 
@@ -40,7 +41,9 @@ class RTSGAME_API ARGPlayerPawn : public APawn
 	bool IsEntitySelected(AActor* Entity) const;
 
 	void AddPlayerResources(int32 Amount);
-	int32 GetPlayerResources();
+	int32 GetPlayerResources() const;
+
+	void SetAwaitingAction(IRGAction* Action);
 
 	FOnSelectedEntitiesChanged OnSelectedEntitiesChanged;
 	FOnMostImportantEntityChanged OnMostImportantEntityChanged;
@@ -57,12 +60,16 @@ class RTSGAME_API ARGPlayerPawn : public APawn
 
   private:
 	static bool CompareEntityImportance(const AActor& A, const AActor& B);
+	void ExecuteActionWithTarget(FVector TargetLocation);
 
 	UPROPERTY()
 	ARGPlayerController* PlayerController;
 
 	UPROPERTY()
 	TArray<AActor*> SelectedEntities;
+	
+	IRGAction* AwaitingAction;
 
 	int32 PlayerWoodResource;
+	bool bIsAwaitingTarget;
 };
