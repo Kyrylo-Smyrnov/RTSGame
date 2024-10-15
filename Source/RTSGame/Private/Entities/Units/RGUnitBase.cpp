@@ -156,6 +156,7 @@ void ARGUnitBase::InitializeActions()
 {
 	URGMoveToAction* MoveToAction = NewObject<URGMoveToAction>();
 	FRGActionData MoveToData = UnitActions::Base_Move;
+	MoveToData.ActionIcon = LoadObject<UTexture2D>(nullptr, TEXT("/Game/UI/Icons/Entities/Units/T_IconMoveTo.T_IconMoveTo"));
 	MoveToAction->InitializeAction(this);
 	MoveToAction->SetActionData(MoveToData);
 	MoveAction = MoveToAction;
