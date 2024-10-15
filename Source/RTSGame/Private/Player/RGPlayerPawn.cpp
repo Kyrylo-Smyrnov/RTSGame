@@ -101,6 +101,11 @@ void ARGPlayerPawn::AddEntitiesToSelected(AActor* Entity)
 
 	OnMostImportantEntityChanged.Broadcast(GetMostImportantEntity());
 	OnSelectedEntitiesChanged.Broadcast(SelectedEntities);
+	if(AwaitingAction)
+	{
+		bIsAwaitingTarget = false;
+		AwaitingAction = nullptr;
+	}
 }
 
 void ARGPlayerPawn::AddEntitiesToSelected(TArray<AActor*> Entities)
@@ -129,6 +134,11 @@ void ARGPlayerPawn::AddEntitiesToSelected(TArray<AActor*> Entities)
 
 	OnMostImportantEntityChanged.Broadcast(GetMostImportantEntity());
 	OnSelectedEntitiesChanged.Broadcast(SelectedEntities);
+	if(AwaitingAction)
+	{
+		bIsAwaitingTarget = false;
+		AwaitingAction = nullptr;
+	}
 }
 
 void ARGPlayerPawn::RemoveEntityFromSelected(AActor* Entity)
@@ -151,6 +161,11 @@ void ARGPlayerPawn::RemoveEntityFromSelected(AActor* Entity)
 
 	OnMostImportantEntityChanged.Broadcast(GetMostImportantEntity());
 	OnSelectedEntitiesChanged.Broadcast(SelectedEntities);
+	if(AwaitingAction)
+	{
+		bIsAwaitingTarget = false;
+		AwaitingAction = nullptr;
+	}
 }
 
 void ARGPlayerPawn::ClearSelectedEntities()
@@ -170,6 +185,11 @@ void ARGPlayerPawn::ClearSelectedEntities()
 
 	OnMostImportantEntityChanged.Broadcast(GetMostImportantEntity());
 	OnSelectedEntitiesChanged.Broadcast(SelectedEntities);
+	if(AwaitingAction)
+	{
+		bIsAwaitingTarget = false;
+		AwaitingAction = nullptr;
+	}
 }
 
 bool ARGPlayerPawn::IsEntitySelected(AActor* Entity) const
@@ -229,10 +249,8 @@ void ARGPlayerPawn::ExecuteActionWithTarget(FVector TargetLocation)
 	if (AwaitingAction)
 	{
 		if (URGMoveToAction* MoveToAction = Cast<URGMoveToAction>(AwaitingAction))
-		{
 			MoveToAction->SetDestination(TargetLocation);
-		}
-
+		
 		AwaitingAction->Execute_Implementation();
 		bIsAwaitingTarget = false;
 		AwaitingAction = nullptr;
