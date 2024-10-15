@@ -1,8 +1,10 @@
 // https://github.com/Kyrylo-Smyrnov/RTSGame
 
 #include "Entities/Actions/RGMoveToAction.h"
+#include "AITypes.h"
 #include "Entities/Units/AI/RGUnitAIController.h"
 #include "Entities/Units/RGUnitBase.h"
+#include "Navigation/PathFollowingComponent.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogRGMoveToAction, All, All)
 
@@ -31,10 +33,25 @@ void URGMoveToAction::Execute_Implementation()
 		return;
 	}
 
-	AIController->MoveToLocation(Destination, 50.0f, true);
+	FNavPathSharedPtr NavPath;
+	FAIMoveRequest MoveRequest(Destination);
+	FPathFollowingRequestResult RequestResult = AIController->MoveTo(MoveRequest, &NavPath);
+	
+	if (RequestResult.Code == EPathFollowingRequestResult::RequestSuccessful)
+		AIController->GetPathFollowingComponent()->OnRequestFinished.AddUObject(this, &URGMoveToAction::OnMoveCompleted);
+	else
+		UE_LOG(LogRGMoveToAction, Warning, TEXT("[Execute] MoveTo request failed."));
 }
 
 void URGMoveToAction::SetDestination(FVector InDestination)
 {
 	Destination = InDestination;
+}
+
+void URGMoveToAction::OnMoveCompleted(FAIRequestID RequestID, const FPathFollowingResult& Result)
+{
+	AIController->GetPathFollowingComponent()->OnRequestFinished.RemoveAll(this);
+	
+	if (Result.Code == EPathFollowingResult::Success)
+		OnActionCompletedDelegate().Broadcast();
 }

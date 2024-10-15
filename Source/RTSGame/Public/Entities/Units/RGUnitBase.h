@@ -30,6 +30,9 @@ class RTSGAME_API ARGUnitBase : public ACharacter
 
 	void SetSelected(bool bIsSelected);
 
+	void AddActionToQueue(IRGAction* Action) const;
+	void ClearActionQueue() const;
+
   protected:
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
@@ -56,6 +59,8 @@ class RTSGAME_API ARGUnitBase : public ACharacter
 	ARGPlayerController* PlayerController;
 	UPROPERTY()
 	URGMoveToAction* MoveAction;
+	UPROPERTY()
+	class URGActionQueue* ActionQueue;
 
 	bool bIsSelected;
 };

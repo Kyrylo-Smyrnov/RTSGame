@@ -11,3 +11,8 @@ FRGActionData& IRGAction::GetActionData()
 {
 	return ActionData;
 }
+
+FOnActionCompleted& IRGAction::OnActionCompletedDelegate()
+{
+	return OnActionCompleted;
+}

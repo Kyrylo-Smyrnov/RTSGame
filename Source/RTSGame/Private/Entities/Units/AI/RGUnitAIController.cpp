@@ -1,9 +1,7 @@
 // https://github.com/Kyrylo-Smyrnov/RTSGame
 
 #include "Entities/Units/AI/RGUnitAIController.h"
-#include "BehaviorTree/BlackboardComponent.h"
 #include "Entities/Actions/RGMoveToAction.h"
-#include "Entities/BBKeys.h"
 #include "Entities/Units/RGUnitBase.h"
 #include "Kismet/GameplayStatics.h"
 #include "Player/RGPlayerController.h"
@@ -29,17 +27,27 @@ void ARGUnitAIController::HandleRightMouseButtonInputPressed()
 		UE_LOG(LogRGUnitAIController, Warning, TEXT("[HandleRightMouseButtonInputPressed] Unit is nullptr."));
 		return;
 	}
-	else if (!Unit->GetIsSelected())
+	
+	if (!Unit->GetIsSelected())
 		return;
 
 	FHitResult HitResult;
 	if (PlayerController->GetHitResultUnderCursor(ECC_Visibility, true, HitResult))
 	{
-		URGMoveToAction* MoveAction = Unit->GetMoveToAction();
-		if (MoveAction)
+		URGMoveToAction* MoveAction = NewObject<URGMoveToAction>(Unit);
+		FRGActionData MoveToData = UnitActions::Base_Move;
+		MoveAction->InitializeAction(Unit);
+		MoveAction->SetActionData(MoveToData);
+		MoveAction->SetDestination(HitResult.Location);
+
+		if (PlayerController->IsInputKeyDown(EKeys::LeftShift))
 		{
-			MoveAction->SetDestination(HitResult.Location);
-			MoveAction->Execute_Implementation();
+			Unit->AddActionToQueue(MoveAction);
+		}
+		else
+		{
+			Unit->ClearActionQueue();
+			Unit->AddActionToQueue(MoveAction);
 		}
 	}
 }

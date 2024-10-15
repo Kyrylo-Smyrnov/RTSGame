@@ -4,6 +4,7 @@
 #include "BehaviorTree/BlackboardComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/DecalComponent.h"
+#include "Entities/Actions/RGActionQueue.h"
 #include "Entities/Actions/RGMoveToAction.h"
 #include "Entities/BBKeys.h"
 #include "Entities/Units/AI/RGUnitAIController.h"
@@ -85,7 +86,10 @@ void ARGUnitBase::BeginPlay()
 	}
 
 	PlayerPawn->AddEntitiesToContolled(this);
+
 	InitializeActions();
+	ActionQueue = NewObject<URGActionQueue>();
+	ActionQueue->Initialize(this);
 }
 
 void ARGUnitBase::Tick(float DeltaTime)
@@ -157,4 +161,14 @@ void ARGUnitBase::InitializeActions()
 	MoveAction = MoveToAction;
 
 	AvailableActions.Add(MoveToAction);
+}
+
+void ARGUnitBase::AddActionToQueue(IRGAction* Action) const
+{
+	ActionQueue->EnqueueAction(Action);
+}
+
+void ARGUnitBase::ClearActionQueue() const
+{
+	ActionQueue->ClearQueue();
 }

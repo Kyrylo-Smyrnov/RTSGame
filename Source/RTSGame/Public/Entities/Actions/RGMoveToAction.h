@@ -6,6 +6,8 @@
 #include "RGAction.h"
 #include "RGMoveToAction.generated.h"
 
+struct FPathFollowingResult;
+struct FAIRequestID;
 class ARGUnitAIController;
 class ARGUnitBase;
 
@@ -22,6 +24,8 @@ class RTSGAME_API URGMoveToAction : public UObject, public IRGAction
 	void SetDestination(FVector InDestination);
 
   private:
+	void OnMoveCompleted(FAIRequestID RequestID, const FPathFollowingResult& Result);
+
 	UPROPERTY()
 	ARGUnitBase* ControlledUnit;
 	UPROPERTY()
