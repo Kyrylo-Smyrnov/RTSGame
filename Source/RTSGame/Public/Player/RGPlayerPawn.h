@@ -32,8 +32,6 @@ class RTSGAME_API ARGPlayerPawn : public APawn
 	UFUNCTION(BlueprintCallable)
 	TArray<AActor*> GetSelectedEntities() const;
 
-	void AddEntitiesToContolled(AActor* Entity);
-	void RemoveEntityFromControlled(AActor* Entity);
 	void AddEntitiesToSelected(AActor* Entity);
 	void AddEntitiesToSelected(TArray<AActor*> Entities);
 	void RemoveEntityFromSelected(AActor* Entity);
@@ -55,12 +53,9 @@ class RTSGAME_API ARGPlayerPawn : public APawn
 	UPROPERTY(EditDefaultsOnly, Category = "Camera")
 	URGPlayerCameraComponent* PlayerCameraComponent;
 
-	UPROPERTY(BlueprintReadOnly, Category = "Entities")
-	TArray<AActor*> ControlledEntities;
-
   private:
 	static bool CompareEntityImportance(const AActor& A, const AActor& B);
-	void ExecuteActionWithTarget(FVector TargetLocation);
+	void ExecuteActionWithTarget(FVector TargetLocation, bool bMustBeEnqueued);
 
 	UPROPERTY()
 	ARGPlayerController* PlayerController;

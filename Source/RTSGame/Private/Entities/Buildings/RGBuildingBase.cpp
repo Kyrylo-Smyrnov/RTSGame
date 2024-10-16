@@ -188,8 +188,6 @@ void ARGBuildingBase::BeginPlay()
 		return;
 	}
 
-	PlayerPawn->AddEntitiesToContolled(this);
-
 	if (!bIsPlacing)
 		LastBannerLocation = GetActorLocation() + FVector(0.0f, 500.0f, 0.0f);
 

@@ -85,8 +85,6 @@ void ARGUnitBase::BeginPlay()
 		return;
 	}
 
-	PlayerPawn->AddEntitiesToContolled(this);
-
 	InitializeActions();
 	ActionQueue = NewObject<URGActionQueue>();
 	ActionQueue->Initialize(this);
@@ -172,4 +170,23 @@ void ARGUnitBase::AddActionToQueue(IRGAction* Action) const
 void ARGUnitBase::ClearActionQueue() const
 {
 	ActionQueue->ClearQueue();
+}
+
+bool ARGUnitBase::CanPerformAction(IRGAction* Action)
+{
+	UObject* ActionObj = Cast<UObject>(Action);
+	if(!ActionObj)
+	{
+		UE_LOG(LogRGUnitBase, Warning, TEXT("[CanPerformAction] Failed to cast Action -> UObject"));
+		return false;
+	}
+	
+	for(IRGAction* AvailableAction : AvailableActions)
+	{
+		UObject* AvailableActionObj = Cast<UObject>(AvailableAction);
+		if(AvailableActionObj && AvailableActionObj->GetClass() == ActionObj->GetClass())
+			return true;
+	}
+	
+	return false;
 }

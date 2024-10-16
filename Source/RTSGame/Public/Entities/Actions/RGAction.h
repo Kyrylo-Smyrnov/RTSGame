@@ -7,6 +7,8 @@
 #include "UObject/Interface.h"
 #include "RGAction.generated.h"
 
+class ARGUnitBase;
+
 DECLARE_MULTICAST_DELEGATE(FOnActionCompleted);
 
 UINTERFACE(MinimalAPI)
@@ -18,7 +20,7 @@ class URGAction : public UInterface
 class RTSGAME_API IRGAction
 {
 	GENERATED_BODY()
-	
+
   public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Action")
 	void Execute();

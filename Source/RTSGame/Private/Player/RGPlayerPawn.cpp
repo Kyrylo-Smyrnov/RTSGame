@@ -1,7 +1,6 @@
 // https://github.com/Kyrylo-Smyrnov/RTSGame
 
 #include "Player/RGPlayerPawn.h"
-
 #include "Entities/Actions/RGMoveToAction.h"
 #include "Entities/Buildings/RGBuildingBase.h"
 #include "Entities/Units/RGUnitBase.h"
@@ -37,7 +36,7 @@ void ARGPlayerPawn::HandleLeftMouseButtonInputPressedUninteractable()
 		FHitResult HitResult;
 		if (PlayerController->GetHitResultUnderCursorByChannel(UEngineTypes::ConvertToTraceType(ECC_Visibility), true, HitResult))
 		{
-			ExecuteActionWithTarget(HitResult.Location);	
+			ExecuteActionWithTarget(HitResult.Location, PlayerController->IsInputKeyDown(EKeys::LeftShift));
 		}
 	}
 	else
@@ -57,28 +56,6 @@ AActor* ARGPlayerPawn::GetMostImportantEntity() const
 TArray<AActor*> ARGPlayerPawn::GetSelectedEntities() const
 {
 	return SelectedEntities;
-}
-
-void ARGPlayerPawn::AddEntitiesToContolled(AActor* Entity)
-{
-	if (Entity == nullptr)
-	{
-		UE_LOG(LogRGPlayerPawn, Warning, TEXT("[AddEntitiesToContolled] Entity is nullptr."));
-		return;
-	}
-
-	ControlledEntities.AddUnique(Entity);
-}
-
-void ARGPlayerPawn::RemoveEntityFromControlled(AActor* Entity)
-{
-	if (Entity == nullptr)
-	{
-		UE_LOG(LogRGPlayerPawn, Warning, TEXT("[RemoveEntityFromControlled] Entity is nullptr."));
-		return;
-	}
-
-	ControlledEntities.Remove(Entity);
 }
 
 void ARGPlayerPawn::AddEntitiesToSelected(AActor* Entity)
@@ -101,7 +78,7 @@ void ARGPlayerPawn::AddEntitiesToSelected(AActor* Entity)
 
 	OnMostImportantEntityChanged.Broadcast(GetMostImportantEntity());
 	OnSelectedEntitiesChanged.Broadcast(SelectedEntities);
-	if(AwaitingAction)
+	if (AwaitingAction)
 	{
 		bIsAwaitingTarget = false;
 		AwaitingAction = nullptr;
@@ -134,7 +111,7 @@ void ARGPlayerPawn::AddEntitiesToSelected(TArray<AActor*> Entities)
 
 	OnMostImportantEntityChanged.Broadcast(GetMostImportantEntity());
 	OnSelectedEntitiesChanged.Broadcast(SelectedEntities);
-	if(AwaitingAction)
+	if (AwaitingAction)
 	{
 		bIsAwaitingTarget = false;
 		AwaitingAction = nullptr;
@@ -161,7 +138,7 @@ void ARGPlayerPawn::RemoveEntityFromSelected(AActor* Entity)
 
 	OnMostImportantEntityChanged.Broadcast(GetMostImportantEntity());
 	OnSelectedEntitiesChanged.Broadcast(SelectedEntities);
-	if(AwaitingAction)
+	if (AwaitingAction)
 	{
 		bIsAwaitingTarget = false;
 		AwaitingAction = nullptr;
@@ -185,7 +162,7 @@ void ARGPlayerPawn::ClearSelectedEntities()
 
 	OnMostImportantEntityChanged.Broadcast(GetMostImportantEntity());
 	OnSelectedEntitiesChanged.Broadcast(SelectedEntities);
-	if(AwaitingAction)
+	if (AwaitingAction)
 	{
 		bIsAwaitingTarget = false;
 		AwaitingAction = nullptr;
@@ -244,14 +221,46 @@ bool ARGPlayerPawn::CompareEntityImportance(const AActor& A, const AActor& B)
 	return false;
 }
 
-void ARGPlayerPawn::ExecuteActionWithTarget(FVector TargetLocation)
+void ARGPlayerPawn::ExecuteActionWithTarget(FVector TargetLocation, bool bMustBeEnqueued)
 {
 	if (AwaitingAction)
 	{
-		if (URGMoveToAction* MoveToAction = Cast<URGMoveToAction>(AwaitingAction))
-			MoveToAction->SetDestination(TargetLocation);
-		
-		AwaitingAction->Execute_Implementation();
+		TArray<ARGUnitBase*> MustBePerformedBy;
+		for (AActor* Entity : SelectedEntities)
+		{
+			if (ARGUnitBase* CastedUnit = Cast<ARGUnitBase>(Entity))
+			{
+				if (CastedUnit->CanPerformAction(AwaitingAction))
+				{
+					MustBePerformedBy.Add(CastedUnit);
+				}
+			}
+		}
+
+		for(ARGUnitBase* Unit : MustBePerformedBy)
+		{
+			if(UObject* ActionObj = Cast<UObject>(AwaitingAction))
+			{
+				IRGAction* NewActionInstance = Cast<IRGAction>(DuplicateObject(ActionObj, this));
+
+				if (URGMoveToAction* MoveToAction = Cast<URGMoveToAction>(NewActionInstance))
+					MoveToAction->SetDestination(TargetLocation);
+
+				if (IRGUnitAction* UnitAction = Cast<IRGUnitAction>(NewActionInstance))
+					UnitAction->InitializeAction(Unit);
+
+				if (bMustBeEnqueued)
+				{
+					Unit->AddActionToQueue(NewActionInstance);
+				}
+				else
+				{
+					Unit->ClearActionQueue();
+					Unit->AddActionToQueue(NewActionInstance);
+				}
+			}
+		}
+
 		bIsAwaitingTarget = false;
 		AwaitingAction = nullptr;
 	}

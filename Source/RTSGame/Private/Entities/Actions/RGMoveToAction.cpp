@@ -13,9 +13,9 @@ URGMoveToAction::URGMoveToAction()
 {
 }
 
-void URGMoveToAction::InitializeAction(ARGUnitBase* InControlledUnit)
+void URGMoveToAction::InitializeAction(ARGUnitBase* Unit)
 {
-	ControlledUnit = InControlledUnit;
+	ControlledUnit = Unit;
 	AIController = Cast<ARGUnitAIController>(ControlledUnit->GetController());
 }
 
@@ -36,7 +36,7 @@ void URGMoveToAction::Execute_Implementation()
 	FNavPathSharedPtr NavPath;
 	FAIMoveRequest MoveRequest(Destination);
 	FPathFollowingRequestResult RequestResult = AIController->MoveTo(MoveRequest, &NavPath);
-	
+
 	if (RequestResult.Code == EPathFollowingRequestResult::RequestSuccessful)
 		AIController->GetPathFollowingComponent()->OnRequestFinished.AddUObject(this, &URGMoveToAction::OnMoveCompleted);
 	else

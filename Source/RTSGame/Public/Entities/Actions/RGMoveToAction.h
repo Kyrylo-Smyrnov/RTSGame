@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "RGAction.h"
+#include "RGUnitAction.h"
 #include "RGMoveToAction.generated.h"
 
 struct FPathFollowingResult;
@@ -12,13 +13,13 @@ class ARGUnitAIController;
 class ARGUnitBase;
 
 UCLASS()
-class RTSGAME_API URGMoveToAction : public UObject, public IRGAction
+class RTSGAME_API URGMoveToAction : public UObject, public IRGAction, public IRGUnitAction
 {
 	GENERATED_BODY()
 
   public:
 	URGMoveToAction();
-	void InitializeAction(ARGUnitBase* InControlledUnit);
+	virtual void InitializeAction(ARGUnitBase* Unit) override;
 	virtual void Execute_Implementation() override;
 
 	void SetDestination(FVector InDestination);

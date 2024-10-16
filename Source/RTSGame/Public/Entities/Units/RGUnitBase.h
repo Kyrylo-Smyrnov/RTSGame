@@ -33,6 +33,8 @@ class RTSGAME_API ARGUnitBase : public ACharacter
 	void AddActionToQueue(IRGAction* Action) const;
 	void ClearActionQueue() const;
 
+	bool CanPerformAction(IRGAction* Action);
+
   protected:
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
