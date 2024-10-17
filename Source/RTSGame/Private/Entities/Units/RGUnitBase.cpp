@@ -1,13 +1,10 @@
 // https://github.com/Kyrylo-Smyrnov/RTSGame
 
 #include "Entities/Units/RGUnitBase.h"
-#include "BehaviorTree/BlackboardComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/DecalComponent.h"
 #include "Entities/Actions/RGActionQueue.h"
 #include "Entities/Actions/RGMoveToAction.h"
-#include "Entities/BBKeys.h"
-#include "Entities/Units/AI/RGUnitAIController.h"
 #include "Kismet/GameplayStatics.h"
 #include "Player/RGPlayerController.h"
 
@@ -133,19 +130,6 @@ void ARGUnitBase::HandleOnClicked(AActor* TouchedActor, FKey ButtonPressed)
 			// Deselect all other entities and leave this one selected
 			PlayerPawn->ClearSelectedEntities();
 			PlayerPawn->AddEntitiesToSelected(this);
-		}
-	}
-	else if (ButtonPressed == EKeys::RightMouseButton && PlayerPawn->GetSelectedEntities().Num() > 0)
-	{
-		TArray<AActor*> SelectedEntities = PlayerPawn->GetSelectedEntities();
-
-		for (int32 i = 0; i < SelectedEntities.Num(); ++i)
-		{
-			if (ARGUnitBase* CastedUnit = Cast<ARGUnitBase>(SelectedEntities[i]))
-			{
-				UBlackboardComponent* Blackboard = Cast<ARGUnitAIController>(CastedUnit->GetController())->GetBlackboardComponent();
-				Blackboard->SetValueAsVector(BBKeys::UNIT_AI_BBKEY_TARGETLOCATIONTOMOVE, GetActorLocation());
-			}
 		}
 	}
 }

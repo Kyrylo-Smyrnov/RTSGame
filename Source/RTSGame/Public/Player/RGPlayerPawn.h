@@ -55,7 +55,7 @@ class RTSGAME_API ARGPlayerPawn : public APawn
 
   private:
 	static bool CompareEntityImportance(const AActor& A, const AActor& B);
-	void ExecuteActionWithTarget(FVector TargetLocation, bool bMustBeEnqueued);
+	void ExecuteActionWithTarget(TVariant<FVector, AActor*> TargetVariant, bool bMustBeEnqueued);
 
 	UPROPERTY()
 	ARGPlayerController* PlayerController;

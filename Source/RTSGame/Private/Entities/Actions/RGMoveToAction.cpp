@@ -19,6 +19,11 @@ void URGMoveToAction::InitializeAction(ARGUnitBase* Unit)
 	AIController = Cast<ARGUnitAIController>(ControlledUnit->GetController());
 }
 
+void URGMoveToAction::SetDestination(FVector InDestination)
+{
+	Destination = InDestination;
+}
+
 void URGMoveToAction::Execute_Implementation()
 {
 	if (!ControlledUnit || !AIController)
@@ -41,11 +46,6 @@ void URGMoveToAction::Execute_Implementation()
 		AIController->GetPathFollowingComponent()->OnRequestFinished.AddUObject(this, &URGMoveToAction::OnMoveCompleted);
 	else
 		UE_LOG(LogRGMoveToAction, Warning, TEXT("[Execute] MoveTo request failed."));
-}
-
-void URGMoveToAction::SetDestination(FVector InDestination)
-{
-	Destination = InDestination;
 }
 
 void URGMoveToAction::OnMoveCompleted(FAIRequestID RequestID, const FPathFollowingResult& Result)

@@ -33,10 +33,25 @@ void ARGPlayerPawn::HandleLeftMouseButtonInputPressedUninteractable()
 {
 	if (bIsAwaitingTarget)
 	{
-		FHitResult HitResult;
-		if (PlayerController->GetHitResultUnderCursorByChannel(UEngineTypes::ConvertToTraceType(ECC_Visibility), true, HitResult))
+		TVariant<FVector, AActor*> TargetVariant;
+
+		if (AwaitingAction && AwaitingAction->GetActionData().TargetType == EActionTargetType::Location)
 		{
-			ExecuteActionWithTarget(HitResult.Location, PlayerController->IsInputKeyDown(EKeys::LeftShift));
+			FHitResult HitResult;
+			if (PlayerController->GetHitResultUnderCursorByChannel(UEngineTypes::ConvertToTraceType(ECC_Visibility), true, HitResult))
+			{
+				TargetVariant.Set<FVector>(HitResult.Location);
+				ExecuteActionWithTarget(TargetVariant, PlayerController->IsInputKeyDown(EKeys::LeftShift));
+			}
+		}
+		else if (AwaitingAction && AwaitingAction->GetActionData().TargetType == EActionTargetType::Actor)
+		{
+			FHitResult HitResult;
+			if (PlayerController->GetHitResultUnderCursorByChannel(UEngineTypes::ConvertToTraceType(ECC_GameTraceChannel1), true, HitResult))
+			{
+				TargetVariant.Set<AActor*>(HitResult.GetActor());
+				ExecuteActionWithTarget(TargetVariant, PlayerController->IsInputKeyDown(EKeys::LeftShift));
+			}
 		}
 	}
 	else
@@ -221,47 +236,51 @@ bool ARGPlayerPawn::CompareEntityImportance(const AActor& A, const AActor& B)
 	return false;
 }
 
-void ARGPlayerPawn::ExecuteActionWithTarget(FVector TargetLocation, bool bMustBeEnqueued)
+void ARGPlayerPawn::ExecuteActionWithTarget(TVariant<FVector, AActor*> TargetVariant, bool bMustBeEnqueued)
 {
-	if (AwaitingAction)
+	TArray<ARGUnitBase*> MustBePerformedBy;
+	for (AActor* Entity : SelectedEntities)
 	{
-		TArray<ARGUnitBase*> MustBePerformedBy;
-		for (AActor* Entity : SelectedEntities)
+		if (ARGUnitBase* CastedUnit = Cast<ARGUnitBase>(Entity))
 		{
-			if (ARGUnitBase* CastedUnit = Cast<ARGUnitBase>(Entity))
+			if (CastedUnit->CanPerformAction(AwaitingAction))
 			{
-				if (CastedUnit->CanPerformAction(AwaitingAction))
-				{
-					MustBePerformedBy.Add(CastedUnit);
-				}
+				MustBePerformedBy.Add(CastedUnit);
 			}
 		}
-
-		for(ARGUnitBase* Unit : MustBePerformedBy)
-		{
-			if(UObject* ActionObj = Cast<UObject>(AwaitingAction))
-			{
-				IRGAction* NewActionInstance = Cast<IRGAction>(DuplicateObject(ActionObj, this));
-
-				if (URGMoveToAction* MoveToAction = Cast<URGMoveToAction>(NewActionInstance))
-					MoveToAction->SetDestination(TargetLocation);
-
-				if (IRGUnitAction* UnitAction = Cast<IRGUnitAction>(NewActionInstance))
-					UnitAction->InitializeAction(Unit);
-
-				if (bMustBeEnqueued)
-				{
-					Unit->AddActionToQueue(NewActionInstance);
-				}
-				else
-				{
-					Unit->ClearActionQueue();
-					Unit->AddActionToQueue(NewActionInstance);
-				}
-			}
-		}
-
-		bIsAwaitingTarget = false;
-		AwaitingAction = nullptr;
 	}
+
+	for (ARGUnitBase* Unit : MustBePerformedBy)
+	{
+		if (UObject* ActionObj = Cast<UObject>(AwaitingAction))
+		{
+			IRGAction* NewActionInstance = Cast<IRGAction>(DuplicateObject(ActionObj, this));
+
+			if(TargetVariant.IsType<FVector>())
+			{
+				if(IRGTargetTypeLocationAction* TargetTypeLocationAction = Cast<IRGTargetTypeLocationAction>(NewActionInstance))
+					TargetTypeLocationAction->SetDestination(TargetVariant.Get<FVector>());
+			}
+			// else if(NewActionInstance->GetActionData().TargetType == EActionTargetType::Actor)
+			// {
+			// 	 TODO: When actions with target type actor will be implemented.
+			// }
+
+			if (IRGUnitAction* UnitAction = Cast<IRGUnitAction>(NewActionInstance))
+				UnitAction->InitializeAction(Unit);
+
+			if (bMustBeEnqueued)
+			{
+				Unit->AddActionToQueue(NewActionInstance);
+			}
+			else
+			{
+				Unit->ClearActionQueue();
+				Unit->AddActionToQueue(NewActionInstance);
+			}
+		}
+	}
+
+	bIsAwaitingTarget = false;
+	AwaitingAction = nullptr;
 }

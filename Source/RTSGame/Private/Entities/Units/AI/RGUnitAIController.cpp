@@ -50,4 +50,22 @@ void ARGUnitAIController::HandleRightMouseButtonInputPressed()
 			Unit->AddActionToQueue(MoveAction);
 		}
 	}
+	else if (PlayerController->GetHitResultUnderCursorByChannel(UEngineTypes::ConvertToTraceType(ECC_GameTraceChannel1), true, HitResult))
+	{
+		URGMoveToAction* MoveAction = NewObject<URGMoveToAction>(Unit);
+		FRGActionData MoveToData = UnitActions::Base_Move;
+		MoveAction->InitializeAction(Unit);
+		MoveAction->SetActionData(MoveToData);
+		MoveAction->SetDestination(HitResult.GetActor()->GetActorLocation());
+
+		if (PlayerController->IsInputKeyDown(EKeys::LeftShift))
+		{
+			Unit->AddActionToQueue(MoveAction);
+		}
+		else
+		{
+			Unit->ClearActionQueue();
+			Unit->AddActionToQueue(MoveAction);
+		}
+	}
 }

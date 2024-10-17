@@ -256,34 +256,6 @@ void ARGBuildingBase::HandleOnClicked(AActor* TouchedActor, FKey ButtonPressed)
 			PlayerPawn->AddEntitiesToSelected(this);
 		}
 	}
-	else if (ButtonPressed == EKeys::RightMouseButton && PlayerPawn->GetSelectedEntities().Num() > 0)
-	{
-		TArray<AActor*> SelectedEntities = PlayerPawn->GetSelectedEntities();
-
-		for (int32 i = 0; i < SelectedEntities.Num(); ++i)
-		{
-			if (ARGUnitBase* CastedUnit = Cast<ARGUnitBase>(SelectedEntities[i]))
-			{
-				FVector Origin;
-				FVector BoxExtent;
-				FVector ActorSize;
-
-				GetActorBounds(true, Origin, BoxExtent);
-				ActorSize = BoxExtent * 2;
-				float SearchRadius = FMath::Max3(ActorSize.X, ActorSize.Y, 0.0f);
-
-				FNavLocation ClosestPointOnNavMesh;
-
-				bool bFoundLocation = PlayerController->GetNavigationSystem()->GetRandomPointInNavigableRadius(
-					GetActorLocation(), SearchRadius, ClosestPointOnNavMesh);
-				if (bFoundLocation)
-				{
-					UBlackboardComponent* Blackboard = Cast<ARGUnitAIController>(CastedUnit->GetController())->GetBlackboardComponent();
-					Blackboard->SetValueAsVector(BBKeys::UNIT_AI_BBKEY_TARGETLOCATIONTOMOVE, ClosestPointOnNavMesh.Location);
-				}
-			}
-		}
-	}
 }
 
 bool ARGBuildingBase::CheckForOverlap() const

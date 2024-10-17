@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "RGAction.h"
+#include "RGTargetTypeLocationAction.h"
 #include "RGUnitAction.h"
 #include "RGMoveToAction.generated.h"
 
@@ -13,16 +14,16 @@ class ARGUnitAIController;
 class ARGUnitBase;
 
 UCLASS()
-class RTSGAME_API URGMoveToAction : public UObject, public IRGAction, public IRGUnitAction
+class RTSGAME_API URGMoveToAction : public UObject, public IRGAction, public IRGUnitAction, public IRGTargetTypeLocationAction
 {
 	GENERATED_BODY()
 
   public:
 	URGMoveToAction();
 	virtual void InitializeAction(ARGUnitBase* Unit) override;
+	virtual void SetDestination(FVector InDestination) override;
+	
 	virtual void Execute_Implementation() override;
-
-	void SetDestination(FVector InDestination);
 
   private:
 	void OnMoveCompleted(FAIRequestID RequestID, const FPathFollowingResult& Result);

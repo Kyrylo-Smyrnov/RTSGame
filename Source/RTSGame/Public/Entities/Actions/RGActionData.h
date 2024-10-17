@@ -10,7 +10,8 @@ UENUM(BlueprintType)
 enum class EActionTargetType : uint8
 {
 	None,
-	Location
+	Location,
+	Actor
 };
 
 USTRUCT(BlueprintType)
