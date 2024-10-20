@@ -3,12 +3,13 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "BaseAction.h"
 #include "RGAction.h"
 #include "RGUnitAction.h"
 #include "RGCompositeAction.generated.h"
 
 UCLASS()
-class RTSGAME_API URGCompositeAction : public UObject, public IRGAction, public IRGUnitAction
+class RTSGAME_API URGCompositeAction : public UBaseAction, public IRGUnitAction
 {
 	GENERATED_BODY()
 

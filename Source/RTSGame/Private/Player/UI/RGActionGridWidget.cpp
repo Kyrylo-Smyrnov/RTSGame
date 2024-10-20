@@ -54,7 +54,7 @@ void URGActionGridWidget::UpdateWidget(AActor* MostImportantEntity)
 	}
 	else
 	{
-		TArray<IRGAction*> AvailableActions;
+		TArray<UBaseAction*> AvailableActions;
 		if (ARGUnitBase* CastedUnit = Cast<ARGUnitBase>(MostImportantEntity))
 			AvailableActions = CastedUnit->GetAvailableActions();
 		else if (ARGBuildingBase* CastedBuilding = Cast<ARGBuildingBase>(MostImportantEntity))

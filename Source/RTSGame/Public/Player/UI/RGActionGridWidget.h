@@ -7,6 +7,7 @@
 #include "Entities/Actions/RGAction.h"
 #include "RGActionGridWidget.generated.h"
 
+class UBaseAction;
 class ARGPlayerController;
 class UButton;
 class UGridPanel;
@@ -24,8 +25,8 @@ class RTSGAME_API URGActionGridWidget : public UUserWidget
   protected:
 	UPROPERTY(meta = (BindWidget))
 	UGridPanel* ActionGrid;
-	
-	TMap<UButton*, IRGAction*> ActionButtons;
+
+	TMap<UButton*, UBaseAction*> ActionButtons;
 	TArray<UImage*> ActionIcons;
 
   private:

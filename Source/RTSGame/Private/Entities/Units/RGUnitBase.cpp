@@ -53,7 +53,7 @@ UTexture2D* ARGUnitBase::GetSelectionIcon() const
 	return SelectionIcon;
 }
 
-TArray<IRGAction*>& ARGUnitBase::GetAvailableActions()
+TArray<UBaseAction*> ARGUnitBase::GetAvailableActions()
 {
 	return AvailableActions;
 }

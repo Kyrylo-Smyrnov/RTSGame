@@ -7,6 +7,7 @@
 #include "GameFramework/Pawn.h"
 #include "RGPlayerPawn.generated.h"
 
+class UBaseAction;
 class ARGPlayerController;
 class URGPlayerCameraComponent;
 
@@ -41,7 +42,7 @@ class RTSGAME_API ARGPlayerPawn : public APawn
 	void AddPlayerResources(int32 Amount);
 	int32 GetPlayerResources() const;
 
-	void SetAwaitingAction(IRGAction* Action);
+	void SetAwaitingAction(UBaseAction* Action);
 
 	FOnSelectedEntitiesChanged OnSelectedEntitiesChanged;
 	FOnMostImportantEntityChanged OnMostImportantEntityChanged;
@@ -62,7 +63,7 @@ class RTSGAME_API ARGPlayerPawn : public APawn
 
 	UPROPERTY()
 	TArray<AActor*> SelectedEntities;
-	
+
 	IRGAction* AwaitingAction;
 
 	int32 PlayerWoodResource;

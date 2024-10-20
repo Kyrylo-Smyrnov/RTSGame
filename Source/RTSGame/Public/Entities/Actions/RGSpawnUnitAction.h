@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "BaseAction.h"
 #include "RGAction.h"
 #include "RGSpawnUnitAction.generated.h"
 
@@ -10,7 +11,7 @@ class ARGPlayerPawn;
 class ARGBuildingBase;
 
 UCLASS()
-class RTSGAME_API URGSpawnUnitAction : public UObject, public IRGAction
+class RTSGAME_API URGSpawnUnitAction : public UBaseAction
 {
 	GENERATED_BODY()
 

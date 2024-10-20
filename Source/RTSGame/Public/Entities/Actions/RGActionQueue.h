@@ -22,6 +22,6 @@ class RTSGAME_API URGActionQueue : public UObject
 
   private:
 	UPROPERTY()
-	class ARGUnitBase* ControlledUnit;
+	ARGUnitBase* ControlledUnit;
 	TArray<IRGAction*> ActionQueue;
 };

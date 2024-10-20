@@ -6,6 +6,7 @@
 #include "Entities/Actions/RGAction.h"
 #include "Entities/Actions/RGActionsList.h"
 #include "Entities/EntitiesImportance.h"
+#include "Entities/Actions/BaseAction.h"
 #include "GameFramework/Character.h"
 #include "Player/RGPlayerPawn.h"
 #include "RGUnitBase.generated.h"
@@ -25,7 +26,7 @@ class RTSGAME_API ARGUnitBase : public ACharacter
 	bool GetIsSelected() const;
 	int32 GetImportance() const;
 	UTexture2D* GetSelectionIcon() const;
-	TArray<IRGAction*>& GetAvailableActions();
+	TArray<UBaseAction*> GetAvailableActions();
 	URGMoveToAction* GetMoveToAction() const;
 
 	void SetSelected(bool bIsSelected);
@@ -52,7 +53,8 @@ class RTSGAME_API ARGUnitBase : public ACharacter
 	UPROPERTY(EditDefaultsOnly, Category = "UI")
 	UTexture2D* SelectionIcon;
 
-	TArray<IRGAction*> AvailableActions;
+	UPROPERTY()
+	TArray<UBaseAction*> AvailableActions;
 
 	EFEntitiesImportance UnitImportance;
 

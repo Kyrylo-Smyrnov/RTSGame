@@ -87,7 +87,7 @@ TArray<FSpawnQueueEntry>& ARGBuildingBase::GetSpawnQueue()
 	return SpawnQueue;
 }
 
-TArray<IRGAction*>& ARGBuildingBase::GetAvailableActions()
+TArray<UBaseAction*> ARGBuildingBase::GetAvailableActions()
 {
 	return AvailableActions;
 }
@@ -256,25 +256,6 @@ void ARGBuildingBase::HandleOnClicked(AActor* TouchedActor, FKey ButtonPressed)
 			PlayerPawn->AddEntitiesToSelected(this);
 		}
 	}
-	// else if(ButtonPressed == EKeys::RightMouseButton)
-	// {
-	// 	for(AActor* Entity : PlayerPawn->GetSelectedEntities())
-	// 	{
-	// 		URGMoveToAction* MoveToAction = NewObject<URGMoveToAction>(this);
-	// 		MoveToAction->SetActionData(UnitActions::Base_Move);
-	// 		MoveToAction->SetDestination(GetActorLocation());
-	// 		
-	// 		if(ARGUnitBase* CastedUnit = Cast<ARGUnitBase>(Entity))
-	// 		{
-	// 			if(CastedUnit->CanPerformAction(MoveToAction))
-	// 			{
-	// 				MoveToAction->InitializeAction(CastedUnit);
-	// 				CastedUnit->ClearActionQueue();
-	// 				CastedUnit->AddActionToQueue(MoveToAction);
-	// 			}
-	// 		}
-	// 	}
-	// }
 }
 
 bool ARGBuildingBase::CheckForOverlap() const

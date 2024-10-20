@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "BaseAction.h"
 #include "RGAction.h"
 #include "RGTargetTypeLocationAction.h"
 #include "RGUnitAction.h"
@@ -14,7 +15,7 @@ class ARGUnitAIController;
 class ARGUnitBase;
 
 UCLASS()
-class RTSGAME_API URGMoveToAction : public UObject, public IRGAction, public IRGUnitAction, public IRGTargetTypeLocationAction
+class RTSGAME_API URGMoveToAction : public UBaseAction, public IRGUnitAction, public IRGTargetTypeLocationAction
 {
 	GENERATED_BODY()
 
@@ -22,7 +23,6 @@ class RTSGAME_API URGMoveToAction : public UObject, public IRGAction, public IRG
 	URGMoveToAction();
 	virtual void InitializeAction(ARGUnitBase* Unit) override;
 	virtual void SetDestination(FVector InDestination) override;
-	
 	virtual void Execute_Implementation() override;
 
   private:

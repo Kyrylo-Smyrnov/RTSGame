@@ -204,7 +204,7 @@ int32 ARGPlayerPawn::GetPlayerResources() const
 	return PlayerWoodResource;
 }
 
-void ARGPlayerPawn::SetAwaitingAction(IRGAction* Action)
+void ARGPlayerPawn::SetAwaitingAction(UBaseAction* Action)
 {
 	bIsAwaitingTarget = true;
 	AwaitingAction = Action;
@@ -260,33 +260,43 @@ void ARGPlayerPawn::ExecuteActionWithTarget(TVariant<FVector, AActor*> TargetVar
 
 	for (ARGUnitBase* Unit : MustBePerformedBy)
 	{
-		if (UObject* ActionObj = Cast<UObject>(AwaitingAction))
+		UBaseAction* NewActionInstance = Cast<UBaseAction>(AwaitingAction);
+		if(NewActionInstance)
 		{
-			IRGAction* NewActionInstance = Cast<IRGAction>(DuplicateObject(ActionObj, this));
-
-			if (TargetVariant.IsType<FVector>())
+			if(NewActionInstance->GetClass()->ImplementsInterface(URGUnitAction::StaticClass()))
 			{
-				if (IRGTargetTypeLocationAction* TargetTypeLocationAction = Cast<IRGTargetTypeLocationAction>(NewActionInstance))
+				IRGUnitAction* UnitAction = Cast<IRGUnitAction>(NewActionInstance);
+				if(UnitAction)
+				{
+					UnitAction->InitializeAction(Unit);
+				}
+			}
+			if(TargetVariant.IsType<FVector>() && NewActionInstance->GetClass()->ImplementsInterface(URGTargetTypeLocationAction::StaticClass()))
+			{
+				IRGTargetTypeLocationAction* TargetTypeLocationAction = Cast<IRGTargetTypeLocationAction>(NewActionInstance);
+				if(TargetTypeLocationAction)
+				{
 					TargetTypeLocationAction->SetDestination(TargetVariant.Get<FVector>());
+				}
 			}
-			else if (TargetVariant.IsType<AActor*>())
+			if(TargetVariant.IsType<AActor*>() && NewActionInstance->GetClass()->ImplementsInterface(URGTargetTypeActorAction::StaticClass()))
 			{
-				if (IRGTargetTypeActorAction* TargetTypeActorAction = Cast<IRGTargetTypeActorAction>(NewActionInstance))
+				IRGTargetTypeActorAction* TargetTypeActorAction = Cast<IRGTargetTypeActorAction>(NewActionInstance);
+				if(TargetTypeActorAction)
+				{
 					TargetTypeActorAction->SetTarget(TargetVariant.Get<AActor*>());
+				}
 			}
+		}
 
-			if (IRGUnitAction* UnitAction = Cast<IRGUnitAction>(NewActionInstance))
-				UnitAction->InitializeAction(Unit);
-
-			if (bMustBeEnqueued)
-			{
-				Unit->AddActionToQueue(NewActionInstance);
-			}
-			else
-			{
-				Unit->ClearActionQueue();
-				Unit->AddActionToQueue(NewActionInstance);
-			}
+		if (bMustBeEnqueued)
+		{
+			Unit->AddActionToQueue(NewActionInstance);
+		}
+		else
+		{
+			Unit->ClearActionQueue();
+			Unit->AddActionToQueue(NewActionInstance);	
 		}
 	}
 

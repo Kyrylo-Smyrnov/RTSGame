@@ -7,8 +7,6 @@
 #include "UObject/Interface.h"
 #include "RGAction.generated.h"
 
-class ARGUnitBase;
-
 DECLARE_MULTICAST_DELEGATE(FOnActionCompleted);
 
 UINTERFACE(MinimalAPI)

@@ -4,12 +4,13 @@
 
 #include "RGAction.h"
 #include "CoreMinimal.h"
+#include "BaseAction.h"
 #include "RGConstructBuildingAction.generated.h"
 
 class ARGPlayerPawn;
 
 UCLASS()
-class RTSGAME_API URGConstructBuildingAction : public UObject, public IRGAction
+class RTSGAME_API URGConstructBuildingAction : public UBaseAction
 {
 	GENERATED_BODY()
   public:
