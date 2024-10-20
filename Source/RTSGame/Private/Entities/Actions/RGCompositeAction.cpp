@@ -22,6 +22,11 @@ void URGCompositeAction::Execute_Implementation()
 	}
 }
 
+void URGCompositeAction::InitializeAction(ARGUnitBase* Unit)
+{
+	ControlledUnit = Unit;
+}
+
 void URGCompositeAction::OnSubActionCompleted()
 {
 	if (SubActions.Num() > 0)

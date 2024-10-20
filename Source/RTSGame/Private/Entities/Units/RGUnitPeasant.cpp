@@ -1,6 +1,8 @@
 // https://github.com/Kyrylo-Smyrnov/RTSGame
 
 #include "Entities/Units/RGUnitPeasant.h"
+
+#include "Entities/Actions/RGCollectResourceAction.h"
 #include "Entities/Actions/RGConstructBuildingAction.h"
 #include "Entities/Buildings/RGBuildingTownHall.h"
 
@@ -53,6 +55,13 @@ void ARGUnitPeasant::InitializeActions()
 	BuildTownHallAction->InitializeAction(BuildingTownHallBlueprintClass, PlayerPawn);
 	BuildTownHallData.ActionIcon = LoadObject<UTexture2D>(nullptr, TEXT("/Game/UI/Icons/Entities/Units/Peasant/T_IconBuildTownHall"));
 	BuildTownHallAction->SetActionData(BuildTownHallData);
+
+	URGCollectResourceAction* CollectResourceAction = NewObject<URGCollectResourceAction>();
+	FRGActionData CollectResourceData = UnitActions::Peasant_CollectResource;
+	CollectResourceAction->InitializeAction(this);
+	CollectResourceData.ActionIcon = LoadObject<UTexture2D>(nullptr, TEXT("/Game/UI/Icons/Entities/Units/Peasant/T_IconCollectResource"));
+	CollectResourceAction->SetActionData(CollectResourceData);
 	
 	AvailableActions.Add(BuildTownHallAction);
+	AvailableActions.Add(CollectResourceAction);
 }

@@ -14,7 +14,6 @@
 DEFINE_LOG_CATEGORY_STATIC(LogRGResourceBase, All, All);
 
 ARGResourceBase::ARGResourceBase()
-	: bIsDead(false), Health(100.0f)
 {
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -82,14 +81,12 @@ void ARGResourceBase::HandleOnClicked(AActor* TouchedActor, FKey ButtonPressed)
 	}
 }
 
-void ARGResourceBase::DealDamage(const float Amount)
+void ARGResourceBase::ReceiveDamage(float DamageAmount, AActor* DamageCauser)
 {
-	Health -= Amount;
-
-	if (Health <= 0)
+	ResourceAmount -= DamageAmount;
+	if(ResourceAmount <= 0)
 	{
-		bIsDead = true;
-		Destroy();
+		UE_LOG(LogRGResourceBase, Warning, TEXT("[ReceiveDamage] TOCHANGE: I'm Dead"));
 	}
 }
 
@@ -117,7 +114,7 @@ void ARGResourceBase::BlinkDecal()
 {
 	bIsDecalVisible = !bIsDecalVisible;
 	DecalComponent->SetVisibility(bIsDecalVisible);
-	
+
 	static int32 BlinkCount = 0;
 	BlinkCount++;
 

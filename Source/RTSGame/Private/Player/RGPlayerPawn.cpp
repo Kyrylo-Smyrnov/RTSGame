@@ -2,6 +2,7 @@
 
 #include "Player/RGPlayerPawn.h"
 #include "Entities/Actions/RGMoveToAction.h"
+#include "Entities/Actions/RGTargetTypeActorAction.h"
 #include "Entities/Buildings/RGBuildingBase.h"
 #include "Entities/Units/RGUnitBase.h"
 #include "Player/RGPlayerCameraComponent.h"
@@ -29,6 +30,27 @@ void ARGPlayerPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 }
 
+void ARGPlayerPawn::HandleLeftMouseButtonInputPressed(FVector2D MousePosition)
+{
+	if (bIsAwaitingTarget)
+	{
+		TVariant<FVector, AActor*> TargetVariant;
+
+		if (AwaitingAction && AwaitingAction->GetActionData().TargetType == EActionTargetType::Actor)
+		{
+			FHitResult HitResult;
+			if (PlayerController->GetHitResultUnderCursorByChannel(UEngineTypes::ConvertToTraceType(ECC_GameTraceChannel1), true, HitResult))
+			{
+				if (HitResult.Actor.IsValid())
+				{
+					TargetVariant.Set<AActor*>(HitResult.Actor.Get());
+					ExecuteActionWithTarget(TargetVariant, PlayerController->IsInputKeyDown(EKeys::LeftShift));
+				}
+			}
+		}
+	}
+}
+
 void ARGPlayerPawn::HandleLeftMouseButtonInputPressedUninteractable()
 {
 	if (bIsAwaitingTarget)
@@ -49,8 +71,15 @@ void ARGPlayerPawn::HandleLeftMouseButtonInputPressedUninteractable()
 			FHitResult HitResult;
 			if (PlayerController->GetHitResultUnderCursorByChannel(UEngineTypes::ConvertToTraceType(ECC_GameTraceChannel1), true, HitResult))
 			{
-				TargetVariant.Set<AActor*>(HitResult.GetActor());
-				ExecuteActionWithTarget(TargetVariant, PlayerController->IsInputKeyDown(EKeys::LeftShift));
+				if (HitResult.Actor.IsValid())
+				{
+					TargetVariant.Set<AActor*>(HitResult.Actor.Get());
+					ExecuteActionWithTarget(TargetVariant, PlayerController->IsInputKeyDown(EKeys::LeftShift));
+				}
+				else
+				{
+					UE_LOG(LogRGPlayerPawn, Warning, TEXT("[HandleLeftMouseButtonInputPressedUninteractable] HitResult.Actor is invalid."));
+				}
 			}
 		}
 	}
@@ -212,9 +241,14 @@ void ARGPlayerPawn::BeginPlay()
 	PlayerController = Cast<ARGPlayerController>(GetController());
 
 	if (PlayerController)
+	{
+		PlayerController->LeftMouseButtonInputPressed.AddUObject(this, &ARGPlayerPawn::HandleLeftMouseButtonInputPressed);
 		PlayerController->LeftMouseButtonInputPressedUninteractable.AddUObject(this, &ARGPlayerPawn::HandleLeftMouseButtonInputPressedUninteractable);
+	}
 	else
+	{
 		UE_LOG(LogRGPlayerPawn, Warning, TEXT("[BeginPlay] PlayerController is nullptr."))
+	}
 }
 
 bool ARGPlayerPawn::CompareEntityImportance(const AActor& A, const AActor& B)
@@ -256,15 +290,16 @@ void ARGPlayerPawn::ExecuteActionWithTarget(TVariant<FVector, AActor*> TargetVar
 		{
 			IRGAction* NewActionInstance = Cast<IRGAction>(DuplicateObject(ActionObj, this));
 
-			if(TargetVariant.IsType<FVector>())
+			if (TargetVariant.IsType<FVector>())
 			{
-				if(IRGTargetTypeLocationAction* TargetTypeLocationAction = Cast<IRGTargetTypeLocationAction>(NewActionInstance))
+				if (IRGTargetTypeLocationAction* TargetTypeLocationAction = Cast<IRGTargetTypeLocationAction>(NewActionInstance))
 					TargetTypeLocationAction->SetDestination(TargetVariant.Get<FVector>());
 			}
-			// else if(NewActionInstance->GetActionData().TargetType == EActionTargetType::Actor)
-			// {
-			// 	 TODO: When actions with target type actor will be implemented.
-			// }
+			else if (NewActionInstance->GetActionData().TargetType == EActionTargetType::Actor)
+			{
+				if (IRGTargetTypeActorAction* TargetTypeActorAction = Cast<IRGTargetTypeActorAction>(NewActionInstance))
+					TargetTypeActorAction->SetTarget(TargetVariant.Get<AActor*>());
+			}
 
 			if (IRGUnitAction* UnitAction = Cast<IRGUnitAction>(NewActionInstance))
 				UnitAction->InitializeAction(Unit);

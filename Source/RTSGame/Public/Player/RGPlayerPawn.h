@@ -25,6 +25,8 @@ class RTSGAME_API ARGPlayerPawn : public APawn
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	UFUNCTION()
+	void HandleLeftMouseButtonInputPressed(FVector2D MousePosition);
+	UFUNCTION()
 	void HandleLeftMouseButtonInputPressedUninteractable();
 
 	UFUNCTION(BlueprintCallable)

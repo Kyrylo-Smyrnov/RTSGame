@@ -40,4 +40,16 @@ FRGActionData Peasant_BuildTownHall = FRGActionData{
 	10,
 	EActionTargetType::None
 };
+
+FRGActionData Peasant_CollectResource = FRGActionData{
+	"CollectResource",
+	nullptr,
+	FText::FromString(""),
+	0,
+	0,
+	0,
+	0,
+	0,
+	EActionTargetType::Actor
+};
 } // namespace UnitActions

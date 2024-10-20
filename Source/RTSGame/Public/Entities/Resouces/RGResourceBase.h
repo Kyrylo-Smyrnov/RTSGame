@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Entities/RGAttackable.h"
 #include "GameFramework/Actor.h"
 #include "RGResourceBase.generated.h"
 
@@ -10,7 +11,7 @@ class ARGPlayerController;
 class ARGPlayerPawn;
 
 UCLASS()
-class RTSGAME_API ARGResourceBase : public AActor
+class RTSGAME_API ARGResourceBase : public AActor, public IRGAttackable
 {
 	GENERATED_BODY()
 
@@ -20,9 +21,7 @@ class RTSGAME_API ARGResourceBase : public AActor
 
 	UFUNCTION()
 	void HandleOnClicked(AActor* TouchedActor, FKey ButtonPressed);
-
-	UFUNCTION(BlueprintCallable)
-	void DealDamage(const float Amount);
+	virtual void ReceiveDamage(float DamageAmount, AActor* DamageCauser) override;
 
   protected:
 	virtual void BeginPlay() override;
@@ -31,11 +30,8 @@ class RTSGAME_API ARGResourceBase : public AActor
 	UStaticMeshComponent* StaticMeshComponent;
 	UPROPERTY(EditDefaultsOnly, Category = "Components")
 	UDecalComponent* DecalComponent;
-
-	UPROPERTY(BlueprintReadOnly, Category = "Health")
-	bool bIsDead;
-	UPROPERTY(BlueprintReadOnly, Category = "Health")
-	int32 Health;
+	
+	int32 ResourceAmount;
 
   private:
 	void BlinkDecal();

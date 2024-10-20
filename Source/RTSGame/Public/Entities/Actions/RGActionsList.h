@@ -13,4 +13,5 @@ namespace UnitActions
 {
 extern FRGActionData Base_Move;
 extern FRGActionData Peasant_BuildTownHall;
+extern FRGActionData Peasant_CollectResource;
 } // namespace UnitActions
