@@ -7,6 +7,7 @@
 #include "Entities/BBKeys.h"
 #include "Entities/Buildings/RGBuildingBase.h"
 #include "Entities/Units/RGUnitBase.h"
+#include "Entities/Units/RGUnitPeasant.h"
 #include "Kismet/GameplayStatics.h"
 #include "Player/RGPlayerController.h"
 #include "Player/RGPlayerPawn.h"
@@ -26,6 +27,8 @@ ARGResourceBase::ARGResourceBase()
 	DecalComponent = CreateDefaultSubobject<UDecalComponent>("DecalComponent");
 	DecalComponent->SetupAttachment(GetRootComponent());
 	DecalComponent->SetVisibility(false);
+
+	ResourceAmount = 100;
 }
 
 void ARGResourceBase::Tick(float DeltaTime)
@@ -84,8 +87,14 @@ void ARGResourceBase::HandleOnClicked(AActor* TouchedActor, FKey ButtonPressed)
 void ARGResourceBase::ReceiveDamage(float DamageAmount, AActor* DamageCauser)
 {
 	ResourceAmount -= DamageAmount;
+	ARGUnitPeasant* CastedPeasant = Cast<ARGUnitPeasant>(DamageCauser);
+	if(CastedPeasant)
+		CastedPeasant->AddCarryingWood(DamageAmount);
+	
+	UE_LOG(LogRGResourceBase, Warning, TEXT("[ReceiveDamage] TOCHANGE: Current Health: %i"), ResourceAmount);
 	if(ResourceAmount <= 0)
 	{
+		Destroy();
 		UE_LOG(LogRGResourceBase, Warning, TEXT("[ReceiveDamage] TOCHANGE: I'm Dead"));
 	}
 }

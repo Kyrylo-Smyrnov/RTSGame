@@ -35,9 +35,16 @@ void URGAttackAction::Execute_Implementation()
 		return;
 	}
 
+	
+
 	URGUnitAnimInstance* UnitAnimInstance = Cast<URGUnitAnimInstance>(ControlledUnit->GetMesh()->GetAnimInstance());
 	if(UnitAnimInstance)
 		UnitAnimInstance->SetIsAttacking(true);
+
+	FVector DirectionToTarget = (Target->GetActorLocation() - ControlledUnit->GetActorLocation()).GetSafeNormal();
+	FRotator RotationToTarget = FRotator(ControlledUnit->GetActorRotation().Pitch, DirectionToTarget.Rotation().Yaw, DirectionToTarget.Rotation().Roll);
+	ControlledUnit->SetActorRotation(RotationToTarget);
+	
 	ControlledUnit->GetWorld()->GetTimerManager().SetTimer(AttackTimerHandle, this, &URGAttackAction::ExecuteAttack, AttackSpeed, true);
 }
 
@@ -48,7 +55,7 @@ void URGAttackAction::ExecuteAttack()
 		StopAttack();
 		return;
 	}
-
+	
 	float DistanceToTarget = FVector::Dist(ControlledUnit->GetActorLocation(), Target->GetActorLocation());
 	if(DistanceToTarget > AttackRange)
 	{
@@ -66,12 +73,8 @@ void URGAttackAction::ExecuteAttack()
 void URGAttackAction::StopAttack()
 {
 	if(AttackTimerHandle.IsValid())
-	{
 		if(GetWorld())
-		{
 			GetWorld()->GetTimerManager().ClearTimer(AttackTimerHandle);
-		}
-	}
 	
 	URGUnitAnimInstance* UnitAnimInstance = Cast<URGUnitAnimInstance>(ControlledUnit->GetMesh()->GetAnimInstance());
 	if(UnitAnimInstance)

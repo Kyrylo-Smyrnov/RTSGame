@@ -1,6 +1,8 @@
 // https://github.com/Kyrylo-Smyrnov/RTSGame
 
 #include "Player/RGPlayerPawn.h"
+
+#include "ToolContextInterfaces.h"
 #include "Entities/Actions/RGMoveToAction.h"
 #include "Entities/Actions/RGTargetTypeActorAction.h"
 #include "Entities/Buildings/RGBuildingBase.h"
@@ -30,62 +32,35 @@ void ARGPlayerPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 }
 
-void ARGPlayerPawn::HandleLeftMouseButtonInputPressed(FVector2D MousePosition)
+void ARGPlayerPawn::HandleLeftMouseButtonInputPressed()
 {
-	if (bIsAwaitingTarget)
+	FHitResult HitResult;
+	
+	if(PlayerController->GetHitResultUnderCursor(ECC_GameTraceChannel1, true, HitResult))
 	{
-		TVariant<FVector, AActor*> TargetVariant;
-
-		if (AwaitingAction && AwaitingAction->GetActionData().TargetType == EActionTargetType::Actor)
+		if(AwaitingAction && AwaitingAction->GetActionData().TargetType == EActionTargetType::Actor)
 		{
-			FHitResult HitResult;
-			if (PlayerController->GetHitResultUnderCursorByChannel(UEngineTypes::ConvertToTraceType(ECC_GameTraceChannel1), true, HitResult))
+			TVariant<FVector, AActor*> TargetVariant;
+			if(HitResult.Actor.IsValid())
 			{
-				if (HitResult.Actor.IsValid())
-				{
-					TargetVariant.Set<AActor*>(HitResult.Actor.Get());
-					ExecuteActionWithTarget(TargetVariant, PlayerController->IsInputKeyDown(EKeys::LeftShift));
-				}
-			}
-		}
-	}
-}
-
-void ARGPlayerPawn::HandleLeftMouseButtonInputPressedUninteractable()
-{
-	if (bIsAwaitingTarget)
-	{
-		TVariant<FVector, AActor*> TargetVariant;
-
-		if (AwaitingAction && AwaitingAction->GetActionData().TargetType == EActionTargetType::Location)
-		{
-			FHitResult HitResult;
-			if (PlayerController->GetHitResultUnderCursorByChannel(UEngineTypes::ConvertToTraceType(ECC_Visibility), true, HitResult))
-			{
-				TargetVariant.Set<FVector>(HitResult.Location);
+				TargetVariant.Set<AActor*>(HitResult.Actor.Get());
 				ExecuteActionWithTarget(TargetVariant, PlayerController->IsInputKeyDown(EKeys::LeftShift));
 			}
 		}
-		else if (AwaitingAction && AwaitingAction->GetActionData().TargetType == EActionTargetType::Actor)
-		{
-			FHitResult HitResult;
-			if (PlayerController->GetHitResultUnderCursorByChannel(UEngineTypes::ConvertToTraceType(ECC_GameTraceChannel1), true, HitResult))
-			{
-				if (HitResult.Actor.IsValid())
-				{
-					TargetVariant.Set<AActor*>(HitResult.Actor.Get());
-					ExecuteActionWithTarget(TargetVariant, PlayerController->IsInputKeyDown(EKeys::LeftShift));
-				}
-				else
-				{
-					UE_LOG(LogRGPlayerPawn, Warning, TEXT("[HandleLeftMouseButtonInputPressedUninteractable] HitResult.Actor is invalid."));
-				}
-			}
-		}
 	}
-	else
+	else if (PlayerController->GetHitResultUnderCursorByChannel(UEngineTypes::ConvertToTraceType(ECC_Visibility), true, HitResult))
 	{
-		ClearSelectedEntities();
+		if (AwaitingAction && AwaitingAction->GetActionData().TargetType == EActionTargetType::Location)
+		{
+			TVariant<FVector, AActor*> TargetVariant;
+			TargetVariant.Set<FVector>(HitResult.Location);
+			ExecuteActionWithTarget(TargetVariant, PlayerController->IsInputKeyDown(EKeys::LeftShift));
+			
+		}
+		else
+		{
+			ClearSelectedEntities();
+		}
 	}
 }
 
@@ -243,7 +218,6 @@ void ARGPlayerPawn::BeginPlay()
 	if (PlayerController)
 	{
 		PlayerController->LeftMouseButtonInputPressed.AddUObject(this, &ARGPlayerPawn::HandleLeftMouseButtonInputPressed);
-		PlayerController->LeftMouseButtonInputPressedUninteractable.AddUObject(this, &ARGPlayerPawn::HandleLeftMouseButtonInputPressedUninteractable);
 	}
 	else
 	{
@@ -295,7 +269,7 @@ void ARGPlayerPawn::ExecuteActionWithTarget(TVariant<FVector, AActor*> TargetVar
 				if (IRGTargetTypeLocationAction* TargetTypeLocationAction = Cast<IRGTargetTypeLocationAction>(NewActionInstance))
 					TargetTypeLocationAction->SetDestination(TargetVariant.Get<FVector>());
 			}
-			else if (NewActionInstance->GetActionData().TargetType == EActionTargetType::Actor)
+			else if (TargetVariant.IsType<AActor*>())
 			{
 				if (IRGTargetTypeActorAction* TargetTypeActorAction = Cast<IRGTargetTypeActorAction>(NewActionInstance))
 					TargetTypeActorAction->SetTarget(TargetVariant.Get<AActor*>());

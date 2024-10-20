@@ -3,7 +3,6 @@
 #include "Entities/Actions/RGCollectResourceAction.h"
 #include "Entities/Actions/RGAttackAction.h"
 #include "Entities/Actions/RGMoveToAction.h"
-#include "Entities/Resouces/RGResourceBase.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogRGCollectResourceAction, All, All);
 
@@ -32,12 +31,6 @@ void URGCollectResourceAction::Execute_Implementation()
 	if (!ControlledUnit)
 	{
 		UE_LOG(LogRGCollectResourceAction, Warning, TEXT("[Execute] It is necessary to initialize the action before execution."));
-		return;
-	}
-
-	if (SubActions.Num() < 2)
-	{
-		UE_LOG(LogRGCollectResourceAction, Warning, TEXT("[Execute] It is necessary to set up the target before execution."));
 		return;
 	}
 

@@ -64,9 +64,9 @@ void ARGPlayerHUD::BeginPlay()
 	}
 }
 
-void ARGPlayerHUD::HandleLeftMouseButtonInputPressed(FVector2D MousePosition)
+void ARGPlayerHUD::HandleLeftMouseButtonInputPressed()
 {
-	SelectionBoxStartPoint = MousePosition;
+	PlayerController->GetMousePosition(SelectionBoxStartPoint.X, SelectionBoxStartPoint.Y);
 	bIsSelectionBoxDrawn = true;
 }
 

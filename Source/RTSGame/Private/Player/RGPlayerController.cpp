@@ -59,14 +59,8 @@ void ARGPlayerController::OnMouseWheelInput(float Amount)
 
 void ARGPlayerController::OnLeftMouseButtonInputPressed()
 {
-	FVector2D MousePosition;
-	GetMousePosition(MousePosition.X, MousePosition.Y);
 	if (LeftMouseButtonInputPressed.IsBound())
-		LeftMouseButtonInputPressed.Broadcast(MousePosition);
-
-	FHitResult HitResult;
-	if (!GetHitResultUnderCursor(ECC_GameTraceChannel1, true, HitResult) && LeftMouseButtonInputPressedUninteractable.IsBound())
-		LeftMouseButtonInputPressedUninteractable.Broadcast();
+		LeftMouseButtonInputPressed.Broadcast();
 }
 
 void ARGPlayerController::OnLeftMouseButtonInputReleased()

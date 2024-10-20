@@ -24,7 +24,7 @@ class RTSGAME_API ARGPlayerHUD : public AHUD
 	virtual void BeginPlay() override;
 
   private:
-	void HandleLeftMouseButtonInputPressed(FVector2D MousePosition);
+	void HandleLeftMouseButtonInputPressed();
 	void HandleLeftMouseButtonInputReleased();
 
 	void DrawSelectionBox();

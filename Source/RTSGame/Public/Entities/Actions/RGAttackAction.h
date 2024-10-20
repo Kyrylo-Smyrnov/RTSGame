@@ -31,5 +31,5 @@ class RTSGAME_API URGAttackAction : public UObject, public IRGAction, public IRG
 
 	int32 DamageAmount = 10;
 	int32 AttackSpeed = 1;
-	int32 AttackRange = 70;
+	int32 AttackRange = 200;
 };
