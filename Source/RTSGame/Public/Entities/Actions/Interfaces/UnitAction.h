@@ -4,17 +4,17 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Interface.h"
-#include "RGUnitAction.generated.h"
+#include "UnitAction.generated.h"
 
 class ARGUnitBase;
 
 UINTERFACE(MinimalAPI)
-class URGUnitAction : public UInterface
+class UUnitAction : public UInterface
 {
 	GENERATED_BODY()
 };
 
-class RTSGAME_API IRGUnitAction
+class RTSGAME_API IUnitAction
 {
 	GENERATED_BODY()
 

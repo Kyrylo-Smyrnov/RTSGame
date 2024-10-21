@@ -2,19 +2,18 @@
 
 #pragma once
 
-#include "RGAction.h"
 #include "CoreMinimal.h"
-#include "BaseAction.h"
-#include "RGConstructBuildingAction.generated.h"
+#include "Entities/Actions/BaseAction.h"
+#include "ConstructBuildingAction.generated.h"
 
 class ARGPlayerPawn;
 
 UCLASS()
-class RTSGAME_API URGConstructBuildingAction : public UBaseAction
+class RTSGAME_API UConstructBuildingAction : public UBaseAction
 {
 	GENERATED_BODY()
   public:
-	URGConstructBuildingAction();
+	UConstructBuildingAction();
 	
 	void InitializeAction(TSubclassOf<AActor> InBuildingClass, ARGPlayerPawn* InPlayerPawn);
 	virtual void Execute_Implementation() override;

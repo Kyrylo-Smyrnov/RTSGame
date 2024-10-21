@@ -3,15 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "RGTargetTypeActorAction.h"
-#include "Entities/Actions/RGCompositeAction.h"
-#include "RGUnitAction.h"
-#include "RGCollectResourceAction.generated.h"
+#include "Entities/Actions/CompositeAction.h"
+#include "Entities/Actions/Interfaces/TargetTypeActorAction.h"
+#include "CollectResourceAction.generated.h"
 
 class ARGResourceBase;
 
 UCLASS()
-class RTSGAME_API URGCollectResourceAction : public URGCompositeAction, public IRGTargetTypeActorAction
+class RTSGAME_API UCollectResourceAction : public UCompositeAction, public ITargetTypeActorAction
 {
 	GENERATED_BODY()
 

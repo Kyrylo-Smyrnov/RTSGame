@@ -1,32 +1,32 @@
 // https://github.com/Kyrylo-Smyrnov/RTSGame
 
-#include "Entities/Actions/RGCollectResourceAction.h"
-#include "Entities/Actions/RGAttackAction.h"
-#include "Entities/Actions/RGMoveToAction.h"
+#include "Entities/Actions/Implementation/CollectResourceAction.h"
+#include "Entities/Actions/Implementation/AttackAction.h"
+#include "Entities/Actions/Implementation/MoveToAction.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogRGCollectResourceAction, All, All);
 
-void URGCollectResourceAction::InitializeAction(ARGUnitBase* Unit)
+void UCollectResourceAction::InitializeAction(ARGUnitBase* Unit)
 {
 	Super::InitializeAction(Unit);
 }
 
-void URGCollectResourceAction::SetTarget(AActor* InTarget)
+void UCollectResourceAction::SetTarget(AActor* InTarget)
 {
 	Target = InTarget;
 
-	URGMoveToAction* MoveToAction = NewObject<URGMoveToAction>(this);
+	UMoveToAction* MoveToAction = NewObject<UMoveToAction>(this);
 	MoveToAction->InitializeAction(ControlledUnit);
 	MoveToAction->SetDestination(Target->GetActorLocation());
 	AddSubAction(MoveToAction);
 
-	URGAttackAction* AttackAction = NewObject<URGAttackAction>(this);
+	UAttackAction* AttackAction = NewObject<UAttackAction>(this);
 	AttackAction->InitializeAction(ControlledUnit);
 	AttackAction->SetTarget(Target);
 	AddSubAction(AttackAction);
 }
 
-void URGCollectResourceAction::Execute_Implementation()
+void UCollectResourceAction::Execute_Implementation()
 {
 	if (!ControlledUnit)
 	{

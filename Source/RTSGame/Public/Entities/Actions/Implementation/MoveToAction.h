@@ -3,11 +3,10 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "BaseAction.h"
-#include "RGAction.h"
-#include "RGTargetTypeLocationAction.h"
-#include "RGUnitAction.h"
-#include "RGMoveToAction.generated.h"
+#include "Entities/Actions/BaseAction.h"
+#include "Entities/Actions/Interfaces/TargetTypeLocationAction.h"
+#include "Entities/Actions/Interfaces/UnitAction.h"
+#include "MoveToAction.generated.h"
 
 struct FPathFollowingResult;
 struct FAIRequestID;
@@ -15,12 +14,12 @@ class ARGUnitAIController;
 class ARGUnitBase;
 
 UCLASS()
-class RTSGAME_API URGMoveToAction : public UBaseAction, public IRGUnitAction, public IRGTargetTypeLocationAction
+class RTSGAME_API UMoveToAction : public UBaseAction, public IUnitAction, public ITargetTypeLocationAction
 {
 	GENERATED_BODY()
 
   public:
-	URGMoveToAction();
+	UMoveToAction();
 	virtual void InitializeAction(ARGUnitBase* Unit) override;
 	virtual void SetDestination(FVector InDestination) override;
 	virtual void Execute_Implementation() override;

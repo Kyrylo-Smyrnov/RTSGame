@@ -3,8 +3,8 @@
 #include "Entities/Units/RGUnitBase.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/DecalComponent.h"
-#include "Entities/Actions/RGActionQueue.h"
-#include "Entities/Actions/RGMoveToAction.h"
+#include "Entities/Actions/ActionQueue.h"
+#include "Entities/Actions/Implementation/MoveToAction.h"
 #include "Kismet/GameplayStatics.h"
 #include "Player/RGPlayerController.h"
 
@@ -58,11 +58,6 @@ TArray<UBaseAction*> ARGUnitBase::GetAvailableActions()
 	return AvailableActions;
 }
 
-URGMoveToAction* ARGUnitBase::GetMoveToAction() const
-{
-	return MoveAction;
-}
-
 void ARGUnitBase::BeginPlay()
 {
 	Super::BeginPlay();
@@ -83,7 +78,7 @@ void ARGUnitBase::BeginPlay()
 	}
 
 	InitializeActions();
-	ActionQueue = NewObject<URGActionQueue>();
+	ActionQueue = NewObject<UActionQueue>();
 	ActionQueue->Initialize(this);
 }
 
@@ -136,17 +131,16 @@ void ARGUnitBase::HandleOnClicked(AActor* TouchedActor, FKey ButtonPressed)
 
 void ARGUnitBase::InitializeActions()
 {
-	URGMoveToAction* MoveToAction = NewObject<URGMoveToAction>();
-	FRGActionData MoveToData = UnitActions::Base_Move;
+	UMoveToAction* MoveToAction = NewObject<UMoveToAction>();
+	FActionData MoveToData = UnitActions::Base_Move;
 	MoveToData.ActionIcon = LoadObject<UTexture2D>(nullptr, TEXT("/Game/UI/Icons/Entities/Units/T_IconMoveTo.T_IconMoveTo"));
 	MoveToAction->InitializeAction(this);
 	MoveToAction->SetActionData(MoveToData);
-	MoveAction = MoveToAction;
 
 	AvailableActions.Add(MoveToAction);
 }
 
-void ARGUnitBase::AddActionToQueue(IRGAction* Action) const
+void ARGUnitBase::AddActionToQueue(UBaseAction* Action) const
 {
 	ActionQueue->EnqueueAction(Action);
 }
@@ -156,7 +150,7 @@ void ARGUnitBase::ClearActionQueue() const
 	ActionQueue->ClearQueue();
 }
 
-bool ARGUnitBase::CanPerformAction(IRGAction* Action)
+bool ARGUnitBase::CanPerformAction(UBaseAction* Action)
 {
 	UObject* ActionObj = Cast<UObject>(Action);
 	if(!ActionObj)
@@ -165,7 +159,7 @@ bool ARGUnitBase::CanPerformAction(IRGAction* Action)
 		return false;
 	}
 	
-	for(IRGAction* AvailableAction : AvailableActions)
+	for(UBaseAction* AvailableAction : AvailableActions)
 	{
 		UObject* AvailableActionObj = Cast<UObject>(AvailableAction);
 		if(AvailableActionObj && AvailableActionObj->GetClass() == ActionObj->GetClass())

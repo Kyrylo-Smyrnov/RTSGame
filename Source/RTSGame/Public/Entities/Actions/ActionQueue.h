@@ -3,19 +3,19 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "RGActionQueue.generated.h"
+#include "ActionQueue.generated.h"
 
+class UBaseAction;
 class ARGUnitBase;
-class IRGAction;
 
 UCLASS()
-class RTSGAME_API URGActionQueue : public UObject
+class RTSGAME_API UActionQueue : public UObject
 {
 	GENERATED_BODY()
 
   public:
 	void Initialize(ARGUnitBase* InUnit);
-	void EnqueueAction(IRGAction* NewAction);
+	void EnqueueAction(UBaseAction* NewAction);
 	void ExecuteNextAction();
 	void OnActionCompleted();
 	void ClearQueue();
@@ -23,5 +23,5 @@ class RTSGAME_API URGActionQueue : public UObject
   private:
 	UPROPERTY()
 	ARGUnitBase* ControlledUnit;
-	TArray<IRGAction*> ActionQueue;
+	TArray<UBaseAction*> ActionQueue;
 };

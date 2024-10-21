@@ -3,19 +3,19 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "RGActionData.h"
+#include "Entities/Actions/ActionData.h"
 #include "UObject/Interface.h"
-#include "RGAction.generated.h"
+#include "Action.generated.h"
 
 DECLARE_MULTICAST_DELEGATE(FOnActionCompleted);
 
 UINTERFACE(MinimalAPI)
-class URGAction : public UInterface
+class UAction : public UInterface
 {
 	GENERATED_BODY()
 };
 
-class RTSGAME_API IRGAction
+class RTSGAME_API IAction
 {
 	GENERATED_BODY()
 
@@ -23,12 +23,12 @@ class RTSGAME_API IRGAction
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Action")
 	void Execute();
 
-	void SetActionData(const FRGActionData& InActionData);
-	FRGActionData& GetActionData();
+	void SetActionData(const FActionData& InActionData);
+	FActionData& GetActionData();
 
 	virtual FOnActionCompleted& OnActionCompletedDelegate();
 
   protected:
-	FRGActionData ActionData;
+	FActionData ActionData;
 	FOnActionCompleted OnActionCompleted;
 };

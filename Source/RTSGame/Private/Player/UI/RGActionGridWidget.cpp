@@ -165,7 +165,6 @@ void URGActionGridWidget::HandleButtonClick()
 				if (ActionButton.Value->GetActionData().TargetType != EActionTargetType::None)
 				{
 					PlayerPawn->SetAwaitingAction(ActionButton.Value);
-					UE_LOG(LogRGActionGridWidget, Log, TEXT("[HandleButtonClick] Awaiting target for action: %s"), *ActionButton.Value->GetActionData().ActionName.ToString());
 				}
 				else
 				{

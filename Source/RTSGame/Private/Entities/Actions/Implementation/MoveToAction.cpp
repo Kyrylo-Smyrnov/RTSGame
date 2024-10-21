@@ -1,6 +1,6 @@
 // https://github.com/Kyrylo-Smyrnov/RTSGame
 
-#include "Entities/Actions/RGMoveToAction.h"
+#include "Entities/Actions/Implementation/MoveToAction.h"
 #include "AITypes.h"
 #include "Entities/Units/AI/RGUnitAIController.h"
 #include "Entities/Units/RGUnitBase.h"
@@ -8,23 +8,23 @@
 
 DEFINE_LOG_CATEGORY_STATIC(LogRGMoveToAction, All, All)
 
-URGMoveToAction::URGMoveToAction()
+UMoveToAction::UMoveToAction()
 	: ControlledUnit(nullptr), AIController(nullptr), Destination(FVector::ZeroVector)
 {
 }
 
-void URGMoveToAction::InitializeAction(ARGUnitBase* Unit)
+void UMoveToAction::InitializeAction(ARGUnitBase* Unit)
 {
 	ControlledUnit = Unit;
 	AIController = Cast<ARGUnitAIController>(ControlledUnit->GetController());
 }
 
-void URGMoveToAction::SetDestination(FVector InDestination)
+void UMoveToAction::SetDestination(FVector InDestination)
 {
 	Destination = InDestination;
 }
 
-void URGMoveToAction::Execute_Implementation()
+void UMoveToAction::Execute_Implementation()
 {
 	if (!ControlledUnit || !AIController)
 	{
@@ -43,12 +43,12 @@ void URGMoveToAction::Execute_Implementation()
 	FPathFollowingRequestResult RequestResult = AIController->MoveTo(MoveRequest, &NavPath);
 
 	if (RequestResult.Code == EPathFollowingRequestResult::RequestSuccessful)
-		AIController->GetPathFollowingComponent()->OnRequestFinished.AddUObject(this, &URGMoveToAction::OnMoveCompleted);
+		AIController->GetPathFollowingComponent()->OnRequestFinished.AddUObject(this, &UMoveToAction::OnMoveCompleted);
 	else
 		UE_LOG(LogRGMoveToAction, Warning, TEXT("[Execute] MoveTo request failed."));
 }
 
-void URGMoveToAction::OnMoveCompleted(FAIRequestID RequestID, const FPathFollowingResult& Result)
+void UMoveToAction::OnMoveCompleted(FAIRequestID RequestID, const FPathFollowingResult& Result)
 {
 	AIController->GetPathFollowingComponent()->OnRequestFinished.RemoveAll(this);
 	

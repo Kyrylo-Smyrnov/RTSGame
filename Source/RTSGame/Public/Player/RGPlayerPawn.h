@@ -3,7 +3,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Entities/Actions/RGAction.h"
 #include "GameFramework/Pawn.h"
 #include "RGPlayerPawn.generated.h"
 
@@ -64,7 +63,7 @@ class RTSGAME_API ARGPlayerPawn : public APawn
 	UPROPERTY()
 	TArray<AActor*> SelectedEntities;
 
-	IRGAction* AwaitingAction;
+	UBaseAction* AwaitingAction;
 
 	int32 PlayerWoodResource;
 	bool bIsAwaitingTarget;

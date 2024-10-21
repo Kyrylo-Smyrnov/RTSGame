@@ -91,11 +91,9 @@ void ARGResourceBase::ReceiveDamage(float DamageAmount, AActor* DamageCauser)
 	if(CastedPeasant)
 		CastedPeasant->AddCarryingWood(DamageAmount);
 	
-	UE_LOG(LogRGResourceBase, Warning, TEXT("[ReceiveDamage] TOCHANGE: Current Health: %i"), ResourceAmount);
 	if(ResourceAmount <= 0)
 	{
 		Destroy();
-		UE_LOG(LogRGResourceBase, Warning, TEXT("[ReceiveDamage] TOCHANGE: I'm Dead"));
 	}
 }
 

@@ -3,20 +3,19 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "BaseAction.h"
-#include "RGAction.h"
-#include "RGSpawnUnitAction.generated.h"
+#include "Entities/Actions/BaseAction.h"
+#include "SpawnUnitAction.generated.h"
 
 class ARGPlayerPawn;
 class ARGBuildingBase;
 
 UCLASS()
-class RTSGAME_API URGSpawnUnitAction : public UBaseAction
+class RTSGAME_API USpawnUnitAction : public UBaseAction
 {
 	GENERATED_BODY()
 
   public:
-	URGSpawnUnitAction();
+	USpawnUnitAction();
 	
 	void InitializeAction(TSubclassOf<ACharacter> InUnitClass, ARGBuildingBase* InTargetBuilding, ARGPlayerPawn* PlayerPawn);
 	virtual void Execute_Implementation() override;

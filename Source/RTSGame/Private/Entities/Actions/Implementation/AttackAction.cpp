@@ -1,6 +1,6 @@
 // https://github.com/Kyrylo-Smyrnov/RTSGame
 
-#include "Entities/Actions/RGAttackAction.h"
+#include "Entities/Actions/Implementation/AttackAction.h"
 
 #include "Entities/RGAttackable.h"
 #include "Entities/Units/RGUnitBase.h"
@@ -8,7 +8,7 @@
 
 DEFINE_LOG_CATEGORY_STATIC(LogRGAttackAction, All, All)
 
-void URGAttackAction::InitializeAction(ARGUnitBase* Unit)
+void UAttackAction::InitializeAction(ARGUnitBase* Unit)
 {
 	ControlledUnit = Unit;
 	// DamageAmount = Unit->GetStatDamage();
@@ -16,12 +16,12 @@ void URGAttackAction::InitializeAction(ARGUnitBase* Unit)
 	// AttackRange = Unit->GetStatAttackRange();
 }
 
-void URGAttackAction::SetTarget(AActor* InTarget)
+void UAttackAction::SetTarget(AActor* InTarget)
 {
 	Target = InTarget;
 }
 
-void URGAttackAction::Execute_Implementation()
+void UAttackAction::Execute_Implementation()
 {
 	if (!ControlledUnit)
 	{
@@ -45,10 +45,10 @@ void URGAttackAction::Execute_Implementation()
 	FRotator RotationToTarget = FRotator(ControlledUnit->GetActorRotation().Pitch, DirectionToTarget.Rotation().Yaw, DirectionToTarget.Rotation().Roll);
 	ControlledUnit->SetActorRotation(RotationToTarget);
 	
-	ControlledUnit->GetWorld()->GetTimerManager().SetTimer(AttackTimerHandle, this, &URGAttackAction::ExecuteAttack, AttackSpeed, true);
+	ControlledUnit->GetWorld()->GetTimerManager().SetTimer(AttackTimerHandle, this, &UAttackAction::ExecuteAttack, AttackSpeed, true);
 }
 
-void URGAttackAction::ExecuteAttack()
+void UAttackAction::ExecuteAttack()
 {
 	if (!Target || Target->IsPendingKill() || !ControlledUnit || ControlledUnit->IsPendingKill())
 	{
@@ -70,7 +70,7 @@ void URGAttackAction::ExecuteAttack()
 	}
 }
 
-void URGAttackAction::StopAttack()
+void UAttackAction::StopAttack()
 {
 	if(AttackTimerHandle.IsValid())
 		if(GetWorld())

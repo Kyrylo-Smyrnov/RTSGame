@@ -3,14 +3,13 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "BaseAction.h"
-#include "RGAction.h"
-#include "RGTargetTypeActorAction.h"
-#include "RGUnitAction.h"
-#include "RGAttackAction.generated.h"
+#include "Entities/Actions/BaseAction.h"
+#include "Entities/Actions/Interfaces/TargetTypeActorAction.h"
+#include "Entities/Actions/Interfaces/UnitAction.h"
+#include "AttackAction.generated.h"
 
 UCLASS()
-class RTSGAME_API URGAttackAction : public UBaseAction, public IRGUnitAction, public IRGTargetTypeActorAction
+class RTSGAME_API UAttackAction : public UBaseAction, public IUnitAction, public ITargetTypeActorAction
 {
 	GENERATED_BODY()
 	

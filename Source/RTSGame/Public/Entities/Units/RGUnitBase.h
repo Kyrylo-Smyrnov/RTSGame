@@ -3,8 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Entities/Actions/RGAction.h"
-#include "Entities/Actions/RGActionsList.h"
+#include "Entities/Actions/ActionsList.h"
 #include "Entities/EntitiesImportance.h"
 #include "Entities/Actions/BaseAction.h"
 #include "GameFramework/Character.h"
@@ -27,14 +26,13 @@ class RTSGAME_API ARGUnitBase : public ACharacter
 	int32 GetImportance() const;
 	UTexture2D* GetSelectionIcon() const;
 	TArray<UBaseAction*> GetAvailableActions();
-	URGMoveToAction* GetMoveToAction() const;
 
 	void SetSelected(bool bIsSelected);
 
-	void AddActionToQueue(IRGAction* Action) const;
+	void AddActionToQueue(UBaseAction* Action) const;
 	void ClearActionQueue() const;
 
-	bool CanPerformAction(IRGAction* Action);
+	bool CanPerformAction(UBaseAction* Action);
 
   protected:
 	virtual void BeginPlay() override;
@@ -62,9 +60,7 @@ class RTSGAME_API ARGUnitBase : public ACharacter
 	UPROPERTY()
 	ARGPlayerController* PlayerController;
 	UPROPERTY()
-	URGMoveToAction* MoveAction;
-	UPROPERTY()
-	class URGActionQueue* ActionQueue;
+	class UActionQueue* ActionQueue;
 
 	bool bIsSelected;
 };

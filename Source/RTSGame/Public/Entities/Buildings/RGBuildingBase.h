@@ -3,9 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Entities/Actions/RGAction.h"
-#include "Entities/Actions/RGActionsList.h"
-#include "Entities/Actions/RGSpawnUnitAction.h"
+#include "Entities/Actions/ActionsList.h"
+#include "Entities/Actions/Implementation/SpawnUnitAction.h"
 #include "Entities/Buildings/SpawnQueueEntry.h"
 #include "Entities/EntitiesImportance.h"
 #include "Entities/Units/AI/RGUnitAIController.h"

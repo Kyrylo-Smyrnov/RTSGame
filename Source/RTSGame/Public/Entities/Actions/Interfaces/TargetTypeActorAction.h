@@ -4,15 +4,15 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Interface.h"
-#include "RGTargetTypeActorAction.generated.h"
+#include "TargetTypeActorAction.generated.h"
 
 UINTERFACE(MinimalAPI)
-class URGTargetTypeActorAction : public UInterface
+class UTargetTypeActorAction : public UInterface
 {
 	GENERATED_BODY()
 };
 
-class RTSGAME_API IRGTargetTypeActorAction
+class RTSGAME_API ITargetTypeActorAction
 {
 	GENERATED_BODY()
 

@@ -1,7 +1,7 @@
 // https://github.com/Kyrylo-Smyrnov/RTSGame
 
 #include "Entities/Units/AI/RGUnitAIController.h"
-#include "Entities/Actions/RGMoveToAction.h"
+#include "Entities/Actions/Implementation/MoveToAction.h"
 #include "Entities/Units/RGUnitBase.h"
 #include "Kismet/GameplayStatics.h"
 #include "Player/RGPlayerController.h"
@@ -34,8 +34,8 @@ void ARGUnitAIController::HandleRightMouseButtonInputPressed()
 	FHitResult HitResult;
 	if (PlayerController->GetHitResultUnderCursor(ECC_Visibility, true, HitResult))
 	{
-		URGMoveToAction* MoveAction = NewObject<URGMoveToAction>(Unit);
-		FRGActionData MoveToData = UnitActions::Base_Move;
+		UMoveToAction* MoveAction = NewObject<UMoveToAction>(Unit);
+		FActionData MoveToData = UnitActions::Base_Move;
 		MoveAction->InitializeAction(Unit);
 		MoveAction->SetActionData(MoveToData);
 		MoveAction->SetDestination(HitResult.Location);
@@ -52,8 +52,8 @@ void ARGUnitAIController::HandleRightMouseButtonInputPressed()
 	}
 	else if (PlayerController->GetHitResultUnderCursorByChannel(UEngineTypes::ConvertToTraceType(ECC_GameTraceChannel1), true, HitResult))
 	{
-		URGMoveToAction* MoveAction = NewObject<URGMoveToAction>(Unit);
-		FRGActionData MoveToData = UnitActions::Base_Move;
+		UMoveToAction* MoveAction = NewObject<UMoveToAction>(Unit);
+		FActionData MoveToData = UnitActions::Base_Move;
 		MoveAction->InitializeAction(Unit);
 		MoveAction->SetActionData(MoveToData);
 		MoveAction->SetDestination(HitResult.GetActor()->GetActorLocation());

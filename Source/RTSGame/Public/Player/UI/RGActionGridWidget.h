@@ -4,7 +4,6 @@
 
 #include "Blueprint/UserWidget.h"
 #include "CoreMinimal.h"
-#include "Entities/Actions/RGAction.h"
 #include "RGActionGridWidget.generated.h"
 
 class UBaseAction;

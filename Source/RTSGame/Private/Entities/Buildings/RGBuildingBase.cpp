@@ -3,7 +3,7 @@
 #include "Entities/Buildings/RGBuildingBase.h"
 #include "Components/DecalComponent.h"
 #include "Components/StaticMeshComponent.h"
-#include "Entities/Actions/RGMoveToAction.h"
+#include "Entities/Actions/Implementation/MoveToAction.h"
 #include "Entities/Buildings/RGBuildingBanner.h"
 #include "Entities/Units/RGUnitBase.h"
 #include "Kismet/GameplayStatics.h"
@@ -302,7 +302,8 @@ void ARGBuildingBase::SpawnNextUnit()
 				SpawnLocation.Z = 108;
 				ARGUnitBase* SpawnedUnit = GetWorld()->SpawnActor<ARGUnitBase>(CurrentEntry.UnitClass, SpawnLocation, FRotator::ZeroRotator);
 
-				URGMoveToAction* MoveToAction = SpawnedUnit->GetMoveToAction();
+				UMoveToAction* MoveToAction = NewObject<UMoveToAction>(this);
+				MoveToAction->InitializeAction(SpawnedUnit);
 				MoveToAction->SetDestination(LastBannerLocation);
 				MoveToAction->Execute_Implementation();
 

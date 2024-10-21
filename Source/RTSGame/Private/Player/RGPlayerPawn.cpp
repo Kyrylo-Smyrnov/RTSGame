@@ -1,10 +1,8 @@
 // https://github.com/Kyrylo-Smyrnov/RTSGame
 
 #include "Player/RGPlayerPawn.h"
-
-#include "ToolContextInterfaces.h"
-#include "Entities/Actions/RGMoveToAction.h"
-#include "Entities/Actions/RGTargetTypeActorAction.h"
+#include "Entities/Actions/Implementation/MoveToAction.h"
+#include "Entities/Actions/Interfaces/TargetTypeActorAction.h"
 #include "Entities/Buildings/RGBuildingBase.h"
 #include "Entities/Units/RGUnitBase.h"
 #include "Player/RGPlayerCameraComponent.h"
@@ -263,25 +261,25 @@ void ARGPlayerPawn::ExecuteActionWithTarget(TVariant<FVector, AActor*> TargetVar
 		UBaseAction* NewActionInstance = Cast<UBaseAction>(AwaitingAction);
 		if(NewActionInstance)
 		{
-			if(NewActionInstance->GetClass()->ImplementsInterface(URGUnitAction::StaticClass()))
+			if(NewActionInstance->GetClass()->ImplementsInterface(UUnitAction::StaticClass()))
 			{
-				IRGUnitAction* UnitAction = Cast<IRGUnitAction>(NewActionInstance);
+				IUnitAction* UnitAction = Cast<IUnitAction>(NewActionInstance);
 				if(UnitAction)
 				{
 					UnitAction->InitializeAction(Unit);
 				}
 			}
-			if(TargetVariant.IsType<FVector>() && NewActionInstance->GetClass()->ImplementsInterface(URGTargetTypeLocationAction::StaticClass()))
+			if(TargetVariant.IsType<FVector>() && NewActionInstance->GetClass()->ImplementsInterface(UTargetTypeLocationAction::StaticClass()))
 			{
-				IRGTargetTypeLocationAction* TargetTypeLocationAction = Cast<IRGTargetTypeLocationAction>(NewActionInstance);
+				ITargetTypeLocationAction* TargetTypeLocationAction = Cast<ITargetTypeLocationAction>(NewActionInstance);
 				if(TargetTypeLocationAction)
 				{
 					TargetTypeLocationAction->SetDestination(TargetVariant.Get<FVector>());
 				}
 			}
-			if(TargetVariant.IsType<AActor*>() && NewActionInstance->GetClass()->ImplementsInterface(URGTargetTypeActorAction::StaticClass()))
+			if(TargetVariant.IsType<AActor*>() && NewActionInstance->GetClass()->ImplementsInterface(UTargetTypeActorAction::StaticClass()))
 			{
-				IRGTargetTypeActorAction* TargetTypeActorAction = Cast<IRGTargetTypeActorAction>(NewActionInstance);
+				ITargetTypeActorAction* TargetTypeActorAction = Cast<ITargetTypeActorAction>(NewActionInstance);
 				if(TargetTypeActorAction)
 				{
 					TargetTypeActorAction->SetTarget(TargetVariant.Get<AActor*>());

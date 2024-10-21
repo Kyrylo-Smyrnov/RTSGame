@@ -1,10 +1,10 @@
 // https://github.com/Kyrylo-Smyrnov/RTSGame
 
-#include "Entities/Actions/RGActionsList.h"
+#include "Entities/Actions/ActionsList.h"
 
 namespace BuildingActions
 {
-FRGActionData TownHall_BuildPeasant = FRGActionData{
+FActionData TownHall_BuildPeasant = FActionData{
 	"BuildPeasant",
 	nullptr,
 	FText::FromString("Capable of constructing various buildings to expand your base and strengthen your position."),
@@ -18,7 +18,7 @@ FRGActionData TownHall_BuildPeasant = FRGActionData{
 
 namespace UnitActions
 {
-FRGActionData Base_Move = FRGActionData{
+FActionData Base_Move = FActionData{
 	"MoveTo",
 	nullptr,
 	FText::FromString(""),
@@ -29,7 +29,7 @@ FRGActionData Base_Move = FRGActionData{
 	0,
 	EActionTargetType::Location};
 // Peasant
-FRGActionData Peasant_BuildTownHall = FRGActionData{
+FActionData Peasant_BuildTownHall = FActionData{
 	"BuildTownHall",
 	nullptr,
 	FText::FromString("Capable of constructing various buildings to expand your base and strengthen your position."),
@@ -41,7 +41,7 @@ FRGActionData Peasant_BuildTownHall = FRGActionData{
 	EActionTargetType::None
 };
 
-FRGActionData Peasant_CollectResource = FRGActionData{
+FActionData Peasant_CollectResource = FActionData{
 	"CollectResource",
 	nullptr,
 	FText::FromString(""),

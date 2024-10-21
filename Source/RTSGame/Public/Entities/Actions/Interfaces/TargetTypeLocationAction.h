@@ -4,15 +4,15 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Interface.h"
-#include "RGTargetTypeLocationAction.generated.h"
+#include "TargetTypeLocationAction.generated.h"
 
 UINTERFACE(MinimalAPI)
-class URGTargetTypeLocationAction : public UInterface
+class UTargetTypeLocationAction : public UInterface
 {
 	GENERATED_BODY()
 };
 
-class RTSGAME_API IRGTargetTypeLocationAction
+class RTSGAME_API ITargetTypeLocationAction
 {
 	GENERATED_BODY()
 
