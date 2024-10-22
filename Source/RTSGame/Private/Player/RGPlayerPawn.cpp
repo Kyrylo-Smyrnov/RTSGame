@@ -287,15 +287,12 @@ void ARGPlayerPawn::ExecuteActionWithTarget(TVariant<FVector, AActor*> TargetVar
 			}
 		}
 
-		if (bMustBeEnqueued)
-		{
-			Unit->AddActionToQueue(NewActionInstance);
-		}
-		else
+		if (!bMustBeEnqueued)
 		{
 			Unit->ClearActionQueue();
-			Unit->AddActionToQueue(NewActionInstance);	
 		}
+
+		Unit->AddActionToQueue(NewActionInstance);	
 	}
 
 	bIsAwaitingTarget = false;

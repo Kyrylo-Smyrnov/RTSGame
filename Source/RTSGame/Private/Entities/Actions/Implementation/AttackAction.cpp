@@ -5,16 +5,12 @@
 #include "Entities/Units/Animation/RGUnitAnimInstance.h"
 #include "Entities/Units/RGUnitBase.h"
 
-DEFINE_LOG_CATEGORY_STATIC(LogRGAttackAction, All, All)
+DEFINE_LOG_CATEGORY_STATIC(LogAttackAction, All, All)
 
 void UAttackAction::InitializeAction(ARGUnitBase* Unit)
 {
 	ControlledUnit = Unit;
 	UnitAnimInstance = Cast<URGUnitAnimInstance>(ControlledUnit->GetMesh()->GetAnimInstance());
-
-	// DamageAmount = Unit->GetStatDamage();
-	// AttackSpeed = Unit->GetStatAttackSpeed();
-	// AttackRange = Unit->GetStatAttackRange();
 }
 
 void UAttackAction::SetTarget(AActor* InTarget)
@@ -27,23 +23,23 @@ void UAttackAction::Execute_Implementation()
 {
 	if (!ControlledUnit)
 	{
-		UE_LOG(LogRGAttackAction, Warning, TEXT("[Execute] It is necessary to initialize the action before execution."));
+		UE_LOG(LogAttackAction, Warning, TEXT("[Execute] It is necessary to initialize the action before execution."));
 		return;
 	}
 
 	if (!Target)
 	{
-		UE_LOG(LogRGAttackAction, Warning, TEXT("[Execute] It is necessary to set up the target before execution."));
+		UE_LOG(LogAttackAction, Warning, TEXT("[Execute] It is necessary to set up the target before execution."));
 		return;
 	}
-
-	if (UnitAnimInstance)
-		UnitAnimInstance->SetIsAttacking(true);
 
 	FVector DirectionToTarget = (Target->GetActorLocation() - ControlledUnit->GetActorLocation()).GetSafeNormal();
 	FRotator RotationToTarget = FRotator(ControlledUnit->GetActorRotation().Pitch, DirectionToTarget.Rotation().Yaw, DirectionToTarget.Rotation().Roll);
 	ControlledUnit->SetActorRotation(RotationToTarget);
 
+	if (UnitAnimInstance)
+		UnitAnimInstance->SetIsAttacking(true);
+	
 	ControlledUnit->GetWorld()->GetTimerManager().SetTimer(AttackTimerHandle, this, &UAttackAction::ExecuteAttack, AttackSpeed, true);
 }
 
@@ -76,15 +72,14 @@ void UAttackAction::ExecuteAttack()
 
 void UAttackAction::StopAttack(AActor* DestroyedActor)
 {
+	if (AttackTimerHandle.IsValid() && GetWorld())
+			GetWorld()->GetTimerManager().ClearTimer(AttackTimerHandle);
+	
 	if (Target)
 		Target->OnDestroyed.RemoveDynamic(this, &UAttackAction::StopAttack);
 
 	if (UnitAnimInstance)
 		UnitAnimInstance->SetIsAttacking(false);
-
-	if (AttackTimerHandle.IsValid())
-		if (GetWorld())
-			GetWorld()->GetTimerManager().ClearTimer(AttackTimerHandle);
 
 	OnActionCompletedDelegate().Broadcast();
 }

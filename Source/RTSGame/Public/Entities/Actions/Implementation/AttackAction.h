@@ -38,5 +38,5 @@ class RTSGAME_API UAttackAction : public UBaseAction, public IUnitAction, public
 
 	int32 DamageAmount = 10;
 	int32 AttackSpeed = 1;
-	int32 AttackRange = 200;
+	int32 AttackRange = 300;
 };

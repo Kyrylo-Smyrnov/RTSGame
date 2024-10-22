@@ -30,7 +30,11 @@ void UActionQueue::ExecuteNextAction()
 void UActionQueue::OnActionCompleted()
 {
 	if (ActionQueue.Num() > 0)
+	{
+		ActionQueue[0]->Cancel_Implementation();
 		ActionQueue.RemoveAt(0);
+	}
+		
 
 	ExecuteNextAction();
 }
