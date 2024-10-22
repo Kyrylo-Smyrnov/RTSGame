@@ -17,6 +17,7 @@ class RTSGAME_API UConstructBuildingAction : public UBaseAction
 	
 	void InitializeAction(TSubclassOf<AActor> InBuildingClass, ARGPlayerPawn* InPlayerPawn);
 	virtual void Execute_Implementation() override;
+	virtual void Cancel_Implementation() override;
 
   private:
 	TSubclassOf<AActor> BuildingClass;

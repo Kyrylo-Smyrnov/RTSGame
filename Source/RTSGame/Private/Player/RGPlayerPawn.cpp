@@ -258,7 +258,7 @@ void ARGPlayerPawn::ExecuteActionWithTarget(TVariant<FVector, AActor*> TargetVar
 
 	for (ARGUnitBase* Unit : MustBePerformedBy)
 	{
-		UBaseAction* NewActionInstance = Cast<UBaseAction>(AwaitingAction);
+		UBaseAction* NewActionInstance = DuplicateObject(AwaitingAction, this);
 		if(NewActionInstance)
 		{
 			if(NewActionInstance->GetClass()->ImplementsInterface(UUnitAction::StaticClass()))

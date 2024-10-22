@@ -19,6 +19,7 @@ class RTSGAME_API USpawnUnitAction : public UBaseAction
 	
 	void InitializeAction(TSubclassOf<ACharacter> InUnitClass, ARGBuildingBase* InTargetBuilding, ARGPlayerPawn* PlayerPawn);
 	virtual void Execute_Implementation() override;
+	virtual void Cancel_Implementation() override;
 
   private:
 	TSubclassOf<ACharacter> UnitClass;

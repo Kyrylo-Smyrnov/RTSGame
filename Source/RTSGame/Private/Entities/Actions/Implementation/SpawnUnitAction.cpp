@@ -27,7 +27,7 @@ void USpawnUnitAction::Execute_Implementation()
 		return;
 	}
 
-	if(ActionData.ActionName == NAME_None)
+	if (ActionData.ActionName == NAME_None)
 	{
 		UE_LOG(LogRGSpawnUnitAction, Warning, TEXT("[Execute] It is necessary to set ActionData before execution."));
 		return;
@@ -38,4 +38,8 @@ void USpawnUnitAction::Execute_Implementation()
 		TargetBuilding->AddUnitToSpawnQueue(UnitClass, ActionData.TimeToProduce);
 		PlayerPawn->AddPlayerResources(-ActionData.ActionWoodCost);
 	}
+}
+
+void USpawnUnitAction::Cancel_Implementation()
+{
 }

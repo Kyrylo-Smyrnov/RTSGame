@@ -36,3 +36,8 @@ void UCollectResourceAction::Execute_Implementation()
 
 	Super::Execute_Implementation();
 }
+
+void UCollectResourceAction::Cancel_Implementation()
+{
+	Super::Cancel_Implementation();
+}

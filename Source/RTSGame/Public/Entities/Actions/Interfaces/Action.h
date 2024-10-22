@@ -22,7 +22,9 @@ class RTSGAME_API IAction
   public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Action")
 	void Execute();
-
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Action")
+	void Cancel();
+	
 	void SetActionData(const FActionData& InActionData);
 	FActionData& GetActionData();
 

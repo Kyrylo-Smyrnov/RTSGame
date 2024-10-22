@@ -22,6 +22,20 @@ void UCompositeAction::Execute_Implementation()
 	}
 }
 
+void UCompositeAction::Cancel_Implementation()
+{
+	for (int32 i = 0; i < SubActions.Num(); ++i)
+	{
+		UBaseAction* Action = SubActions[i];
+		if (Action)
+		{
+			Action->Cancel_Implementation();
+		}
+	}
+
+	SubActions.Empty();
+}
+
 void UCompositeAction::InitializeAction(ARGUnitBase* Unit)
 {
 	ControlledUnit = Unit;

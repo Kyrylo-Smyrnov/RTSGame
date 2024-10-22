@@ -17,6 +17,7 @@ class RTSGAME_API UCollectResourceAction : public UCompositeAction, public ITarg
   public:
 	virtual void InitializeAction(ARGUnitBase* Unit) override;
 	virtual void Execute_Implementation() override;
+	virtual void Cancel_Implementation() override;
 	virtual void SetTarget(AActor* InTarget) override;
 
   private:

@@ -15,6 +15,7 @@ class RTSGAME_API UCompositeAction : public UBaseAction, public IUnitAction
   public:
 	void AddSubAction(UBaseAction* Action);
 	virtual void Execute_Implementation() override;
+	virtual void Cancel_Implementation() override;
 	virtual void InitializeAction(ARGUnitBase* Unit) override;
 	
   protected:

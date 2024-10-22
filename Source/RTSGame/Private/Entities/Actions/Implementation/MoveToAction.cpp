@@ -48,10 +48,14 @@ void UMoveToAction::Execute_Implementation()
 		UE_LOG(LogRGMoveToAction, Warning, TEXT("[Execute] MoveTo request failed."));
 }
 
+void UMoveToAction::Cancel_Implementation()
+{
+}
+
 void UMoveToAction::OnMoveCompleted(FAIRequestID RequestID, const FPathFollowingResult& Result)
 {
 	AIController->GetPathFollowingComponent()->OnRequestFinished.RemoveAll(this);
-	
+
 	if (Result.Code == EPathFollowingResult::Success)
 		OnActionCompletedDelegate().Broadcast();
 }

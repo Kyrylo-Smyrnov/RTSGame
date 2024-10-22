@@ -37,5 +37,11 @@ void UActionQueue::OnActionCompleted()
 
 void UActionQueue::ClearQueue()
 {
-	ActionQueue.Empty();
+	if(ActionQueue.Num() > 0)
+	{
+		if(ActionQueue[0])
+			ActionQueue[0]->Cancel_Implementation();
+		
+		ActionQueue.Empty();
+	}
 }

@@ -38,7 +38,7 @@ void UConstructBuildingAction::Execute_Implementation()
 	if (ActionsUtility::IsEnoughResourcesToBuild(PlayerPawn, ActionData.ActionWoodCost))
 	{
 		ARGBuildingBase* SpawnedBuilding = PlayerPawn->GetWorld()->SpawnActor<ARGBuildingBase>(BuildingClass, ConstructParameters);
-		if(SpawnedBuilding)
+		if (SpawnedBuilding)
 		{
 			SpawnedBuilding->SetTimeToConstruct(ActionData.TimeToProduce);
 			SpawnedBuilding->SetBuildingPlacementMaterial(true);
@@ -46,4 +46,8 @@ void UConstructBuildingAction::Execute_Implementation()
 
 		PlayerPawn->AddPlayerResources(-ActionData.ActionWoodCost);
 	}
+}
+
+void UConstructBuildingAction::Cancel_Implementation()
+{
 }

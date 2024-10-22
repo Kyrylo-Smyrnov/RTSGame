@@ -8,24 +8,31 @@
 #include "Entities/Actions/Interfaces/UnitAction.h"
 #include "AttackAction.generated.h"
 
+class URGUnitAnimInstance;
+class ARGPlayerPawn;
+
 UCLASS()
 class RTSGAME_API UAttackAction : public UBaseAction, public IUnitAction, public ITargetTypeActorAction
 {
 	GENERATED_BODY()
-	
+
   public:
 	virtual void InitializeAction(ARGUnitBase* Unit) override;
 	virtual void Execute_Implementation() override;
+	virtual void Cancel_Implementation() override;
 	virtual void SetTarget(AActor* InTarget) override;
 
   private:
 	void ExecuteAttack();
-	void StopAttack();
-	
+	UFUNCTION()
+	void StopAttack(AActor* DestroyedActor);
+
 	UPROPERTY()
 	ARGUnitBase* ControlledUnit;
 	UPROPERTY()
 	AActor* Target;
+	UPROPERTY()
+	URGUnitAnimInstance* UnitAnimInstance;
 
 	FTimerHandle AttackTimerHandle;
 
