@@ -1,24 +1,24 @@
 // https://github.com/Kyrylo-Smyrnov/RTSGame
 
-#include "Entities/Actions/RGConstructBuildingAction.h"
-#include "Entities/Actions/RGActionsUtility.h"
+#include "Entities/Actions/Implementation/ConstructBuildingAction.h"
+#include "Entities/Actions/ActionsUtility.h"
 #include "Entities/Buildings/RGBuildingBase.h"
 #include "Player/RGPlayerPawn.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogRGConstructBuildingAction, All, All);
 
-URGConstructBuildingAction::URGConstructBuildingAction()
+UConstructBuildingAction::UConstructBuildingAction()
 	: BuildingClass(nullptr), PlayerPawn(nullptr)
 {
 }
 
-void URGConstructBuildingAction::InitializeAction(TSubclassOf<AActor> InBuildingClass, ARGPlayerPawn* InPlayerPawn)
+void UConstructBuildingAction::InitializeAction(TSubclassOf<AActor> InBuildingClass, ARGPlayerPawn* InPlayerPawn)
 {
 	BuildingClass = InBuildingClass;
 	PlayerPawn = InPlayerPawn;
 }
 
-void URGConstructBuildingAction::Execute_Implementation()
+void UConstructBuildingAction::Execute_Implementation()
 {
 	if (!BuildingClass || !PlayerPawn)
 	{
@@ -38,7 +38,7 @@ void URGConstructBuildingAction::Execute_Implementation()
 	if (ActionsUtility::IsEnoughResourcesToBuild(PlayerPawn, ActionData.ActionWoodCost))
 	{
 		ARGBuildingBase* SpawnedBuilding = PlayerPawn->GetWorld()->SpawnActor<ARGBuildingBase>(BuildingClass, ConstructParameters);
-		if(SpawnedBuilding)
+		if (SpawnedBuilding)
 		{
 			SpawnedBuilding->SetTimeToConstruct(ActionData.TimeToProduce);
 			SpawnedBuilding->SetBuildingPlacementMaterial(true);
@@ -46,4 +46,8 @@ void URGConstructBuildingAction::Execute_Implementation()
 
 		PlayerPawn->AddPlayerResources(-ActionData.ActionWoodCost);
 	}
+}
+
+void UConstructBuildingAction::Cancel_Implementation()
+{
 }

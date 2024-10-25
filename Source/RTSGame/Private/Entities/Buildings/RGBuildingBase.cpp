@@ -3,6 +3,7 @@
 #include "Entities/Buildings/RGBuildingBase.h"
 #include "Components/DecalComponent.h"
 #include "Components/StaticMeshComponent.h"
+#include "Entities/Actions/Implementation/MoveToAction.h"
 #include "Entities/Buildings/RGBuildingBanner.h"
 #include "Entities/Units/RGUnitBase.h"
 #include "Kismet/GameplayStatics.h"
@@ -86,7 +87,7 @@ TArray<FSpawnQueueEntry>& ARGBuildingBase::GetSpawnQueue()
 	return SpawnQueue;
 }
 
-TArray<IRGAction*>& ARGBuildingBase::GetAvailableActions()
+TArray<UBaseAction*> ARGBuildingBase::GetAvailableActions()
 {
 	return AvailableActions;
 }
@@ -187,8 +188,6 @@ void ARGBuildingBase::BeginPlay()
 		return;
 	}
 
-	PlayerPawn->AddEntitiesToContolled(this);
-
 	if (!bIsPlacing)
 		LastBannerLocation = GetActorLocation() + FVector(0.0f, 500.0f, 0.0f);
 
@@ -257,34 +256,6 @@ void ARGBuildingBase::HandleOnClicked(AActor* TouchedActor, FKey ButtonPressed)
 			PlayerPawn->AddEntitiesToSelected(this);
 		}
 	}
-	else if (ButtonPressed == EKeys::RightMouseButton && PlayerPawn->GetSelectedEntities().Num() > 0)
-	{
-		TArray<AActor*> SelectedEntities = PlayerPawn->GetSelectedEntities();
-
-		for (int32 i = 0; i < SelectedEntities.Num(); ++i)
-		{
-			if (ARGUnitBase* CastedUnit = Cast<ARGUnitBase>(SelectedEntities[i]))
-			{
-				FVector Origin;
-				FVector BoxExtent;
-				FVector ActorSize;
-
-				GetActorBounds(true, Origin, BoxExtent);
-				ActorSize = BoxExtent * 2;
-				float SearchRadius = FMath::Max3(ActorSize.X, ActorSize.Y, 0.0f);
-
-				FNavLocation ClosestPointOnNavMesh;
-
-				bool bFoundLocation = PlayerController->GetNavigationSystem()->GetRandomPointInNavigableRadius(
-					GetActorLocation(), SearchRadius, ClosestPointOnNavMesh);
-				if (bFoundLocation)
-				{
-					UBlackboardComponent* Blackboard = Cast<ARGUnitAIController>(CastedUnit->GetController())->GetBlackboardComponent();
-					Blackboard->SetValueAsVector(BBKeys::UNIT_AI_BBKEY_TARGETLOCATIONTOMOVE, ClosestPointOnNavMesh.Location);
-				}
-			}
-		}
-	}
 }
 
 bool ARGBuildingBase::CheckForOverlap() const
@@ -331,15 +302,10 @@ void ARGBuildingBase::SpawnNextUnit()
 				SpawnLocation.Z = 108;
 				ARGUnitBase* SpawnedUnit = GetWorld()->SpawnActor<ARGUnitBase>(CurrentEntry.UnitClass, SpawnLocation, FRotator::ZeroRotator);
 
-				UBlackboardComponent* BlackboardComponent = Cast<ARGUnitAIController>(SpawnedUnit->GetController())->GetBlackboardComponent();
-				BlackboardComponent->SetValueAsVector(BBKeys::UNIT_AI_BBKEY_TARGETLOCATIONTOMOVE, LastBannerLocation);
-				if(ActorToAttackForSpawnedUnits)
-				{
-					BlackboardComponent->SetValueAsObject(BBKeys::UNIT_AI_BBKEY_TARGETACTORTOATTACK, ActorToAttackForSpawnedUnits);
-					BlackboardComponent->SetValueAsEnum(BBKeys::UNIT_AI_BBKEY_UNITSTATE, 1);
-				}
-				else
-					BlackboardComponent->SetValueAsEnum(BBKeys::UNIT_AI_BBKEY_UNITSTATE, 0);
+				UMoveToAction* MoveToAction = NewObject<UMoveToAction>(this);
+				MoveToAction->InitializeAction(SpawnedUnit);
+				MoveToAction->SetDestination(LastBannerLocation);
+				MoveToAction->Execute_Implementation();
 
 				SpawnQueue.RemoveAt(0);
 				OnSpawnQueueChanged.Broadcast(SpawnQueue);

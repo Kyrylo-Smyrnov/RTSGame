@@ -1,12 +1,12 @@
 // https://github.com/Kyrylo-Smyrnov/RTSGame
 
 #include "Entities/Resouces/RGResourceBase.h"
-#include "AIController.h"
-#include "BehaviorTree/BlackboardComponent.h"
 #include "Components/DecalComponent.h"
-#include "Entities/BBKeys.h"
+#include "Entities/Actions/Implementation/CollectResourceAction.h"
+#include "Entities/Actions/Implementation/MoveToAction.h"
 #include "Entities/Buildings/RGBuildingBase.h"
 #include "Entities/Units/RGUnitBase.h"
+#include "Entities/Units/RGUnitPeasant.h"
 #include "Kismet/GameplayStatics.h"
 #include "Player/RGPlayerController.h"
 #include "Player/RGPlayerPawn.h"
@@ -14,7 +14,6 @@
 DEFINE_LOG_CATEGORY_STATIC(LogRGResourceBase, All, All);
 
 ARGResourceBase::ARGResourceBase()
-	: bIsDead(false), Health(100.0f)
 {
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -27,6 +26,8 @@ ARGResourceBase::ARGResourceBase()
 	DecalComponent = CreateDefaultSubobject<UDecalComponent>("DecalComponent");
 	DecalComponent->SetupAttachment(GetRootComponent());
 	DecalComponent->SetVisibility(false);
+
+	ResourceAmount = 100;
 }
 
 void ARGResourceBase::Tick(float DeltaTime)
@@ -54,27 +55,35 @@ void ARGResourceBase::HandleOnClicked(AActor* TouchedActor, FKey ButtonPressed)
 		}
 		for (AActor* SelectedEntity : PlayerPawn->GetSelectedEntities())
 		{
-			ARGUnitBase* Unit = Cast<ARGUnitBase>(SelectedEntity);
-			if (Unit)
+			ARGUnitBase* CastedUnit = Cast<ARGUnitBase>(SelectedEntity);
+			if (CastedUnit)
 			{
-				AAIController* AIController = Cast<AAIController>(Unit->GetController());
-				if (!AIController)
+				if (ARGUnitPeasant* CastedPeasant = Cast<ARGUnitPeasant>(CastedUnit))
 				{
-					UE_LOG(LogRGResourceBase, Warning, TEXT("[HandleOnClicked] AIController is nullptr."))
-					return;
-				}
+					UCollectResourceAction* CollectResourceAction = NewObject<UCollectResourceAction>();
+					CollectResourceAction->InitializeAction(CastedPeasant);
+					CollectResourceAction->SetTarget(this);
 
-				UBlackboardComponent* BlackboardComponent = AIController->GetBlackboardComponent();
-				if (!BlackboardComponent)
+					if (!PlayerController->IsInputKeyDown(EKeys::LeftShift))
+					{
+						CastedPeasant->ClearActionQueue();
+					}
+						
+					CastedPeasant->AddActionToQueue(CollectResourceAction);
+				}
+				else
 				{
-					UE_LOG(LogRGResourceBase, Warning, TEXT("[HandleOnClicked] BlackboardComponent is nullptr."))
-					return;
-				}
+					UMoveToAction* MoveToAction = NewObject<UMoveToAction>();
+					MoveToAction->InitializeAction(CastedUnit);
+					MoveToAction->SetDestination(GetActorLocation());
 
-				// 1 - Attack
-				BlackboardComponent->SetValueAsEnum(BBKeys::UNIT_AI_BBKEY_UNITSTATE, 1);
-				BlackboardComponent->SetValueAsVector(BBKeys::UNIT_AI_BBKEY_TARGETLOCATIONTOMOVE, GetActorLocation());
-				BlackboardComponent->SetValueAsObject(BBKeys::UNIT_AI_BBKEY_TARGETACTORTOATTACK, this);
+					if (PlayerController->IsInputKeyDown(EKeys::LeftShift))
+					{
+						CastedUnit->ClearActionQueue();
+					}
+					
+					CastedUnit->AddActionToQueue(MoveToAction);
+				}
 			}
 		}
 
@@ -82,13 +91,15 @@ void ARGResourceBase::HandleOnClicked(AActor* TouchedActor, FKey ButtonPressed)
 	}
 }
 
-void ARGResourceBase::DealDamage(const float Amount)
+void ARGResourceBase::ReceiveDamage(float DamageAmount, AActor* DamageCauser)
 {
-	Health -= Amount;
+	ResourceAmount -= DamageAmount;
+	ARGUnitPeasant* CastedPeasant = Cast<ARGUnitPeasant>(DamageCauser);
+	if (CastedPeasant)
+		CastedPeasant->AddCarryingWood(DamageAmount);
 
-	if (Health <= 0)
+	if (ResourceAmount <= 0)
 	{
-		bIsDead = true;
 		Destroy();
 	}
 }
@@ -117,7 +128,7 @@ void ARGResourceBase::BlinkDecal()
 {
 	bIsDecalVisible = !bIsDecalVisible;
 	DecalComponent->SetVisibility(bIsDecalVisible);
-	
+
 	static int32 BlinkCount = 0;
 	BlinkCount++;
 

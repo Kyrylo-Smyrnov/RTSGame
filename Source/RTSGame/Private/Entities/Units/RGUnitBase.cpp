@@ -1,11 +1,10 @@
 // https://github.com/Kyrylo-Smyrnov/RTSGame
 
 #include "Entities/Units/RGUnitBase.h"
-#include "BehaviorTree/BlackboardComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/DecalComponent.h"
-#include "Entities/BBKeys.h"
-#include "Entities/Units/AI/RGUnitAIController.h"
+#include "Entities/Actions/ActionQueue.h"
+#include "Entities/Actions/Implementation/MoveToAction.h"
 #include "Kismet/GameplayStatics.h"
 #include "Player/RGPlayerController.h"
 
@@ -54,7 +53,7 @@ UTexture2D* ARGUnitBase::GetSelectionIcon() const
 	return SelectionIcon;
 }
 
-TArray<IRGAction*>& ARGUnitBase::GetAvailableActions()
+TArray<UBaseAction*> ARGUnitBase::GetAvailableActions()
 {
 	return AvailableActions;
 }
@@ -78,8 +77,9 @@ void ARGUnitBase::BeginPlay()
 		return;
 	}
 
-	PlayerPawn->AddEntitiesToContolled(this);
 	InitializeActions();
+	ActionQueue = NewObject<UActionQueue>();
+	ActionQueue->Initialize(this);
 }
 
 void ARGUnitBase::Tick(float DeltaTime)
@@ -127,21 +127,44 @@ void ARGUnitBase::HandleOnClicked(AActor* TouchedActor, FKey ButtonPressed)
 			PlayerPawn->AddEntitiesToSelected(this);
 		}
 	}
-	else if (ButtonPressed == EKeys::RightMouseButton && PlayerPawn->GetSelectedEntities().Num() > 0)
-	{
-		TArray<AActor*> SelectedEntities = PlayerPawn->GetSelectedEntities();
-
-		for (int32 i = 0; i < SelectedEntities.Num(); ++i)
-		{
-			if (ARGUnitBase* CastedUnit = Cast<ARGUnitBase>(SelectedEntities[i]))
-			{
-				UBlackboardComponent* Blackboard = Cast<ARGUnitAIController>(CastedUnit->GetController())->GetBlackboardComponent();
-				Blackboard->SetValueAsVector(BBKeys::UNIT_AI_BBKEY_TARGETLOCATIONTOMOVE, GetActorLocation());
-			}
-		}
-	}
 }
 
 void ARGUnitBase::InitializeActions()
 {
+	UMoveToAction* MoveToAction = NewObject<UMoveToAction>();
+	FActionData MoveToData = UnitActions::Base_Move;
+	MoveToData.ActionIcon = LoadObject<UTexture2D>(nullptr, TEXT("/Game/UI/Icons/Entities/Units/T_IconMoveTo.T_IconMoveTo"));
+	MoveToAction->InitializeAction(this);
+	MoveToAction->SetActionData(MoveToData);
+
+	AvailableActions.Add(MoveToAction);
+}
+
+void ARGUnitBase::AddActionToQueue(UBaseAction* Action) const
+{
+	ActionQueue->EnqueueAction(Action);
+}
+
+void ARGUnitBase::ClearActionQueue() const
+{
+	ActionQueue->ClearQueue();
+}
+
+bool ARGUnitBase::CanPerformAction(UBaseAction* Action)
+{
+	UObject* ActionObj = Cast<UObject>(Action);
+	if(!ActionObj)
+	{
+		UE_LOG(LogRGUnitBase, Warning, TEXT("[CanPerformAction] Failed to cast Action -> UObject"));
+		return false;
+	}
+	
+	for(UBaseAction* AvailableAction : AvailableActions)
+	{
+		UObject* AvailableActionObj = Cast<UObject>(AvailableAction);
+		if(AvailableActionObj && AvailableActionObj->GetClass() == ActionObj->GetClass())
+			return true;
+	}
+	
+	return false;
 }

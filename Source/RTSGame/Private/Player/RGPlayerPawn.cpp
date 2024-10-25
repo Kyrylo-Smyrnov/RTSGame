@@ -1,6 +1,8 @@
 // https://github.com/Kyrylo-Smyrnov/RTSGame
 
 #include "Player/RGPlayerPawn.h"
+#include "Entities/Actions/Implementation/MoveToAction.h"
+#include "Entities/Actions/Interfaces/TargetTypeActorAction.h"
 #include "Entities/Buildings/RGBuildingBase.h"
 #include "Entities/Units/RGUnitBase.h"
 #include "Player/RGPlayerCameraComponent.h"
@@ -28,9 +30,36 @@ void ARGPlayerPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 }
 
-void ARGPlayerPawn::HandleLeftMouseButtonInputPressedUninteractable()
+void ARGPlayerPawn::HandleLeftMouseButtonInputPressed()
 {
-	ClearSelectedEntities();
+	FHitResult HitResult;
+	
+	if(PlayerController->GetHitResultUnderCursor(ECC_GameTraceChannel1, true, HitResult))
+	{
+		if(AwaitingAction && AwaitingAction->GetActionData().TargetType == EActionTargetType::Actor)
+		{
+			TVariant<FVector, AActor*> TargetVariant;
+			if(HitResult.Actor.IsValid())
+			{
+				TargetVariant.Set<AActor*>(HitResult.Actor.Get());
+				ExecuteActionWithTarget(TargetVariant, PlayerController->IsInputKeyDown(EKeys::LeftShift));
+			}
+		}
+	}
+	else if (PlayerController->GetHitResultUnderCursorByChannel(UEngineTypes::ConvertToTraceType(ECC_Visibility), true, HitResult))
+	{
+		if (AwaitingAction && AwaitingAction->GetActionData().TargetType == EActionTargetType::Location)
+		{
+			TVariant<FVector, AActor*> TargetVariant;
+			TargetVariant.Set<FVector>(HitResult.Location);
+			ExecuteActionWithTarget(TargetVariant, PlayerController->IsInputKeyDown(EKeys::LeftShift));
+			
+		}
+		else
+		{
+			ClearSelectedEntities();
+		}
+	}
 }
 
 AActor* ARGPlayerPawn::GetMostImportantEntity() const
@@ -44,28 +73,6 @@ AActor* ARGPlayerPawn::GetMostImportantEntity() const
 TArray<AActor*> ARGPlayerPawn::GetSelectedEntities() const
 {
 	return SelectedEntities;
-}
-
-void ARGPlayerPawn::AddEntitiesToContolled(AActor* Entity)
-{
-	if (Entity == nullptr)
-	{
-		UE_LOG(LogRGPlayerPawn, Warning, TEXT("[AddEntitiesToContolled] Entity is nullptr."));
-		return;
-	}
-
-	ControlledEntities.AddUnique(Entity);
-}
-
-void ARGPlayerPawn::RemoveEntityFromControlled(AActor* Entity)
-{
-	if (Entity == nullptr)
-	{
-		UE_LOG(LogRGPlayerPawn, Warning, TEXT("[RemoveEntityFromControlled] Entity is nullptr."));
-		return;
-	}
-
-	ControlledEntities.Remove(Entity);
 }
 
 void ARGPlayerPawn::AddEntitiesToSelected(AActor* Entity)
@@ -88,6 +95,11 @@ void ARGPlayerPawn::AddEntitiesToSelected(AActor* Entity)
 
 	OnMostImportantEntityChanged.Broadcast(GetMostImportantEntity());
 	OnSelectedEntitiesChanged.Broadcast(SelectedEntities);
+	if (AwaitingAction)
+	{
+		bIsAwaitingTarget = false;
+		AwaitingAction = nullptr;
+	}
 }
 
 void ARGPlayerPawn::AddEntitiesToSelected(TArray<AActor*> Entities)
@@ -116,6 +128,11 @@ void ARGPlayerPawn::AddEntitiesToSelected(TArray<AActor*> Entities)
 
 	OnMostImportantEntityChanged.Broadcast(GetMostImportantEntity());
 	OnSelectedEntitiesChanged.Broadcast(SelectedEntities);
+	if (AwaitingAction)
+	{
+		bIsAwaitingTarget = false;
+		AwaitingAction = nullptr;
+	}
 }
 
 void ARGPlayerPawn::RemoveEntityFromSelected(AActor* Entity)
@@ -138,6 +155,11 @@ void ARGPlayerPawn::RemoveEntityFromSelected(AActor* Entity)
 
 	OnMostImportantEntityChanged.Broadcast(GetMostImportantEntity());
 	OnSelectedEntitiesChanged.Broadcast(SelectedEntities);
+	if (AwaitingAction)
+	{
+		bIsAwaitingTarget = false;
+		AwaitingAction = nullptr;
+	}
 }
 
 void ARGPlayerPawn::ClearSelectedEntities()
@@ -157,6 +179,11 @@ void ARGPlayerPawn::ClearSelectedEntities()
 
 	OnMostImportantEntityChanged.Broadcast(GetMostImportantEntity());
 	OnSelectedEntitiesChanged.Broadcast(SelectedEntities);
+	if (AwaitingAction)
+	{
+		bIsAwaitingTarget = false;
+		AwaitingAction = nullptr;
+	}
 }
 
 bool ARGPlayerPawn::IsEntitySelected(AActor* Entity) const
@@ -170,9 +197,15 @@ void ARGPlayerPawn::AddPlayerResources(int32 Amount)
 	OnPlayerResourcesChanged.Broadcast(PlayerWoodResource);
 }
 
-int32 ARGPlayerPawn::GetPlayerResources()
+int32 ARGPlayerPawn::GetPlayerResources() const
 {
 	return PlayerWoodResource;
+}
+
+void ARGPlayerPawn::SetAwaitingAction(UBaseAction* Action)
+{
+	bIsAwaitingTarget = true;
+	AwaitingAction = Action;
 }
 
 void ARGPlayerPawn::BeginPlay()
@@ -181,9 +214,13 @@ void ARGPlayerPawn::BeginPlay()
 	PlayerController = Cast<ARGPlayerController>(GetController());
 
 	if (PlayerController)
-		PlayerController->LeftMouseButtonInputPressedUninteractable.AddUObject(this, &ARGPlayerPawn::HandleLeftMouseButtonInputPressedUninteractable);
+	{
+		PlayerController->LeftMouseButtonInputPressed.AddUObject(this, &ARGPlayerPawn::HandleLeftMouseButtonInputPressed);
+	}
 	else
+	{
 		UE_LOG(LogRGPlayerPawn, Warning, TEXT("[BeginPlay] PlayerController is nullptr."))
+	}
 }
 
 bool ARGPlayerPawn::CompareEntityImportance(const AActor& A, const AActor& B)
@@ -203,4 +240,61 @@ bool ARGPlayerPawn::CompareEntityImportance(const AActor& A, const AActor& B)
 		return BuildingA->GetImportance() < UnitB->GetImportance();
 
 	return false;
+}
+
+void ARGPlayerPawn::ExecuteActionWithTarget(TVariant<FVector, AActor*> TargetVariant, bool bMustBeEnqueued)
+{
+	TArray<ARGUnitBase*> MustBePerformedBy;
+	for (AActor* Entity : SelectedEntities)
+	{
+		if (ARGUnitBase* CastedUnit = Cast<ARGUnitBase>(Entity))
+		{
+			if (CastedUnit->CanPerformAction(AwaitingAction))
+			{
+				MustBePerformedBy.Add(CastedUnit);
+			}
+		}
+	}
+
+	for (ARGUnitBase* Unit : MustBePerformedBy)
+	{
+		UBaseAction* NewActionInstance = DuplicateObject(AwaitingAction, this);
+		if(NewActionInstance)
+		{
+			if(NewActionInstance->GetClass()->ImplementsInterface(UUnitAction::StaticClass()))
+			{
+				IUnitAction* UnitAction = Cast<IUnitAction>(NewActionInstance);
+				if(UnitAction)
+				{
+					UnitAction->InitializeAction(Unit);
+				}
+			}
+			if(TargetVariant.IsType<FVector>() && NewActionInstance->GetClass()->ImplementsInterface(UTargetTypeLocationAction::StaticClass()))
+			{
+				ITargetTypeLocationAction* TargetTypeLocationAction = Cast<ITargetTypeLocationAction>(NewActionInstance);
+				if(TargetTypeLocationAction)
+				{
+					TargetTypeLocationAction->SetDestination(TargetVariant.Get<FVector>());
+				}
+			}
+			if(TargetVariant.IsType<AActor*>() && NewActionInstance->GetClass()->ImplementsInterface(UTargetTypeActorAction::StaticClass()))
+			{
+				ITargetTypeActorAction* TargetTypeActorAction = Cast<ITargetTypeActorAction>(NewActionInstance);
+				if(TargetTypeActorAction)
+				{
+					TargetTypeActorAction->SetTarget(TargetVariant.Get<AActor*>());
+				}
+			}
+		}
+
+		if (!bMustBeEnqueued)
+		{
+			Unit->ClearActionQueue();
+		}
+
+		Unit->AddActionToQueue(NewActionInstance);	
+	}
+
+	bIsAwaitingTarget = false;
+	AwaitingAction = nullptr;
 }

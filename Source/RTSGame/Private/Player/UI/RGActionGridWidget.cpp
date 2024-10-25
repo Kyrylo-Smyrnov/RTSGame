@@ -54,12 +54,12 @@ void URGActionGridWidget::UpdateWidget(AActor* MostImportantEntity)
 	}
 	else
 	{
-		TArray<IRGAction*> AvailableActions;
-		if(ARGUnitBase* CastedUnit = Cast<ARGUnitBase>(MostImportantEntity))
+		TArray<UBaseAction*> AvailableActions;
+		if (ARGUnitBase* CastedUnit = Cast<ARGUnitBase>(MostImportantEntity))
 			AvailableActions = CastedUnit->GetAvailableActions();
-		else if(ARGBuildingBase* CastedBuilding = Cast<ARGBuildingBase>(MostImportantEntity))
+		else if (ARGBuildingBase* CastedBuilding = Cast<ARGBuildingBase>(MostImportantEntity))
 			AvailableActions = CastedBuilding->GetAvailableActions();
-		
+
 		int32 Index = 0;
 		for (auto& Action : ActionButtons)
 		{
@@ -162,7 +162,15 @@ void URGActionGridWidget::HandleButtonClick()
 		{
 			if (ActionButton.Value)
 			{
-				ActionButton.Value->Execute_Implementation();
+				if (ActionButton.Value->GetActionData().TargetType != EActionTargetType::None)
+				{
+					PlayerPawn->SetAwaitingAction(ActionButton.Value);
+				}
+				else
+				{
+					ActionButton.Value->Execute_Implementation();
+				}
+				
 				return;
 			}
 		}

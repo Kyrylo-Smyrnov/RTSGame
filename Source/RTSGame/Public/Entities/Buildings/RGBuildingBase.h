@@ -2,12 +2,9 @@
 
 #pragma once
 
-#include "BehaviorTree/BlackboardComponent.h"
 #include "CoreMinimal.h"
-#include "Entities/Actions/RGAction.h"
-#include "Entities/Actions/RGActionsList.h"
-#include "Entities/Actions/RGSpawnUnitAction.h"
-#include "Entities/BBKeys.h"
+#include "Entities/Actions/ActionsList.h"
+#include "Entities/Actions/Implementation/SpawnUnitAction.h"
 #include "Entities/Buildings/SpawnQueueEntry.h"
 #include "Entities/EntitiesImportance.h"
 #include "Entities/Units/AI/RGUnitAIController.h"
@@ -39,7 +36,7 @@ class RTSGAME_API ARGBuildingBase : public APawn
 	int32 GetImportance() const;
 	UTexture2D* GetSelectionIcon() const;
 	TArray<FSpawnQueueEntry>& GetSpawnQueue();
-	TArray<IRGAction*>& GetAvailableActions();
+	TArray<UBaseAction*> GetAvailableActions();
 
 	void SetSelected(bool bIsBuildingSelected);
 	void SetTimeToConstruct(float Time);
@@ -84,7 +81,8 @@ class RTSGAME_API ARGBuildingBase : public APawn
 	UPROPERTY(EditDefaultsOnly, Category = "UI")
 	UTexture2D* SelectionIcon;
 
-	TArray<IRGAction*> AvailableActions;
+	UPROPERTY()
+	TArray<UBaseAction*> AvailableActions;
 
 	EFEntitiesImportance BuildingImportance;
 

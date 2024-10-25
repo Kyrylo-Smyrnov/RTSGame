@@ -6,6 +6,7 @@
 #include "GameFramework/Pawn.h"
 #include "RGPlayerPawn.generated.h"
 
+class UBaseAction;
 class ARGPlayerController;
 class URGPlayerCameraComponent;
 
@@ -24,15 +25,13 @@ class RTSGAME_API ARGPlayerPawn : public APawn
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	UFUNCTION()
-	void HandleLeftMouseButtonInputPressedUninteractable();
+	void HandleLeftMouseButtonInputPressed();
 
 	UFUNCTION(BlueprintCallable)
 	AActor* GetMostImportantEntity() const;
 	UFUNCTION(BlueprintCallable)
 	TArray<AActor*> GetSelectedEntities() const;
 
-	void AddEntitiesToContolled(AActor* Entity);
-	void RemoveEntityFromControlled(AActor* Entity);
 	void AddEntitiesToSelected(AActor* Entity);
 	void AddEntitiesToSelected(TArray<AActor*> Entities);
 	void RemoveEntityFromSelected(AActor* Entity);
@@ -40,7 +39,9 @@ class RTSGAME_API ARGPlayerPawn : public APawn
 	bool IsEntitySelected(AActor* Entity) const;
 
 	void AddPlayerResources(int32 Amount);
-	int32 GetPlayerResources();
+	int32 GetPlayerResources() const;
+
+	void SetAwaitingAction(UBaseAction* Action);
 
 	FOnSelectedEntitiesChanged OnSelectedEntitiesChanged;
 	FOnMostImportantEntityChanged OnMostImportantEntityChanged;
@@ -52,11 +53,9 @@ class RTSGAME_API ARGPlayerPawn : public APawn
 	UPROPERTY(EditDefaultsOnly, Category = "Camera")
 	URGPlayerCameraComponent* PlayerCameraComponent;
 
-	UPROPERTY(BlueprintReadOnly, Category = "Entities")
-	TArray<AActor*> ControlledEntities;
-
   private:
 	static bool CompareEntityImportance(const AActor& A, const AActor& B);
+	void ExecuteActionWithTarget(TVariant<FVector, AActor*> TargetVariant, bool bMustBeEnqueued);
 
 	UPROPERTY()
 	ARGPlayerController* PlayerController;
@@ -64,5 +63,8 @@ class RTSGAME_API ARGPlayerPawn : public APawn
 	UPROPERTY()
 	TArray<AActor*> SelectedEntities;
 
+	UBaseAction* AwaitingAction;
+
 	int32 PlayerWoodResource;
+	bool bIsAwaitingTarget;
 };

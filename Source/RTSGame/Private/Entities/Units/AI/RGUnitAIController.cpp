@@ -1,8 +1,7 @@
 // https://github.com/Kyrylo-Smyrnov/RTSGame
 
 #include "Entities/Units/AI/RGUnitAIController.h"
-#include "BehaviorTree/BlackboardComponent.h"
-#include "Entities/BBKeys.h"
+#include "Entities/Actions/Implementation/MoveToAction.h"
 #include "Entities/Units/RGUnitBase.h"
 #include "Kismet/GameplayStatics.h"
 #include "Player/RGPlayerController.h"
@@ -28,17 +27,23 @@ void ARGUnitAIController::HandleRightMouseButtonInputPressed()
 		UE_LOG(LogRGUnitAIController, Warning, TEXT("[HandleRightMouseButtonInputPressed] Unit is nullptr."));
 		return;
 	}
-	else if(!Unit->GetIsSelected())
+	
+	if (!Unit->GetIsSelected())
 		return;
 
 	FHitResult HitResult;
-	if(!PlayerController->GetHitResultUnderCursor(ECC_GameTraceChannel1, true, HitResult))
+	if (!PlayerController->GetHitResultUnderCursor(ECC_GameTraceChannel1, true, HitResult) &&
+		PlayerController->GetHitResultUnderCursor(ECC_Visibility, true, HitResult))
 	{
-		UBlackboardComponent* BlackboardComponent = GetBlackboardComponent();
-
-		BlackboardComponent->SetValueAsEnum(BBKeys::UNIT_AI_BBKEY_UNITSTATE, 0);
+		UMoveToAction* MoveAction = NewObject<UMoveToAction>(Unit);
+		MoveAction->InitializeAction(Unit);
+		MoveAction->SetDestination(HitResult.Location);
+	
+		if (! PlayerController->IsInputKeyDown(EKeys::LeftShift))
+		{
+			Unit->ClearActionQueue();
+		}
 		
-		if (PlayerController->GetHitResultUnderCursorByChannel(UEngineTypes::ConvertToTraceType(ECC_Visibility), true, HitResult))
-			BlackboardComponent->SetValueAsVector(BBKeys::UNIT_AI_BBKEY_TARGETLOCATIONTOMOVE, HitResult.Location);
+		Unit->AddActionToQueue(MoveAction);
 	}
 }
