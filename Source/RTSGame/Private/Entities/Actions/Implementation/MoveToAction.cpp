@@ -43,9 +43,13 @@ void UMoveToAction::Execute_Implementation()
 	FPathFollowingRequestResult RequestResult = AIController->MoveTo(MoveRequest, &NavPath);
 
 	if (RequestResult.Code == EPathFollowingRequestResult::RequestSuccessful)
+	{
 		AIController->GetPathFollowingComponent()->OnRequestFinished.AddUObject(this, &UMoveToAction::OnMoveCompleted);
+	}
 	else
-		UE_LOG(LogRGMoveToAction, Warning, TEXT("[Execute] MoveTo request failed."));
+	{
+		OnActionCompletedDelegate().Broadcast();
+	}
 }
 
 void UMoveToAction::Cancel_Implementation()
@@ -53,9 +57,9 @@ void UMoveToAction::Cancel_Implementation()
 }
 
 void UMoveToAction::OnMoveCompleted(FAIRequestID RequestID, const FPathFollowingResult& Result)
-{
-	AIController->GetPathFollowingComponent()->OnRequestFinished.RemoveAll(this);
+{	
+	if (AIController && AIController->GetPathFollowingComponent())
+		AIController->GetPathFollowingComponent()->OnRequestFinished.RemoveAll(this);
 
-	if (Result.Code == EPathFollowingResult::Success)
-		OnActionCompletedDelegate().Broadcast();
+	OnActionCompletedDelegate().Broadcast();
 }
