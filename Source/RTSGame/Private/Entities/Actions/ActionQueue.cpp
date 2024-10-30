@@ -23,7 +23,7 @@ void UActionQueue::ExecuteNextAction()
 	{
 		UBaseAction* CurrentAction = ActionQueue[0];
 		CurrentAction->OnActionCompletedDelegate().AddUObject(this, &UActionQueue::OnActionCompleted);
-		CurrentAction->Execute_Implementation();
+		CurrentAction->Execute_Execute(CurrentAction);
 	}
 }
 
@@ -31,7 +31,7 @@ void UActionQueue::OnActionCompleted()
 {
 	if (ActionQueue.Num() > 0)
 	{
-		ActionQueue[0]->Cancel_Implementation();
+		ActionQueue[0]->Execute_Cancel(ActionQueue[0]);
 		ActionQueue.RemoveAt(0);
 	}
 	
@@ -43,7 +43,7 @@ void UActionQueue::ClearQueue()
 	if(ActionQueue.Num() > 0)
 	{
 		if(ActionQueue[0])
-			ActionQueue[0]->Cancel_Implementation();
+			ActionQueue[0]->Execute_Cancel(ActionQueue[0]);
 		
 		ActionQueue.Empty();
 	}

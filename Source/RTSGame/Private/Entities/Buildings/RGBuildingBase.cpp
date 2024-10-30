@@ -305,7 +305,7 @@ void ARGBuildingBase::SpawnNextUnit()
 				UMoveToAction* MoveToAction = NewObject<UMoveToAction>(this);
 				MoveToAction->InitializeAction(SpawnedUnit);
 				MoveToAction->SetDestination(LastBannerLocation);
-				MoveToAction->Execute_Implementation();
+				MoveToAction->Execute_Execute(MoveToAction);
 
 				SpawnQueue.RemoveAt(0);
 				OnSpawnQueueChanged.Broadcast(SpawnQueue);

@@ -13,7 +13,7 @@ void UCompositeAction::Execute_Implementation()
 	{
 		UBaseAction* CurrentSubaction = SubActions[0];
 
-		CurrentSubaction->Execute_Implementation();
+		CurrentSubaction->Execute_Execute(CurrentSubaction);
 		CurrentSubaction->OnActionCompletedDelegate().AddUObject(this, &UCompositeAction::OnSubActionCompleted);
 	}
 	else
@@ -29,7 +29,7 @@ void UCompositeAction::Cancel_Implementation()
 		UBaseAction* Action = SubActions[i];
 		if (Action)
 		{
-			Action->Cancel_Implementation();
+			Action->Execute_Cancel(Action);
 		}
 	}
 
@@ -46,7 +46,7 @@ void UCompositeAction::OnSubActionCompleted()
 	if (SubActions.Num() > 0)
 	{
 		SubActions.RemoveAt(0);
-		Execute_Implementation();
+		Execute_Execute(this);
 	}
 	else
 	{

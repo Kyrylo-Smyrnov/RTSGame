@@ -168,7 +168,7 @@ void URGActionGridWidget::HandleButtonClick()
 				}
 				else
 				{
-					ActionButton.Value->Execute_Implementation();
+					ActionButton.Value->Execute_Execute(ActionButton.Value);
 				}
 				
 				return;
