@@ -54,6 +54,8 @@ void UMoveToAction::Execute_Implementation()
 
 void UMoveToAction::Cancel_Implementation()
 {
+	if(AIController && AIController->GetPathFollowingComponent())
+		AIController->GetPathFollowingComponent()->OnRequestFinished.RemoveAll(this);
 }
 
 void UMoveToAction::OnMoveCompleted(FAIRequestID RequestID, const FPathFollowingResult& Result)

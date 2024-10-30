@@ -45,21 +45,28 @@ void UAttackAction::Execute_Implementation()
 
 void UAttackAction::Cancel_Implementation()
 {
-	StopAttack(nullptr);
+	if (AttackTimerHandle.IsValid() && ControlledUnit->GetWorld())
+		ControlledUnit->GetWorld()->GetTimerManager().ClearTimer(AttackTimerHandle);
+	
+	if (Target)
+		Target->OnDestroyed.RemoveDynamic(this, &UAttackAction::StopAttack);
+
+	if (UnitAnimInstance)
+		UnitAnimInstance->SetIsAttacking(false);
 }
 
 void UAttackAction::ExecuteAttack()
 {
 	if (!Target || Target->IsPendingKill() || !ControlledUnit || ControlledUnit->IsPendingKill())
 	{
-		StopAttack(nullptr);
+		StopAttack(Target);
 		return;
 	}
 
 	float DistanceToTarget = FVector::Dist(ControlledUnit->GetActorLocation(), Target->GetActorLocation());
 	if (DistanceToTarget > AttackRange)
 	{
-		StopAttack(nullptr);
+		StopAttack(Target);
 		return;
 	}
 
@@ -72,8 +79,8 @@ void UAttackAction::ExecuteAttack()
 
 void UAttackAction::StopAttack(AActor* DestroyedActor)
 {
-	if (AttackTimerHandle.IsValid() && GetWorld())
-			GetWorld()->GetTimerManager().ClearTimer(AttackTimerHandle);
+	if (AttackTimerHandle.IsValid() && ControlledUnit->GetWorld())
+			ControlledUnit->GetWorld()->GetTimerManager().ClearTimer(AttackTimerHandle);
 	
 	if (Target)
 		Target->OnDestroyed.RemoveDynamic(this, &UAttackAction::StopAttack);
