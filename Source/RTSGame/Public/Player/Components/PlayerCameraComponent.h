@@ -5,7 +5,7 @@
 #include "Components/SceneComponent.h"
 #include "CoreMinimal.h"
 #include "GameFramework/SpringArmComponent.h"
-#include "RGPlayerCameraComponent.generated.h"
+#include "PlayerCameraComponent.generated.h"
 
 class USpringArmComponent;
 class UCameraComponent;
