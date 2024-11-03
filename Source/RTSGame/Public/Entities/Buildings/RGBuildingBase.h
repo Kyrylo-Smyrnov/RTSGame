@@ -11,9 +11,9 @@
 #include "GameFramework/Pawn.h"
 #include "RGBuildingBase.generated.h"
 
+class UEntityHandlerComponent;
 class ARGBuildingBanner;
 class ARGPlayerController;
-class ARGPlayerPawn;
 class UDecalComponent;
 class UStaticMeshComponent;
 
@@ -35,8 +35,8 @@ class RTSGAME_API ARGBuildingBase : public APawn
 	bool GetIsConstructing() const;
 	int32 GetImportance() const;
 	UTexture2D* GetSelectionIcon() const;
+	TArray<UBaseAction*> GetAvailableActions() const;
 	TArray<FSpawnQueueEntry>& GetSpawnQueue();
-	TArray<UBaseAction*> GetAvailableActions();
 
 	void SetSelected(bool bIsBuildingSelected);
 	void SetTimeToConstruct(float Time);
@@ -55,11 +55,12 @@ class RTSGAME_API ARGBuildingBase : public APawn
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
 	virtual void InitializeActions();
+
 	UFUNCTION()
 	virtual void HandleOnClicked(AActor* TouchedActor, FKey ButtonPressed);
 
 	UPROPERTY()
-	ARGPlayerPawn* PlayerPawn;
+	UEntityHandlerComponent* EntityHandler;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Components")
 	UDecalComponent* SelectionCircleDecal;
@@ -100,11 +101,7 @@ class RTSGAME_API ARGBuildingBase : public APawn
 
 	UPROPERTY()
 	AActor* ActorToAttackForSpawnedUnits;
-	FTimerHandle SpawnTimerHandle;
-	TArray<FSpawnQueueEntry> SpawnQueue;
-	float RemainingSpawnTime;
-	bool bIsSpawning;
-
+	
 	UPROPERTY()
 	UMaterialInterface* ValidPlacementMaterial;
 	UPROPERTY()
@@ -113,10 +110,15 @@ class RTSGAME_API ARGBuildingBase : public APawn
 	TArray<UMaterialInterface*> BuildingMeshMaterials;
 
 	FVector LastBannerLocation;
+	
+	FTimerHandle SpawnTimerHandle;
+	TArray<FSpawnQueueEntry> SpawnQueue;
+	float RemainingSpawnTime;
 
+	float TimeToConstruct;
+
+	bool bIsSpawning;
 	bool bIsSelected;
 	bool bIsPlacing;
 	bool bIsConstructing;
-
-	float TimeToConstruct;
 };

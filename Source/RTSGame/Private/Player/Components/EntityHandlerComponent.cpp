@@ -4,8 +4,10 @@
 
 #include "Entities/Buildings/RGBuildingBase.h"
 #include "Entities/Units/RGUnitBase.h"
+#include "Kismet/GameplayStatics.h"
+#include "Player/RGPlayerController.h"
 
-UEntityHandlerComponent::UEntityHandlerComponent() : MostImportantEntity(nullptr)
+UEntityHandlerComponent::UEntityHandlerComponent() : PlayerController(nullptr), MostImportantEntity(nullptr)
 {
 	PrimaryComponentTick.bCanEverTick = false;
 }
@@ -16,7 +18,7 @@ bool UEntityHandlerComponent::IsEntitySelected(AActor* Entity) const
 	{
 		return false;
 	}
-	
+
 	if (ARGUnitBase* Unit = Cast<ARGUnitBase>(Entity))
 	{
 		return SelectedUnits.Contains(Unit);
@@ -25,7 +27,7 @@ bool UEntityHandlerComponent::IsEntitySelected(AActor* Entity) const
 	{
 		return SelectedBuildings.Contains(Building);
 	}
-    
+
 	return false;
 }
 
@@ -34,9 +36,9 @@ void UEntityHandlerComponent::AddUnitToSelected(ARGUnitBase* Unit)
 	if (Unit)
 	{
 		SelectedUnits.AddUnique(Unit);
-		Unit->SetSelected(true);
-
 		IdentifyMostImportantEntity();
+
+		Unit->SetSelected(true);
 
 		if (OnSelectedEntitiesChanged.IsBound())
 		{
@@ -50,9 +52,9 @@ void UEntityHandlerComponent::AddBuildingToSelected(ARGBuildingBase* Building)
 	if (Building)
 	{
 		SelectedBuildings.AddUnique(Building);
-		Building->SetSelected(true);
-
 		IdentifyMostImportantEntity();
+
+		Building->SetSelected(true);
 
 		if (OnSelectedEntitiesChanged.IsBound())
 		{
@@ -63,22 +65,31 @@ void UEntityHandlerComponent::AddBuildingToSelected(ARGBuildingBase* Building)
 
 void UEntityHandlerComponent::AddEntitiesToSelected(TArray<AActor*> Entities)
 {
+	if (Entities.Num() == 0)
+	{
+		ClearSelectedEntities();
+		return;
+	}
+
+	if (SelectedUnits.Num() > 0 || SelectedBuildings.Num() > 0)
+	{
+		ClearSelectedEntities();
+	}
+
 	for (AActor* Entity : Entities)
 	{
 		if (Entity)
 		{
 			if (ARGUnitBase* Unit = Cast<ARGUnitBase>(Entity))
 			{
-				SelectedUnits.AddUnique(Unit);
+				AddUnitToSelected(Unit);
 			}
 			else if (ARGBuildingBase* Building = Cast<ARGBuildingBase>(Entity))
 			{
-				SelectedBuildings.AddUnique(Building);
+				AddBuildingToSelected(Building);
 			}
 		}
 	}
-
-	IdentifyMostImportantEntity();
 
 	if (OnSelectedEntitiesChanged.IsBound())
 	{
@@ -93,7 +104,7 @@ void UEntityHandlerComponent::RemoveUnitFromSelected(ARGUnitBase* Unit)
 		SelectedUnits.Remove(Unit);
 		Unit->SetSelected(false);
 
-		if(SelectedUnits.Num() > 0 || SelectedBuildings.Num() > 0)
+		if (SelectedUnits.Num() > 0 || SelectedBuildings.Num() > 0)
 		{
 			IdentifyMostImportantEntity();
 		}
@@ -112,7 +123,7 @@ void UEntityHandlerComponent::RemoveBuildingFromSelected(ARGBuildingBase* Buildi
 		SelectedBuildings.Remove(Building);
 		Building->SetSelected(false);
 
-		if(SelectedBuildings.Num() > 0 || SelectedUnits.Num() > 0)
+		if (SelectedBuildings.Num() > 0 || SelectedUnits.Num() > 0)
 		{
 			IdentifyMostImportantEntity();
 		}
@@ -140,7 +151,7 @@ void UEntityHandlerComponent::ClearSelectedEntities()
 
 	MostImportantEntity = nullptr;
 
-	if(OnMostImportantEntityChanged.IsBound())
+	if (OnMostImportantEntityChanged.IsBound())
 	{
 		OnMostImportantEntityChanged.Broadcast(MostImportantEntity);
 	}
@@ -189,9 +200,28 @@ TArray<AActor*> UEntityHandlerComponent::GetSelectedEntities() const
 	return SelectedEntities;
 }
 
+void UEntityHandlerComponent::HandleLeftMouseButtonInputPressed()
+{
+	FHitResult HitResult;
+
+	if (PlayerController->GetHitResultUnderCursor(ECC_GameTraceChannel1, true, HitResult))
+	{
+	}
+	else if (PlayerController->GetHitResultUnderCursorByChannel(UEngineTypes::ConvertToTraceType(ECC_Visibility), true, HitResult))
+	{
+		ClearSelectedEntities();
+	}
+}
+
 void UEntityHandlerComponent::BeginPlay()
 {
 	Super::BeginPlay();
+
+	PlayerController = Cast<ARGPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	if (PlayerController)
+	{
+		PlayerController->LeftMouseButtonInputPressed.AddUObject(this, &UEntityHandlerComponent::HandleLeftMouseButtonInputPressed);
+	}
 }
 
 void UEntityHandlerComponent::IdentifyMostImportantEntity()

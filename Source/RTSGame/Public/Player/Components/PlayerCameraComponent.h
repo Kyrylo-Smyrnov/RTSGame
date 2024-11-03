@@ -12,12 +12,12 @@ class UCameraComponent;
 class ARGPlayerController;
 
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
-class RTSGAME_API URGPlayerCameraComponent : public USceneComponent
+class RTSGAME_API UPlayerCameraComponent : public USceneComponent
 {
 	GENERATED_BODY()
 
   public:
-	URGPlayerCameraComponent();
+	UPlayerCameraComponent();
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
   protected:

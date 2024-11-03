@@ -7,15 +7,13 @@
 #include "Entities/Buildings/RGBuildingBanner.h"
 #include "Entities/Units/RGUnitBase.h"
 #include "Kismet/GameplayStatics.h"
+#include "Player/Components/EntityHandlerComponent.h"
 #include "Player/RGPlayerController.h"
 #include "Player/RGPlayerPawn.h"
 #include "Player/UI/RGActionGridWidget.h"
 #include "Player/UI/RGPlayerHUD.h"
 
-DEFINE_LOG_CATEGORY_STATIC(LogRGBuildingBase, All, All);
-
-ARGBuildingBase::ARGBuildingBase()
-	: RemainingSpawnTime(0.0f), bIsSpawning(false), bIsSelected(false), bIsPlacing(false), bIsConstructing(false), TimeToConstruct(0.0f)
+ARGBuildingBase::ARGBuildingBase() : RemainingSpawnTime(0.0f), bIsSpawning(false), bIsSelected(false), bIsPlacing(false), bIsConstructing(false), TimeToConstruct(0.0f)
 {
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -36,14 +34,13 @@ ARGBuildingBase::ARGBuildingBase()
 		TEXT("/Game/Entities/Buildings/Materials/M_BuildingInvalidPlacement.M_BuildingInvalidPlacement"));
 
 	if (ValidPlacementMaterialFinder.Succeeded())
-		ValidPlacementMaterial = ValidPlacementMaterialFinder.Object;
-	else
-		UE_LOG(LogRGBuildingBase, Warning, TEXT("[Constructor] ValidPlacementMaterial not found."));
-
+	{
+		ValidPlacementMaterial = ValidPlacementMaterialFinder.Object;	
+	}
 	if (InValidPlacementMaterialFinder.Succeeded())
+	{
 		InValidPlacementMaterial = InValidPlacementMaterialFinder.Object;
-	else
-		UE_LOG(LogRGBuildingBase, Warning, TEXT("[Constructor] ValidPlacementMaterial not found."));
+	}
 }
 
 void ARGBuildingBase::AddUnitToSpawnQueue(TSubclassOf<AActor> UnitClass, float SpawnTime)
@@ -56,7 +53,9 @@ void ARGBuildingBase::AddUnitToSpawnQueue(TSubclassOf<AActor> UnitClass, float S
 	OnSpawnQueueChanged.Broadcast(SpawnQueue);
 
 	if (!bIsSpawning)
+	{
 		SpawnNextUnit();
+	}
 }
 
 bool ARGBuildingBase::GetIsSelected() const
@@ -76,10 +75,12 @@ int32 ARGBuildingBase::GetImportance() const
 
 UTexture2D* ARGBuildingBase::GetSelectionIcon() const
 {
-	if (!SelectionIcon)
-		UE_LOG(LogRGBuildingBase, Warning, TEXT("[GetSelectionIcon] SelectionIcon is nullptr."))
-
 	return SelectionIcon;
+}
+
+TArray<UBaseAction*> ARGBuildingBase::GetAvailableActions() const
+{
+	return AvailableActions;
 }
 
 TArray<FSpawnQueueEntry>& ARGBuildingBase::GetSpawnQueue()
@@ -87,23 +88,17 @@ TArray<FSpawnQueueEntry>& ARGBuildingBase::GetSpawnQueue()
 	return SpawnQueue;
 }
 
-TArray<UBaseAction*> ARGBuildingBase::GetAvailableActions()
-{
-	return AvailableActions;
-}
-
 void ARGBuildingBase::SetSelected(bool bIsBuildingSelected)
 {
 	if (!SelectionCircleDecal)
 	{
-		UE_LOG(LogRGBuildingBase, Warning, TEXT("[SetSelected] SelectionCircleDecal is nullptr."));
 		return;
 	}
 
 	bIsSelected = bIsBuildingSelected;
 	SelectionCircleDecal->SetVisibility(bIsBuildingSelected);
 
-	if (bIsBuildingSelected && PlayerPawn->GetMostImportantEntity() == this)
+	if (bIsBuildingSelected && Cast<ARGBuildingBase>(EntityHandler->GetMostImportantEntity()) == this)
 	{
 		if (!BuildingBanner)
 		{
@@ -112,8 +107,11 @@ void ARGBuildingBase::SetSelected(bool bIsBuildingSelected)
 	}
 	else
 	{
-		BuildingBanner->Destroy();
-		BuildingBanner = nullptr;
+		if(BuildingBanner)
+		{
+			BuildingBanner->Destroy();
+			BuildingBanner = nullptr;
+		}
 	}
 }
 
@@ -126,12 +124,10 @@ void ARGBuildingBase::SetBuildingPlacementMaterial(const bool IsValidPlacement)
 {
 	if (!StaticMeshComponentCurrent)
 	{
-		UE_LOG(LogRGBuildingBase, Warning, TEXT("[SetBuildingPlacementMaterial] StaticMeshComponent is nullptr."));
 		return;
 	}
 	if (!ValidPlacementMaterial || !InValidPlacementMaterial)
 	{
-		UE_LOG(LogRGBuildingBase, Warning, TEXT("[SetBuildingPlacementMaterial] Placement materials aren't set."));
 		return;
 	}
 
@@ -144,9 +140,6 @@ void ARGBuildingBase::SetBuildingPlacementMaterial(const bool IsValidPlacement)
 
 void ARGBuildingBase::SetBuildingMeshMaterials()
 {
-	if (!StaticMeshComponentCurrent)
-		UE_LOG(LogRGBuildingBase, Warning, TEXT("[SetBuildingMeshMaterials] StaticMeshComponent is nullptr."));
-
 	for (int i = 0; i < BuildingMeshMaterials.Num(); ++i)
 		StaticMeshComponentCurrent->SetMaterial(i, BuildingMeshMaterials[i]);
 }
@@ -176,38 +169,38 @@ void ARGBuildingBase::BeginPlay()
 	BuildingMeshMaterials = StaticMeshComponentCurrent->GetMaterials();
 
 	PlayerController = Cast<ARGPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
-	if (!PlayerController)
-		UE_LOG(LogRGBuildingBase, Warning, TEXT("[BeginPlay] PlayerController is nullptr."));
-
-	PlayerController->RightMouseButtonInputPressed.AddUObject(this, &ARGBuildingBase::HandleRightMouseButtonInputPressed);
-
-	PlayerPawn = Cast<ARGPlayerPawn>(PlayerController->GetPawn());
-	if (!PlayerPawn)
+	if(PlayerController)
 	{
-		UE_LOG(LogRGBuildingBase, Warning, TEXT("[BeginPlay] PlayerPawn is nullptr."));
-		return;
+		PlayerController->RightMouseButtonInputPressed.AddUObject(this, &ARGBuildingBase::HandleRightMouseButtonInputPressed);
+		EntityHandler = Cast<ARGPlayerPawn>(PlayerController->GetPawn())->GetEntityHandler();
 	}
-
+	
 	if (!bIsPlacing)
+	{
 		LastBannerLocation = GetActorLocation() + FVector(0.0f, 500.0f, 0.0f);
-
+	}
+	
 	InitializeActions();
 }
 
 void ARGBuildingBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	
 	if (bIsPlacing)
+	{
 		HandleBuildingPlacing();
+	}
 }
 
-void ARGBuildingBase::InitializeActions() { }
+void ARGBuildingBase::InitializeActions()
+{
+}
 
 void ARGBuildingBase::HandleOnClicked(AActor* TouchedActor, FKey ButtonPressed)
 {
-	if (!PlayerController || !PlayerPawn)
+	if (!PlayerController || !EntityHandler)
 	{
-		UE_LOG(LogRGBuildingBase, Warning, TEXT("[HandleOnClicked] PlayerController or PlayerPawn is nullptr."));
 		return;
 	}
 
@@ -229,31 +222,26 @@ void ARGBuildingBase::HandleOnClicked(AActor* TouchedActor, FKey ButtonPressed)
 		bool bIsShiftDown = PlayerController->IsInputKeyDown(EKeys::LeftShift);
 		bool bIsCtrlDown = PlayerController->IsInputKeyDown(EKeys::LeftControl);
 
-		if (!PlayerPawn->IsEntitySelected(this))
+		if (!EntityHandler->IsEntitySelected(this))
 		{
 			if (bIsShiftDown)
 			{
-				// Shift + Click: add a entity to selected
-				PlayerPawn->AddEntitiesToSelected(this);
+				EntityHandler->AddBuildingToSelected(this);
 			}
 			else
 			{
-				// Click without Shift: deselect all other entities and select clicked entity.
-				PlayerPawn->ClearSelectedEntities();
-				PlayerPawn->AddEntitiesToSelected(this);
+				EntityHandler->ClearSelectedEntities();
+				EntityHandler->AddBuildingToSelected(this);
 			}
 		}
 		else if (bIsCtrlDown)
 		{
-			// Ctrl + Click: Remove entity from selected
-			PlayerPawn->RemoveEntityFromSelected(this);
+			EntityHandler->RemoveBuildingFromSelected(this);
 		}
 		else
 		{
-			// Click on an already selected entity without Shift and Ctrl
-			// Deselect all other entities and leave this one selected
-			PlayerPawn->ClearSelectedEntities();
-			PlayerPawn->AddEntitiesToSelected(this);
+			EntityHandler->ClearSelectedEntities();
+			EntityHandler->AddBuildingToSelected(this);
 		}
 	}
 }
@@ -333,7 +321,6 @@ void ARGBuildingBase::HandleBuildingConstructing()
 	if (TimeToConstruct == 0.0f || !StaticMeshConstructionPhase1 ||
 		!StaticMeshConstructionPhase2 || !StaticMeshConstructionPhase3)
 	{
-		UE_LOG(LogRGBuildingBase, Warning, TEXT("[HandleBuildingConstructing] Invalid input to perform constructing."));
 		return;
 	}
 
@@ -365,11 +352,11 @@ void ARGBuildingBase::HandleBuildingConstructing()
 			OnConstructionProgressChanged.Broadcast(0.0f);
 			OnSpawnQueueChanged.Broadcast(SpawnQueue);
 
-			if(Cast<ARGBuildingBase>(PlayerPawn->GetMostImportantEntity()) == this)
+			if(Cast<ARGBuildingBase>(EntityHandler->GetMostImportantEntity()) == this)
 			{
 				if(ARGPlayerHUD* PlayerHUD = Cast<ARGPlayerHUD>(PlayerController->GetHUD()))
 				{
-					PlayerHUD->GetActionGridWidget()->UpdateWidget(PlayerPawn->GetMostImportantEntity());
+					PlayerHUD->GetActionGridWidget()->UpdateWidget(EntityHandler->GetMostImportantEntity());
 				}
 			}
 		} }, 0.1f, true);
@@ -377,12 +364,13 @@ void ARGBuildingBase::HandleBuildingConstructing()
 
 void ARGBuildingBase::HandleRightMouseButtonInputPressed()
 {
-	if (PlayerPawn->GetMostImportantEntity() != this)
+	if (EntityHandler->GetMostImportantEntity() != this)
+	{
 		return;
+	}
 
 	if (!BuildingBannerClass)
 	{
-		UE_LOG(LogRGBuildingBase, Warning, TEXT("[HandleRightMouseButtonInputPressedUninteractable] BuildingBannerClass is nullptr."));
 		return;
 	}
 

@@ -6,11 +6,12 @@
 #include "CoreMinimal.h"
 #include "EntityHandlerComponent.generated.h"
 
+class ARGPlayerController;
 class ARGUnitBase;
 class ARGBuildingBase;
 
-DECLARE_MULTICAST_DELEGATE_OneParam(FOnSelectedEntitiesChanged, TArray<AActor*>)
-DECLARE_MULTICAST_DELEGATE_OneParam(FOnMostImportantEntityChanged, AActor*)
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnSelectedEntitiesChanged, TArray<AActor*>);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnMostImportantEntityChanged, AActor*);
 
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class RTSGAME_API UEntityHandlerComponent : public UActorComponent
@@ -40,8 +41,13 @@ class RTSGAME_API UEntityHandlerComponent : public UActorComponent
 	virtual void BeginPlay() override;
 
   private:
+	void HandleLeftMouseButtonInputPressed();
+	
 	void IdentifyMostImportantEntity();
 	static bool CompareEntityImportance(const AActor& A, const AActor& B);
+
+	UPROPERTY()
+	ARGPlayerController* PlayerController;
 
 	UPROPERTY()
 	AActor* MostImportantEntity;
