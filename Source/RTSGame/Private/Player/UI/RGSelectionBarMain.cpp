@@ -5,36 +5,32 @@
 #include "Kismet/GameplayStatics.h"
 #include "Player/RGPlayerController.h"
 #include "Player/RGPlayerPawn.h"
+#include "Player/Components/EntityHandlerComponent.h"
 #include "Player/UI/RGSelectionBarQueue.h"
 #include "Player/UI/RGSelectionBarSquad.h"
-
-DEFINE_LOG_CATEGORY_STATIC(LogRGSelectionBarMain, All, All);
 
 void URGSelectionBarMain::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	PlayerController = Cast<ARGPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
-	if (!PlayerController)
+	const ARGPlayerController* PlayerController = Cast<ARGPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	if(!PlayerController)
 	{
-		UE_LOG(LogRGSelectionBarMain, Warning, TEXT("[NativeConstruct] PlayerController is nullptr."));
 		return;
 	}
-
-	ARGPlayerPawn* PlayerPawn = Cast<ARGPlayerPawn>(PlayerController->GetPawn());
-	if (!PlayerPawn)
+	EntityHandler = Cast<ARGPlayerPawn>(PlayerController->GetPawn())->GetEntityHandler();
+	if(EntityHandler)
 	{
-		UE_LOG(LogRGSelectionBarMain, Warning, TEXT("[NativeConstruct] PlayerPawn is nullptr."));
-		return;
+		EntityHandler->OnSelectedEntitiesChanged.AddUObject(this, &URGSelectionBarMain::UpdateWidget);
 	}
-
-	PlayerPawn->OnSelectedEntitiesChanged.AddUObject(this, &URGSelectionBarMain::UpdateWidget);
 }
 
 void URGSelectionBarMain::UpdateWidget(TArray<AActor*> SelectedEntities)
 {
 	if (SelectedBuilding)
+	{
 		SelectedBuilding->OnSpawnQueueChanged.RemoveAll(this);
+	}
 
 	if (SelectedEntities.Num() == 1)
 	{

@@ -6,9 +6,9 @@
 #include "CoreMinimal.h"
 #include "RGSelectionBarMain.generated.h"
 
-class ARGBuildingBase;
 struct FSpawnQueueEntry;
-class ARGPlayerController;
+class UEntityHandlerComponent;
+class ARGBuildingBase;
 class URGSelectionBarSquad;
 class URGSelectionBarQueue;
 
@@ -38,9 +38,9 @@ class RTSGAME_API URGSelectionBarMain : public UUserWidget
   private:
 	void HandleSpawnQueueChange(TArray<FSpawnQueueEntry>& SpawnQueue);
 
-	
 	UPROPERTY()
-	ARGPlayerController* PlayerController;
+	UEntityHandlerComponent* EntityHandler;
+	UPROPERTY()
 	ARGBuildingBase* SelectedBuilding;
 
 	ECurrentWidgetState CurrentState;
