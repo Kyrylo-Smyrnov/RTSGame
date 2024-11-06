@@ -2,39 +2,30 @@
 
 #include "Player/UI/RGActionGridWidget.h"
 #include "Components/Button.h"
-#include "Components/GridPanel.h"
-#include "Components/GridSlot.h"
 #include "Components/Image.h"
-#include "Components/SizeBox.h"
-#include "Entities/Buildings/RGBuildingTownHall.h"
-#include "Entities/Units/RGUnitPeasant.h"
+#include "Entities/Buildings/RGBuildingBase.h"
+#include "Entities/Units/RGUnitBase.h"
 #include "Kismet/GameplayStatics.h"
+#include "Player/Components/EntityHandlerComponent.h"
 #include "Player/RGPlayerController.h"
 #include "Player/RGPlayerPawn.h"
-
-DEFINE_LOG_CATEGORY_STATIC(LogRGActionGridWidget, All, All);
 
 void URGActionGridWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
-
 	InitializeWidget();
 
-	PlayerController = Cast<ARGPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	const ARGPlayerController* PlayerController = Cast<ARGPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 	if (!PlayerController)
 	{
-		UE_LOG(LogRGActionGridWidget, Warning, TEXT("[NativeConstruct] PlayerController is nullptr."));
 		return;
 	}
 
-	ARGPlayerPawn* PlayerPawn = Cast<ARGPlayerPawn>(PlayerController->GetPawn());
-	if (!PlayerPawn)
+	EntityHandler = Cast<ARGPlayerPawn>(PlayerController->GetPawn())->GetEntityHandler();
+	if (EntityHandler)
 	{
-		UE_LOG(LogRGActionGridWidget, Warning, TEXT("[NativeConstruct] PlayerPawn is nullptr."));
-		return;
+		EntityHandler->OnMostImportantEntityChanged.AddUObject(this, &URGActionGridWidget::UpdateWidget);
 	}
-
-	PlayerPawn->OnMostImportantEntityChanged.AddUObject(this, &URGActionGridWidget::UpdateWidget);
 }
 
 void URGActionGridWidget::UpdateWidget(AActor* MostImportantEntity)
@@ -56,9 +47,13 @@ void URGActionGridWidget::UpdateWidget(AActor* MostImportantEntity)
 	{
 		TArray<UBaseAction*> AvailableActions;
 		if (ARGUnitBase* CastedUnit = Cast<ARGUnitBase>(MostImportantEntity))
+		{
 			AvailableActions = CastedUnit->GetAvailableActions();
+		}
 		else if (ARGBuildingBase* CastedBuilding = Cast<ARGBuildingBase>(MostImportantEntity))
+		{
 			AvailableActions = CastedBuilding->GetAvailableActions();
+		}
 
 		int32 Index = 0;
 		for (auto& Action : ActionButtons)
@@ -96,67 +91,59 @@ void URGActionGridWidget::UpdateWidget(AActor* MostImportantEntity)
 
 void URGActionGridWidget::InitializeWidget()
 {
-	if (!ActionGrid)
-	{
-		UE_LOG(LogRGActionGridWidget, Warning, TEXT("[InitializeWidget] ActionGrid is nullptr."));
-		return;
-	}
-
-	const int32 ROWS = 3;
-	const int32 COLS = 4;
-	const float BUTTON_PADDING = 1.0f;
-	const float BUTTON_MARGIN = 20.0f;
-	const FVector2D BUTTON_SIZE(75.0f, 75.0f);
-
-	ActionGrid->SetRenderTranslation(
-		FVector2D(-BUTTON_SIZE.X * COLS - BUTTON_MARGIN, -BUTTON_SIZE.Y * ROWS - BUTTON_MARGIN));
-
-	for (int32 Row = 0; Row < ROWS; ++Row)
-	{
-		for (int32 Col = 0; Col < COLS; ++Col)
-		{
-			UImage* ActionIcon = NewObject<UImage>(this);
-			ActionIcon->SetVisibility(ESlateVisibility::Hidden);
-			ActionIcon->SetBrushSize(BUTTON_SIZE);
-			ActionIcons.Add(ActionIcon);
-
-			UButton* ActionButton = NewObject<UButton>(this);
-			ActionButton->SetVisibility(ESlateVisibility::Visible);
-			ActionButton->SetIsEnabled(false);
-			ActionButton->AddChild(ActionIcon);
-			ActionButton->OnClicked.AddDynamic(this, &URGActionGridWidget::HandleButtonClick);
-			ActionButtons.Add(ActionButton, nullptr);
-
-			USizeBox* SizeBox = NewObject<USizeBox>(this);
-			SizeBox->SetWidthOverride(BUTTON_SIZE.X);
-			SizeBox->SetHeightOverride(BUTTON_SIZE.Y);
-			SizeBox->AddChild(ActionButton);
-
-			UGridSlot* GridSlot = Cast<UGridSlot>(ActionGrid->AddChildToGrid(SizeBox, Row, Col));
-
-			if (GridSlot)
-				GridSlot->SetPadding(FMargin(BUTTON_PADDING));
-		}
-	}
+	ActionButtons.Add(ActionButton_0, nullptr);
+	ActionButton_0->SetIsEnabled(false);
+	ActionButton_0->OnClicked.AddDynamic(this, &URGActionGridWidget::HandleButtonClick);
+	ActionIcons.Add(ActionImage_0);
+	ActionButtons.Add(ActionButton_1, nullptr);
+	ActionButton_1->SetIsEnabled(false);
+	ActionButton_1->OnClicked.AddDynamic(this, &URGActionGridWidget::HandleButtonClick);
+	ActionIcons.Add(ActionImage_1);
+	ActionButtons.Add(ActionButton_2, nullptr);
+	ActionButton_2->SetIsEnabled(false);
+	ActionButton_2->OnClicked.AddDynamic(this, &URGActionGridWidget::HandleButtonClick);
+	ActionIcons.Add(ActionImage_2);
+	ActionButtons.Add(ActionButton_3, nullptr);
+	ActionButton_3->SetIsEnabled(false);
+	ActionButton_3->OnClicked.AddDynamic(this, &URGActionGridWidget::HandleButtonClick);
+	ActionIcons.Add(ActionImage_3);
+	ActionButtons.Add(ActionButton_4, nullptr);
+	ActionButton_4->SetIsEnabled(false);
+	ActionButton_4->OnClicked.AddDynamic(this, &URGActionGridWidget::HandleButtonClick);
+	ActionIcons.Add(ActionImage_4);
+	ActionButtons.Add(ActionButton_5, nullptr);
+	ActionButton_5->SetIsEnabled(false);
+	ActionButton_5->OnClicked.AddDynamic(this, &URGActionGridWidget::HandleButtonClick);
+	ActionIcons.Add(ActionImage_5);
+	ActionButtons.Add(ActionButton_6, nullptr);
+	ActionButton_6->SetIsEnabled(false);
+	ActionButton_6->OnClicked.AddDynamic(this, &URGActionGridWidget::HandleButtonClick);
+	ActionIcons.Add(ActionImage_6);
+	ActionButtons.Add(ActionButton_7, nullptr);
+	ActionButton_7->SetIsEnabled(false);
+	ActionButton_7->OnClicked.AddDynamic(this, &URGActionGridWidget::HandleButtonClick);
+	ActionIcons.Add(ActionImage_7);
+	ActionButtons.Add(ActionButton_8, nullptr);
+	ActionButton_8->SetIsEnabled(false);
+	ActionButton_8->OnClicked.AddDynamic(this, &URGActionGridWidget::HandleButtonClick);
+	ActionIcons.Add(ActionImage_8);
+	ActionButtons.Add(ActionButton_9, nullptr);
+	ActionButton_9->SetIsEnabled(false);
+	ActionButton_9->OnClicked.AddDynamic(this, &URGActionGridWidget::HandleButtonClick);
+	ActionIcons.Add(ActionImage_9);
+	ActionButtons.Add(ActionButton_10, nullptr);
+	ActionButton_10->SetIsEnabled(false);
+	ActionButton_10->OnClicked.AddDynamic(this, &URGActionGridWidget::HandleButtonClick);
+	ActionIcons.Add(ActionImage_10);
+	ActionButtons.Add(ActionButton_11, nullptr);
+	ActionButton_11->SetIsEnabled(false);
+	ActionButton_11->OnClicked.AddDynamic(this, &URGActionGridWidget::HandleButtonClick);
+	ActionIcons.Add(ActionImage_11);
 }
 
 void URGActionGridWidget::HandleButtonClick()
 {
-	ARGPlayerPawn* PlayerPawn = Cast<ARGPlayerPawn>(PlayerController->GetPawn());
-	if (!PlayerPawn)
-	{
-		UE_LOG(LogRGActionGridWidget, Warning, TEXT("[HandleButtonClick] PlayerPawn is nullptr."))
-		return;
-	}
-
-	AActor* MostImportanEntity = PlayerPawn->GetMostImportantEntity();
-	if (!MostImportanEntity)
-	{
-		UE_LOG(LogRGActionGridWidget, Warning, TEXT("[HandleButtonClick] MostImportanEntity is nullptr."))
-		return;
-	}
-
-	for (auto& ActionButton : ActionButtons)
+	for (const auto& ActionButton : ActionButtons)
 	{
 		if (ActionButton.Key->IsHovered() && ActionButton.Key->GetIsEnabled())
 		{
@@ -164,13 +151,13 @@ void URGActionGridWidget::HandleButtonClick()
 			{
 				if (ActionButton.Value->GetActionData().TargetType != EActionTargetType::None)
 				{
-					PlayerPawn->SetAwaitingAction(ActionButton.Value);
+					EntityHandler->SetAwaitingAction(ActionButton.Value);
 				}
 				else
 				{
-					ActionButton.Value->Execute_Implementation();
+					EntityHandler->ExecuteAction(ActionButton.Value);
 				}
-				
+
 				return;
 			}
 		}

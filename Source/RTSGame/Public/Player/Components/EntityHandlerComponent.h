@@ -6,6 +6,7 @@
 #include "CoreMinimal.h"
 #include "EntityHandlerComponent.generated.h"
 
+class UBaseAction;
 class ARGPlayerController;
 class ARGUnitBase;
 class ARGBuildingBase;
@@ -34,6 +35,9 @@ class RTSGAME_API UEntityHandlerComponent : public UActorComponent
 	AActor* GetMostImportantEntity() const;
 	TArray<AActor*> GetSelectedEntities() const;
 
+	void SetAwaitingAction(UBaseAction* Action);
+	void ExecuteAction(UBaseAction* Action);
+
 	FOnSelectedEntitiesChanged OnSelectedEntitiesChanged;
 	FOnMostImportantEntityChanged OnMostImportantEntityChanged;
 
@@ -42,7 +46,8 @@ class RTSGAME_API UEntityHandlerComponent : public UActorComponent
 
   private:
 	void HandleLeftMouseButtonInputPressed();
-	
+	void ExecuteActionWithTarget(TVariant<FVector, AActor*> TargetVariant, bool bMustBeEnqueued);
+
 	void IdentifyMostImportantEntity();
 	static bool CompareEntityImportance(const AActor& A, const AActor& B);
 
@@ -53,4 +58,7 @@ class RTSGAME_API UEntityHandlerComponent : public UActorComponent
 	AActor* MostImportantEntity;
 	TArray<ARGUnitBase*> SelectedUnits;
 	TArray<ARGBuildingBase*> SelectedBuildings;
+
+	UPROPERTY()
+	UBaseAction* AwaitingAction;
 };

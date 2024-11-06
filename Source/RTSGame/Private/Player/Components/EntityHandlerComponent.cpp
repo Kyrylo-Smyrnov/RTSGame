@@ -2,12 +2,17 @@
 
 #include "Player/Components/EntityHandlerComponent.h"
 
+#include "Entities/Actions/Interfaces/TargetTypeActorAction.h"
+#include "Entities/Actions/Interfaces/TargetTypeLocationAction.h"
+#include "Entities/Actions/Interfaces/UnitAction.h"
 #include "Entities/Buildings/RGBuildingBase.h"
 #include "Entities/Units/RGUnitBase.h"
 #include "Kismet/GameplayStatics.h"
 #include "Player/RGPlayerController.h"
 
-UEntityHandlerComponent::UEntityHandlerComponent() : PlayerController(nullptr), MostImportantEntity(nullptr)
+class ITargetTypeActorAction;
+class ITargetTypeLocationAction;
+UEntityHandlerComponent::UEntityHandlerComponent() : PlayerController(nullptr), MostImportantEntity(nullptr), AwaitingAction(nullptr)
 {
 	PrimaryComponentTick.bCanEverTick = false;
 }
@@ -200,16 +205,102 @@ TArray<AActor*> UEntityHandlerComponent::GetSelectedEntities() const
 	return SelectedEntities;
 }
 
+void UEntityHandlerComponent::SetAwaitingAction(UBaseAction* Action)
+{
+	AwaitingAction = Action;
+}
+
+void UEntityHandlerComponent::ExecuteAction(UBaseAction* Action)
+{
+	for (const ARGUnitBase* Unit : SelectedUnits)
+	{
+		if (Unit->CanPerformAction(Action))
+		{
+			Unit->ClearActionQueue();
+			Unit->AddActionToQueue(Action);
+		}
+	}
+}
+
 void UEntityHandlerComponent::HandleLeftMouseButtonInputPressed()
 {
 	FHitResult HitResult;
 
 	if (PlayerController->GetHitResultUnderCursor(ECC_GameTraceChannel1, true, HitResult))
 	{
+		if (AwaitingAction && AwaitingAction->GetActionData().TargetType == EActionTargetType::Actor)
+		{
+			TVariant<FVector, AActor*> TargetVariant;
+			if (HitResult.Actor.IsValid())
+			{
+				TargetVariant.Set<AActor*>(HitResult.Actor.Get());
+				ExecuteActionWithTarget(TargetVariant, PlayerController->IsInputKeyDown(EKeys::LeftShift));
+			}
+		}
 	}
 	else if (PlayerController->GetHitResultUnderCursorByChannel(UEngineTypes::ConvertToTraceType(ECC_Visibility), true, HitResult))
 	{
-		ClearSelectedEntities();
+		if (AwaitingAction && AwaitingAction->GetActionData().TargetType == EActionTargetType::Location)
+		{
+			TVariant<FVector, AActor*> TargetVariant;
+			TargetVariant.Set<FVector>(HitResult.Location);
+			ExecuteActionWithTarget(TargetVariant, PlayerController->IsInputKeyDown(EKeys::LeftShift));
+		}
+		else
+		{
+			AwaitingAction = nullptr;
+			ClearSelectedEntities();
+		}
+	}
+}
+void UEntityHandlerComponent::ExecuteActionWithTarget(TVariant<FVector, AActor*> TargetVariant, bool bMustBeEnqueued)
+{
+	TArray<ARGUnitBase*> MustBePerformedBy;
+	for (ARGUnitBase* Unit : SelectedUnits)
+	{
+		if (Unit->CanPerformAction(AwaitingAction))
+		{
+			MustBePerformedBy.Add(Unit);
+		}
+	}
+
+	for (ARGUnitBase* Unit : MustBePerformedBy)
+	{
+		UBaseAction* NewActionInstance = DuplicateObject(AwaitingAction, this);
+		if (NewActionInstance)
+		{
+			if (NewActionInstance->GetClass()->ImplementsInterface(UUnitAction::StaticClass()))
+			{
+				IUnitAction* UnitAction = Cast<IUnitAction>(NewActionInstance);
+				if (UnitAction)
+				{
+					UnitAction->InitializeAction(Unit);
+				}
+			}
+			if (TargetVariant.IsType<FVector>() && NewActionInstance->GetClass()->ImplementsInterface(UTargetTypeLocationAction::StaticClass()))
+			{
+				ITargetTypeLocationAction* TargetTypeLocationAction = Cast<ITargetTypeLocationAction>(NewActionInstance);
+				if (TargetTypeLocationAction)
+				{
+					TargetTypeLocationAction->SetDestination(TargetVariant.Get<FVector>());
+				}
+			}
+			if (TargetVariant.IsType<AActor*>() && NewActionInstance->GetClass()->ImplementsInterface(UTargetTypeActorAction::StaticClass()))
+			{
+				ITargetTypeActorAction* TargetTypeActorAction = Cast<ITargetTypeActorAction>(NewActionInstance);
+				if (TargetTypeActorAction)
+				{
+					TargetTypeActorAction->SetTarget(TargetVariant.Get<AActor*>());
+				}
+			}
+		}
+
+		if (!bMustBeEnqueued)
+		{
+			Unit->ClearActionQueue();
+		}
+
+		Unit->AddActionToQueue(NewActionInstance);
 	}
 }
 
