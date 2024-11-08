@@ -97,8 +97,7 @@ void ARGUnitBase::BeginPlay()
 	{
 		return;
 	}
-
-	InitializeActions();
+	
 	ActionQueue = NewObject<UActionQueue>();
 	ActionQueue->Initialize(this);
 }

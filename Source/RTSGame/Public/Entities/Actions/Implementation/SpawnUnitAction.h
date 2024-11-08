@@ -15,11 +15,10 @@ class RTSGAME_API USpawnUnitAction : public UBaseAction
 	GENERATED_BODY()
 
   public:
-	USpawnUnitAction();
+	virtual void Execute() override;
+	virtual void Cancel() override;
 	
-	void InitializeAction(TSubclassOf<ACharacter> InUnitClass, ARGBuildingBase* InTargetBuilding, ARGPlayerPawn* PlayerPawn);
-	virtual void Execute_Implementation() override;
-	virtual void Cancel_Implementation() override;
+	void InitializeAction(const TSubclassOf<ACharacter> InUnitClass, ARGBuildingBase* InTargetBuilding, ARGPlayerPawn* PlayerPawn);
 
   private:
 	TSubclassOf<ACharacter> UnitClass;

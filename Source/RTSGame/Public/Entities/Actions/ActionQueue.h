@@ -16,11 +16,12 @@ class RTSGAME_API UActionQueue : public UObject
   public:
 	void Initialize(ARGUnitBase* InUnit);
 	void EnqueueAction(UBaseAction* NewAction);
-	void ExecuteNextAction();
-	void OnActionCompleted();
 	void ClearQueue();
 
   private:
+	void ExecuteNextAction();
+	void OnActionCompleted();
+	
 	UPROPERTY()
 	ARGUnitBase* ControlledUnit;
 	TArray<UBaseAction*> ActionQueue;

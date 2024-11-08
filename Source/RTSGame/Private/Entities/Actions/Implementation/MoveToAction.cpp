@@ -6,35 +6,10 @@
 #include "Entities/Units/RGUnitBase.h"
 #include "Navigation/PathFollowingComponent.h"
 
-DEFINE_LOG_CATEGORY_STATIC(LogRGMoveToAction, All, All)
-
-UMoveToAction::UMoveToAction()
-	: ControlledUnit(nullptr), AIController(nullptr), Destination(FVector::ZeroVector)
+void UMoveToAction::Execute()
 {
-}
-
-void UMoveToAction::InitializeAction(ARGUnitBase* Unit)
-{
-	ControlledUnit = Unit;
-	AIController = Cast<ARGUnitAIController>(ControlledUnit->GetController());
-}
-
-void UMoveToAction::SetDestination(FVector InDestination)
-{
-	Destination = InDestination;
-}
-
-void UMoveToAction::Execute_Implementation()
-{
-	if (!ControlledUnit || !AIController)
+	if (!ControlledUnit || !AIController || Destination == FVector::ZeroVector)
 	{
-		UE_LOG(LogRGMoveToAction, Warning, TEXT("[Execute] It is necessary to initialize the action before execution."));
-		return;
-	}
-
-	if (Destination == FVector::ZeroVector)
-	{
-		UE_LOG(LogRGMoveToAction, Warning, TEXT("[Execute] It is necessary to set up the destination before execution."));
 		return;
 	}
 
@@ -52,12 +27,19 @@ void UMoveToAction::Execute_Implementation()
 	}
 }
 
-void UMoveToAction::Cancel_Implementation()
+void UMoveToAction::InitializeAction(ARGUnitBase* Unit)
 {
+	ControlledUnit = Unit;
+	AIController = Cast<ARGUnitAIController>(ControlledUnit->GetController());
+}
+
+void UMoveToAction::SetDestination(const FVector InDestination)
+{
+	Destination = InDestination;
 }
 
 void UMoveToAction::OnMoveCompleted(FAIRequestID RequestID, const FPathFollowingResult& Result)
-{	
+{
 	if (AIController && AIController->GetPathFollowingComponent())
 		AIController->GetPathFollowingComponent()->OnRequestFinished.RemoveAll(this);
 

@@ -41,6 +41,9 @@ class RTSGAME_API ARGUnitBase : public ACharacter
 
 	UPROPERTY(EditDefaultsOnly, Category = "Components")
 	UDecalComponent* SelectionCircleDecal;
+	
+	UPROPERTY()
+	ARGPlayerController* PlayerController;
 	UPROPERTY()
 	UEntityHandlerComponent* EntityHandler;
 
@@ -53,8 +56,6 @@ class RTSGAME_API ARGUnitBase : public ACharacter
 	EFEntitiesImportance UnitImportance;
 
   private:
-	UPROPERTY()
-	ARGPlayerController* PlayerController;
 	UPROPERTY()
 	class UActionQueue* ActionQueue;
 

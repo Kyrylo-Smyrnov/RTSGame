@@ -5,10 +5,7 @@
 #include "Entities/Buildings/RGBuildingBase.h"
 #include "Player/RGPlayerPawn.h"
 
-DEFINE_LOG_CATEGORY_STATIC(LogRGConstructBuildingAction, All, All);
-
-UConstructBuildingAction::UConstructBuildingAction()
-	: BuildingClass(nullptr), PlayerPawn(nullptr)
+UConstructBuildingAction::UConstructBuildingAction() : BuildingClass(nullptr), PlayerPawn(nullptr)
 {
 }
 
@@ -18,17 +15,10 @@ void UConstructBuildingAction::InitializeAction(TSubclassOf<AActor> InBuildingCl
 	PlayerPawn = InPlayerPawn;
 }
 
-void UConstructBuildingAction::Execute_Implementation()
+void UConstructBuildingAction::Execute()
 {
-	if (!BuildingClass || !PlayerPawn)
+	if (!BuildingClass || !PlayerPawn || ActionData.ActionName == NAME_None)
 	{
-		UE_LOG(LogRGConstructBuildingAction, Warning, TEXT("[Execute] It is necessary to initialize the action before execution."));
-		return;
-	}
-
-	if (ActionData.ActionName == NAME_None)
-	{
-		UE_LOG(LogRGConstructBuildingAction, Warning, TEXT("[Execute] It is necessary to set ActionData before execution."));
 		return;
 	}
 
@@ -46,8 +36,4 @@ void UConstructBuildingAction::Execute_Implementation()
 
 		PlayerPawn->AddPlayerResources(-ActionData.ActionWoodCost);
 	}
-}
-
-void UConstructBuildingAction::Cancel_Implementation()
-{
 }

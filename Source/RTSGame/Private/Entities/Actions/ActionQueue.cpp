@@ -3,8 +3,6 @@
 #include "Entities/Actions/ActionQueue.h"
 #include "Entities/Actions/BaseAction.h"
 
-DEFINE_LOG_CATEGORY_STATIC(LogRGActionQueue, All, All);
-
 void UActionQueue::Initialize(ARGUnitBase* InUnit)
 {
 	ControlledUnit = InUnit;
@@ -14,7 +12,9 @@ void UActionQueue::EnqueueAction(UBaseAction* NewAction)
 {
 	ActionQueue.Add(NewAction);
 	if (ActionQueue.Num() == 1)
+	{
 		ExecuteNextAction();
+	}
 }
 
 void UActionQueue::ExecuteNextAction()
@@ -23,7 +23,7 @@ void UActionQueue::ExecuteNextAction()
 	{
 		UBaseAction* CurrentAction = ActionQueue[0];
 		CurrentAction->OnActionCompletedDelegate().AddUObject(this, &UActionQueue::OnActionCompleted);
-		CurrentAction->Execute_Implementation();
+		CurrentAction->Execute();
 	}
 }
 
@@ -31,7 +31,7 @@ void UActionQueue::OnActionCompleted()
 {
 	if (ActionQueue.Num() > 0)
 	{
-		ActionQueue[0]->Cancel_Implementation();
+		ActionQueue[0]->Cancel();
 		ActionQueue.RemoveAt(0);
 	}
 	
@@ -43,7 +43,9 @@ void UActionQueue::ClearQueue()
 	if(ActionQueue.Num() > 0)
 	{
 		if(ActionQueue[0])
-			ActionQueue[0]->Cancel_Implementation();
+		{
+			ActionQueue[0]->Cancel();
+		}
 		
 		ActionQueue.Empty();
 	}

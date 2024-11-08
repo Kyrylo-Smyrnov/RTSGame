@@ -212,12 +212,19 @@ void UEntityHandlerComponent::SetAwaitingAction(UBaseAction* Action)
 
 void UEntityHandlerComponent::ExecuteAction(UBaseAction* Action)
 {
-	for (const ARGUnitBase* Unit : SelectedUnits)
+	if(ARGBuildingBase* Building = Cast<ARGBuildingBase>(MostImportantEntity))
 	{
-		if (Unit->CanPerformAction(Action))
+		Action->Execute();
+	}
+	else
+	{
+		for (const ARGUnitBase* Unit : SelectedUnits)
 		{
-			Unit->ClearActionQueue();
-			Unit->AddActionToQueue(Action);
+			if (Unit->CanPerformAction(Action))
+			{
+				Unit->ClearActionQueue();
+				Unit->AddActionToQueue(Action);
+			}
 		}
 	}
 }
@@ -253,6 +260,7 @@ void UEntityHandlerComponent::HandleLeftMouseButtonInputPressed()
 		}
 	}
 }
+
 void UEntityHandlerComponent::ExecuteActionWithTarget(TVariant<FVector, AActor*> TargetVariant, bool bMustBeEnqueued)
 {
 	TArray<ARGUnitBase*> MustBePerformedBy;

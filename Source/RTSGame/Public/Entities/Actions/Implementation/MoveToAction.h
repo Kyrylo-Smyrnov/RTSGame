@@ -19,11 +19,10 @@ class RTSGAME_API UMoveToAction : public UBaseAction, public IUnitAction, public
 	GENERATED_BODY()
 
   public:
-	UMoveToAction();
+	virtual void Execute() override;
+	
 	virtual void InitializeAction(ARGUnitBase* Unit) override;
 	virtual void SetDestination(FVector InDestination) override;
-	virtual void Execute_Implementation() override;
-	virtual void Cancel_Implementation() override;
 
   private:
 	void OnMoveCompleted(FAIRequestID RequestID, const FPathFollowingResult& Result);
