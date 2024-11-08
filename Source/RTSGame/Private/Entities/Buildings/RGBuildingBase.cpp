@@ -13,7 +13,7 @@
 #include "Player/UI/RGActionGridWidget.h"
 #include "Player/UI/RGPlayerHUD.h"
 
-ARGBuildingBase::ARGBuildingBase() : RemainingSpawnTime(0.0f), bIsSpawning(false), bIsSelected(false), bIsPlacing(false), bIsConstructing(false), TimeToConstruct(0.0f)
+ARGBuildingBase::ARGBuildingBase() : RemainingSpawnTime(0.0f), TimeToConstruct(0.0f), bIsSpawning(false), bIsSelected(false), bIsPlacing(false), bIsConstructing(false)
 {
 	PrimaryActorTick.bCanEverTick = true;
 
