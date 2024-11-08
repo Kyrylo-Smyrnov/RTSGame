@@ -276,7 +276,7 @@ void ARGBuildingBase::SpawnNextUnit()
 
 	bIsSpawning = true;
 	RemainingSpawnTime = CurrentEntry.SpawnTime;
-
+	
 	GetWorld()->GetTimerManager().SetTimer(SpawnTimerHandle, [this, CurrentEntry]() {
 		if (SpawnQueue.Num() > 0)
 		{
@@ -293,7 +293,7 @@ void ARGBuildingBase::SpawnNextUnit()
 				UMoveToAction* MoveToAction = NewObject<UMoveToAction>(this);
 				MoveToAction->InitializeAction(SpawnedUnit);
 				MoveToAction->SetDestination(LastBannerLocation);
-				MoveToAction->Execute_Implementation();
+				MoveToAction->Execute();
 
 				SpawnQueue.RemoveAt(0);
 				OnSpawnQueueChanged.Broadcast(SpawnQueue);

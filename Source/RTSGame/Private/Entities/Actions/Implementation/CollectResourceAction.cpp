@@ -4,8 +4,6 @@
 #include "Entities/Actions/Implementation/AttackAction.h"
 #include "Entities/Actions/Implementation/MoveToAction.h"
 
-DEFINE_LOG_CATEGORY_STATIC(LogRGCollectResourceAction, All, All);
-
 void UCollectResourceAction::InitializeAction(ARGUnitBase* Unit)
 {
 	Super::InitializeAction(Unit);
@@ -26,18 +24,12 @@ void UCollectResourceAction::SetTarget(AActor* InTarget)
 	AddSubAction(AttackAction);
 }
 
-void UCollectResourceAction::Execute_Implementation()
+void UCollectResourceAction::Execute()
 {
 	if (!ControlledUnit)
 	{
-		UE_LOG(LogRGCollectResourceAction, Warning, TEXT("[Execute] It is necessary to initialize the action before execution."));
 		return;
 	}
 
-	Super::Execute_Implementation();
-}
-
-void UCollectResourceAction::Cancel_Implementation()
-{
-	Super::Cancel_Implementation();
+	Super::Execute();
 }

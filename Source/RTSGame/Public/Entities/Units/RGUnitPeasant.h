@@ -6,6 +6,7 @@
 #include "Entities/Units/RGUnitBase.h"
 #include "RGUnitPeasant.generated.h"
 
+class ARGPlayerPawn;
 class ARGBuildingTownHall;
 
 UCLASS()
@@ -18,8 +19,6 @@ class RTSGAME_API ARGUnitPeasant : public ARGUnitBase
 
 	UFUNCTION(BlueprintCallable, Category = "Resources")
 	void AddCarryingWood(int32 Amount);
-	UFUNCTION(BlueprintCallable, Category = "Resources")
-	void PutCarryingResources();
 
 	bool GetIsCarryingResources() const;
 
@@ -29,6 +28,8 @@ class RTSGAME_API ARGUnitPeasant : public ARGUnitBase
 	virtual void InitializeActions() override;
 
   private:
+	UPROPERTY()
+	ARGPlayerPawn* PlayerPawn;
 	UPROPERTY(EditDefaultsOnly, Category = "Objects")
 	TSubclassOf<ARGBuildingTownHall> BuildingTownHallBlueprintClass;
 

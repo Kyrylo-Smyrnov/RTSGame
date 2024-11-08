@@ -1,14 +1,12 @@
 // https://github.com/Kyrylo-Smyrnov/RTSGame
 
 #include "Entities/Buildings/RGBuildingTownHall.h"
-
 #include "Entities/Actions/ActionsList.h"
 #include "Entities/Units/RGUnitPeasant.h"
-
-DEFINE_LOG_CATEGORY_STATIC(LogBuildingTownHall, All, All);
+#include "Player/RGPlayerController.h"
+#include "Player/RGPlayerPawn.h"
 
 ARGBuildingTownHall::ARGBuildingTownHall()
-	: ARGBuildingBase()
 {
 	this->BuildingImportance = EFEntitiesImportance::TownHall;
 }
@@ -31,6 +29,12 @@ void ARGBuildingTownHall::HandleOnClicked(AActor* TouchedActor, FKey ButtonPress
 void ARGBuildingTownHall::InitializeActions()
 {
 	Super::InitializeActions();
+
+	ARGPlayerPawn* PlayerPawn = Cast<ARGPlayerPawn>(PlayerController->GetPawn());
+	if(!PlayerPawn)
+	{
+		return;
+	}
 	
 	USpawnUnitAction* SpawnPeasantAction = NewObject<USpawnUnitAction>();
 	SpawnPeasantAction->InitializeAction(UnitPeasantBlueprintClass, this, PlayerPawn);

@@ -60,6 +60,8 @@ class RTSGAME_API ARGBuildingBase : public APawn
 	virtual void HandleOnClicked(AActor* TouchedActor, FKey ButtonPressed);
 
 	UPROPERTY()
+	ARGPlayerController* PlayerController;
+	UPROPERTY()
 	UEntityHandlerComponent* EntityHandler;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Components")
@@ -95,9 +97,6 @@ class RTSGAME_API ARGBuildingBase : public APawn
 	void HandleBuildingPlacing();
 	void HandleBuildingConstructing();
 	void HandleRightMouseButtonInputPressed();
-
-	UPROPERTY()
-	ARGPlayerController* PlayerController;
 
 	UPROPERTY()
 	AActor* ActorToAttackForSpawnedUnits;

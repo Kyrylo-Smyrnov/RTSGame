@@ -17,9 +17,10 @@ class RTSGAME_API UAttackAction : public UBaseAction, public IUnitAction, public
 	GENERATED_BODY()
 
   public:
+	virtual void Execute() override;
+	virtual void Cancel() override;
+	
 	virtual void InitializeAction(ARGUnitBase* Unit) override;
-	virtual void Execute_Implementation() override;
-	virtual void Cancel_Implementation() override;
 	virtual void SetTarget(AActor* InTarget) override;
 
   private:

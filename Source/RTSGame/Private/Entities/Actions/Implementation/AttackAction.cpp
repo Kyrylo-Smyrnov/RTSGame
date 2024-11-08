@@ -1,11 +1,9 @@
 // https://github.com/Kyrylo-Smyrnov/RTSGame
 
 #include "Entities/Actions/Implementation/AttackAction.h"
-#include "Entities/RGAttackable.h"
+#include "Entities/AttackableBase.h"
 #include "Entities/Units/Animation/RGUnitAnimInstance.h"
 #include "Entities/Units/RGUnitBase.h"
-
-DEFINE_LOG_CATEGORY_STATIC(LogAttackAction, All, All)
 
 void UAttackAction::InitializeAction(ARGUnitBase* Unit)
 {
@@ -19,17 +17,10 @@ void UAttackAction::SetTarget(AActor* InTarget)
 	Target->OnDestroyed.AddDynamic(this, &UAttackAction::StopAttack);
 }
 
-void UAttackAction::Execute_Implementation()
+void UAttackAction::Execute()
 {
-	if (!ControlledUnit)
+	if (!ControlledUnit || !Target)
 	{
-		UE_LOG(LogAttackAction, Warning, TEXT("[Execute] It is necessary to initialize the action before execution."));
-		return;
-	}
-
-	if (!Target)
-	{
-		UE_LOG(LogAttackAction, Warning, TEXT("[Execute] It is necessary to set up the target before execution."));
 		return;
 	}
 
@@ -38,12 +29,14 @@ void UAttackAction::Execute_Implementation()
 	ControlledUnit->SetActorRotation(RotationToTarget);
 
 	if (UnitAnimInstance)
+	{
 		UnitAnimInstance->SetIsAttacking(true);
+	}
 	
 	ControlledUnit->GetWorld()->GetTimerManager().SetTimer(AttackTimerHandle, this, &UAttackAction::ExecuteAttack, AttackSpeed, true);
 }
 
-void UAttackAction::Cancel_Implementation()
+void UAttackAction::Cancel()
 {
 	StopAttack(nullptr);
 }
@@ -63,23 +56,28 @@ void UAttackAction::ExecuteAttack()
 		return;
 	}
 
-	if (Target->GetClass()->ImplementsInterface(URGAttackable::StaticClass()))
+	if(AAttackableBase* Attackable = Cast<AAttackableBase>(Target))
 	{
-		IRGAttackable* AttackableActor = Cast<IRGAttackable>(Target);
-		AttackableActor->ReceiveDamage(DamageAmount, ControlledUnit);
+		Attackable->ReceiveDamage(DamageAmount, ControlledUnit);
 	}
 }
 
 void UAttackAction::StopAttack(AActor* DestroyedActor)
 {
 	if (AttackTimerHandle.IsValid() && GetWorld())
-			GetWorld()->GetTimerManager().ClearTimer(AttackTimerHandle);
+	{
+		GetWorld()->GetTimerManager().ClearTimer(AttackTimerHandle);
+	}
 	
 	if (Target)
+	{
 		Target->OnDestroyed.RemoveDynamic(this, &UAttackAction::StopAttack);
+	}
 
 	if (UnitAnimInstance)
+	{
 		UnitAnimInstance->SetIsAttacking(false);
+	}
 
 	OnActionCompletedDelegate().Broadcast();
 }
